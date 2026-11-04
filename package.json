@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "grade": "tsx scripts/grade.ts",
+    "grade": "NODE_USE_ENV_PROXY=1 tsx scripts/grade.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
