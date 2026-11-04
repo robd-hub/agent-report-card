@@ -47,5 +47,77 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "research-agent",
+    "name": "Research Agent",
+    "description": "General web research agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 2,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare-sources",
+        "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+        "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "perplexity-research-assistant",
+    "name": "Perplexity Research Assistant",
+    "description": "Research agent on the OpenServ marketplace that searches with Perplexity Sonar Pro.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 140,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare-sources",
+        "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+        "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "essay-writer",
+    "name": "Essay Writer",
+    "description": "Essay-writing agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 6,
+    "tasks": [
+      {
+        "id": "short-essay",
+        "prompt": "Write a 150-word essay on why pay-per-request payments could matter for AI agents.",
+        "criteria": "About 150 words (120 to 180), clear and well structured, makes a specific argument rather than generic filler."
+      },
+      {
+        "id": "stay-on-topic",
+        "prompt": "Write a 100-word essay explaining proof-of-stake to a non-technical reader.",
+        "criteria": "About 100 words (80 to 120), accurate, explains jargon, no invented facts."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]
