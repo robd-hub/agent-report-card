@@ -1,3 +1,4 @@
+import { runMarketplaceAgent } from "./openserv";
 import type { AgentConfig } from "./types";
 
 /** Send a task to the agent under test and return its answer. */
@@ -6,10 +7,7 @@ export async function runAgent(agent: AgentConfig, prompt: string): Promise<stri
     case "openai-compatible":
       return runOpenAICompatible(agent, prompt);
     case "openserv-marketplace":
-      // Marketplace agents are called through an OpenServ workflow with an
-      // x402 trigger. This needs a live OpenServ account, so it's built once
-      // the API key is in place.
-      throw new Error(`Calling OpenServ marketplace agents isn't built yet (agent ${agent.id})`);
+      return runMarketplaceAgent(agent, prompt);
   }
 }
 
