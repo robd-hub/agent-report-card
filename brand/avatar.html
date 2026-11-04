@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css">
+<style>
+.stage{width:1000px;height:1000px;--g:62.5px;--gw:900px 700px}
+.grid{mask-image:radial-gradient(circle at 50% 50%,rgba(0,0,0,.25) 0,#000 70%)}
+svg{position:absolute;inset:0}
+.letter{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:400px;letter-spacing:-.04em;line-height:1;
+ background:linear-gradient(135deg,#7ff6c8 0%,var(--a) 45%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 40px rgba(46,242,164,.55));padding-bottom:20px}
+</style></head><body><div class="stage">
+<div class="glow"></div><div class="grid"></div>
+<svg viewBox="0 0 1000 1000" width="1000" height="1000">
+ <defs>
+  <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fe3ff"/><stop offset=".5" stop-color="#2ef2a4"/><stop offset="1" stop-color="#9b7bff"/></linearGradient>
+  <filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ </defs>
+ <circle cx="500" cy="500" r="330" fill="rgba(17,21,31,.75)" stroke="rgba(140,160,210,.18)" stroke-width="2"/>
+ <g id="ticks"></g>
+ <circle cx="500" cy="500" r="300" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="34"/>
+ <circle cx="500" cy="500" r="300" fill="none" stroke="url(#rg)" stroke-width="34" stroke-linecap="round"
+   stroke-dasharray="1696 1885" transform="rotate(-90 500 500)" filter="url(#gl)"/>
+</svg>
+<div class="letter">A</div>
+</div>
+<script>
+const g=document.getElementById('ticks');let s='';
+for(let i=0;i<60;i++){const a=i*6*Math.PI/180,r1=352,r2=i%5?362:376;
+ s+=`<line x1="${500+r1*Math.sin(a)}" y1="${500-r1*Math.cos(a)}" x2="${500+r2*Math.sin(a)}" y2="${500-r2*Math.cos(a)}" stroke="rgba(140,160,210,${i%5?.25:.5})" stroke-width="3" stroke-linecap="round"/>`}
+g.innerHTML=s;
+</script></body></html>
