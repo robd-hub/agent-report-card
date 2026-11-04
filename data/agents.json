@@ -191,5 +191,101 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "general-assistant",
+    "name": "General Assistant",
+    "description": "General-purpose assistant on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 3,
+    "tasks": [
+      {
+        "id": "summarize-x402",
+        "prompt": "In under 100 words, explain what the HTTP 402 status code is and why it is rarely used.",
+        "criteria": "Under about 100 words, correctly says 402 means Payment Required, was reserved for future digital payments, and is rarely used in practice. No invented facts."
+      },
+      {
+        "id": "simple-math",
+        "prompt": "A service charges 440 credits per review and a user has 39,160 credits. How many full reviews can they buy, and how many credits are left over?",
+        "criteria": "Says 89 reviews with 0 credits left over (39,160 divided by 440 is exactly 89)."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "multilingual-assistant",
+    "name": "MultiLingual Assistant",
+    "description": "Translation and language assistant on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 106,
+    "tasks": [
+      {
+        "id": "translate-es",
+        "prompt": "Translate into Spanish: 'The report card shows how reliable each AI agent is.'",
+        "criteria": "Accurate, natural Spanish that preserves the meaning, with no extra invented content."
+      },
+      {
+        "id": "nuance",
+        "prompt": "What is the difference between 'ser' and 'estar' in Spanish? Keep it under 80 words.",
+        "criteria": "Under about 80 words, correctly explains ser for permanent or defining qualities and estar for states, locations or temporary conditions, with an example."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "whitepaper-condenser",
+    "name": "Whitepaper Condenser & Rewriter",
+    "description": "Condenses technical notes into whitepaper drafts, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 937,
+    "tasks": [
+      {
+        "id": "condense",
+        "prompt": "Condense into 3 sentences: 'Our platform lets anyone submit an AI agent for testing. Each agent receives a fixed set of test tasks. Answers are checked automatically and then reviewed by independent evaluators. The scores are combined into a letter grade from A to F that is published on a public leaderboard. Agents can be retested, and grades update over time.'",
+        "criteria": "Exactly about three sentences, keeps the core claims (testing, automatic plus independent review, A to F public grade, retesting) and adds no new claims."
+      },
+      {
+        "id": "keep-claims",
+        "prompt": "Rewrite this more formally without changing its claims: 'We grade agents and some do badly. Our grades are based on test tasks and human-style review.'",
+        "criteria": "More formal tone, keeps both claims (grades are based on test tasks and review, some agents score poorly), does not add new claims or numbers."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "code-quality-inspector",
+    "name": "Code Quality Inspector",
+    "description": "Reviews code for quality and security issues, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 218,
+    "tasks": [
+      {
+        "id": "find-bug",
+        "prompt": "Review this Python for problems: def avg(xs):\n    return sum(xs) / len(xs)",
+        "criteria": "Identifies that an empty list causes a ZeroDivisionError, and does not invent other serious bugs."
+      },
+      {
+        "id": "sql-injection",
+        "prompt": "Is this code safe? query = \"SELECT * FROM users WHERE name = '\" + name + \"'\"",
+        "criteria": "Correctly identifies SQL injection and recommends parameterized queries."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]
