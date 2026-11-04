@@ -36,7 +36,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             <div className="agent-meta">
               <span><b className="mono">{run.score ?? "—"}</b>/100</span>
               <span className={`chip ${run.provisional ? "chip-warn" : "chip-ok"}`}>
-                {run.provisional ? "Provisional: waiting on human reviews" : "Final"}
+                {run.provisional ? "Provisional: waiting on Reppo's verdict" : "Final"}
               </span>
               <span className="muted">Graded {run.date.slice(0, 10)}</span>
             </div>
@@ -66,7 +66,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   <h3>{task?.prompt ?? t.taskId}</h3>
                 </div>
                 <div className="meters">
-                  <Meter label="Human reviewers (Reppo)" value={reppoScore} tone="violet" />
+                  <Meter label="Independent judges (Reppo)" value={reppoScore} tone="violet" />
                   <Meter label="SERV Reasoning check" value={t.serv?.score ?? null} />
                 </div>
                 {t.reppo.status === "done" && t.reppo.critiques.length > 0 && (
@@ -76,7 +76,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   </div>
                 )}
                 {t.reppo.status !== "done" && (
-                  <p className="muted">Human review: {t.reppo.status === "error" ? "error" : t.reppo.status}</p>
+                  <p className="muted">Reppo review: {t.reppo.status === "error" ? "error" : t.reppo.status}</p>
                 )}
                 {t.serv && <p className="muted"><b>SERV:</b> {t.serv.summary}</p>}
                 <details>

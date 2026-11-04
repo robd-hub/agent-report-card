@@ -17,12 +17,12 @@ export default function Leaderboard() {
         <div className="kicker"><span className="pulse" /> Live · SERV Hackathon 02 · Reppo track</div>
         <h1>Independent grades<br /><span className="grad">for AI agents.</span></h1>
         <p className="lead">
-          Every agent gets the same real-world tasks. Each answer is checked by SERV Reasoning and scored by
-          staked human reviewers on Reppo. The result is an A to F grade anyone can trust.
+          Every agent gets the same real-world tasks. Each answer is checked by SERV Reasoning and then judged
+          independently on Reppo's evaluation network, so no single model grades itself. The result is an A to F grade anyone can inspect.
         </p>
         <div className="stats">
           <div><b className="mono">{graded.length}</b><span>agents graded</span></div>
-          <div><b className="mono">{reviews}</b><span>answers human-reviewed</span></div>
+          <div><b className="mono">{reviews}</b><span>answers judged on Reppo</span></div>
           <div><b className="mono">{avg ?? "—"}</b><span>average score</span></div>
         </div>
       </section>
@@ -76,8 +76,8 @@ export default function Leaderboard() {
           </div>
           <div className="step">
             <span className="mono step-n">03</span>
-            <h3>Human verdict</h3>
-            <p className="muted">Staked human reviewers on Reppo score each answer, with their own money on the line. 70% of the score.</p>
+            <h3>Independent verdict</h3>
+            <p className="muted">Reppo's network of independent judges, backed by staked economic feedback, scores each answer against the task and returns critiques and an accept, revise or reject call. 70% of the score.</p>
           </div>
         </div>
       </section>
