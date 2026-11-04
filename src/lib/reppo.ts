@@ -60,9 +60,7 @@ export async function submitEvaluation(input: { prompt: string; criteria: string
 }
 
 interface ReppoVerdict {
-  score: number;
-  decision?: string;
-  confidence?: string;
+  verdict?: { scale?: string; score?: number; decision?: string; confidence?: string };
   verdicts?: { criterion: string; score: number; critique: string }[];
   reason?: string;
 }
@@ -76,12 +74,16 @@ export async function fetchEvaluation(evalId: string): Promise<ReppoResult> {
     if (body.status === "PENDING" || !body.result) return { status: "pending", evalId };
     if (body.status === "FAILED") return { status: "error", message: `Reppo evaluation failed: ${body.result.reason ?? "no reason given"}` };
     const r = body.result;
+    const score = r.verdict?.score;
+    if (typeof score !== "number" || !Number.isFinite(score)) {
+      return { status: "error", message: "Reppo settled but gave no overall score" };
+    }
     return {
       status: "done",
       evalId,
-      score: Math.max(0, Math.min(100, Math.round(r.score))),
-      decision: r.decision,
-      confidence: r.confidence,
+      score: Math.max(0, Math.min(100, Math.round(score))),
+      decision: r.verdict?.decision,
+      confidence: r.verdict?.confidence,
       critiques: (r.verdicts ?? []).map((v) => `${v.criterion}: ${v.critique}`),
     };
   } catch (e) {

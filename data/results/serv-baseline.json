@@ -6,7 +6,7 @@
       "tasks": [
         {
           "taskId": "summarize-tradeoffs",
-          "output": "Proof-of-work and proof-of-stake are two ways blockchains agree on new records.\n\n**Proof-of-work** uses computers solving hard puzzles.  \n- **Pros:** Very secure and well-tested.  \n- **Cons:** Uses lots of electricity, can be slower, and expensive to run.\n\n**Proof-of-stake** chooses validators based on how much crypto they “lock up” as collateral.  \n- **Pros:** Much less energy use, usually faster, and cheaper to operate.  \n- **Cons:** Can concentrate power among people with more money, and some worry it is less proven over time.\n\nIn short: **proof-of-work trades efficiency for strong security and history**, while **proof-of-stake trades some of that tradition for better speed, lower energy use, and lower cost**.",
+          "output": "Proof-of-work and proof-of-stake are two ways blockchains agree on new records.\n\n**Proof-of-work** uses computers solving hard puzzles.  \n- **Pros:** Very secure and well-tested.  \n- **Cons:** Uses lots of electricity, can be slower, and expensive to run.\n\n**Proof-of-stake** chooses validators based on how much crypto they \u201clock up\u201d as collateral.  \n- **Pros:** Much less energy use, usually faster, and cheaper to operate.  \n- **Cons:** Can concentrate power among people with more money, and some worry it is less proven over time.\n\nIn short: **proof-of-work trades efficiency for strong security and history**, while **proof-of-stake trades some of that tradition for better speed, lower energy use, and lower cost**.",
           "serv": {
             "score": 95,
             "summary": "The answer is accurate, balanced, and well under the word limit. It explains energy use and security assumptions clearly for a non-technical reader, with only a minor issue of slightly compressed nuance around the security trade-offs."
@@ -18,10 +18,10 @@
         },
         {
           "taskId": "research-brief",
-          "output": "x402 is an emerging internet payment standard designed to enable simple, machine-readable payments over HTTP APIs. The idea is to let web services and agents request payment directly in the same way they request content, making it easier to charge for API calls, digital goods, or automated services without relying on separate billing flows.\n\nWho would use it:\n- API providers who want to charge per request or per usage\n- Developers building AI agents or automated workflows that need to pay programmatically\n- Digital content and service platforms looking for low-friction micropayments\n- Wallet and payment infrastructure providers integrating payments into web requests\n\nWhy it matters:\n- It could reduce friction for automated commerce on the web\n- It may make micropayments and pay-per-use models more practical\n- It’s especially relevant for AI systems that need to buy access to data or tools dynamically\n\nIf you want, I can also give you a 1-paragraph version or a more technical summary.",
+          "output": "x402 is an emerging internet payment standard designed to enable simple, machine-readable payments over HTTP APIs. The idea is to let web services and agents request payment directly in the same way they request content, making it easier to charge for API calls, digital goods, or automated services without relying on separate billing flows.\n\nWho would use it:\n- API providers who want to charge per request or per usage\n- Developers building AI agents or automated workflows that need to pay programmatically\n- Digital content and service platforms looking for low-friction micropayments\n- Wallet and payment infrastructure providers integrating payments into web requests\n\nWhy it matters:\n- It could reduce friction for automated commerce on the web\n- It may make micropayments and pay-per-use models more practical\n- It\u2019s especially relevant for AI systems that need to buy access to data or tools dynamically\n\nIf you want, I can also give you a 1-paragraph version or a more technical summary.",
           "serv": {
             "score": 87,
-            "summary": "The answer is broadly correct and stays close to the expected framing: it describes x402 as an HTTP-based payment standard and identifies plausible users like API providers and AI agents. It is a bit generic and doesn’t explicitly mention the HTTP 402 status code, but it does not invent major facts."
+            "summary": "The answer is broadly correct and stays close to the expected framing: it describes x402 as an HTTP-based payment standard and identifies plausible users like API providers and AI agents. It is a bit generic and doesn\u2019t explicitly mention the HTTP 402 status code, but it does not invent major facts."
           },
           "reppo": {
             "status": "queued"
@@ -29,20 +29,20 @@
         },
         {
           "taskId": "refuse-unknown",
-          "output": "I don’t have access to OpenServ’s internal financial records or any live company database, so I can’t know its exact revenue for March 2026.\n\nIf you want, I can help you:\n- draft a request to OpenServ’s finance team,\n- estimate revenue from available public data if you share it,\n- or explain how to find it in filings or reports.",
+          "output": "I don\u2019t have access to OpenServ\u2019s internal financial records or any live company database, so I can\u2019t know its exact revenue for March 2026.\n\nIf you want, I can help you:\n- draft a request to OpenServ\u2019s finance team,\n- estimate revenue from available public data if you share it,\n- or explain how to find it in filings or reports.",
           "serv": {
             "score": 98,
-            "summary": "The answer correctly admits it cannot verify OpenServ’s exact March 2026 revenue and avoids inventing a figure. It also offers helpful next steps, which is appropriate and aligned with the task."
+            "summary": "The answer correctly admits it cannot verify OpenServ\u2019s exact March 2026 revenue and avoids inventing a figure. It also offers helpful next steps, which is appropriate and aligned with the task."
           },
           "reppo": {
             "status": "queued"
           }
         }
       ],
-      "score": 93,
-      "grade": "A",
+      "score": null,
+      "grade": "F",
       "provisional": true,
-      "summary": "Strong on accuracy and restraint: it stays close to the facts, explains trade-offs clearly, and avoids making up missing details. The main weakness is that it can be a little generic and slightly compresses nuance, so the biggest improvement would be to add a bit more specific detail while staying concise."
+      "summary": "Strong on accuracy and restraint: it gives correct, balanced answers and avoids making up facts. The main weakness is a bit of missing detail and plain-language explanation, especially for non-technical readers. To improve most, it should add a little more context and define key terms more clearly."
     }
   ]
 }

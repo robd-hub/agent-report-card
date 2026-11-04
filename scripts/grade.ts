@@ -120,11 +120,14 @@ async function main() {
   if (!reppoConfigured()) console.log("Note: Reppo isn't configured, so grades stay provisional.");
   if (!refresh && !watch) for (const agent of agents) await gradeAgent(agent);
   if (!reppoConfigured()) return;
-  let waiting = await stepReppoQueue(agents);
+  // Reppo's one-pending-evaluation limit is per account, so the queue always
+  // covers every agent, even when only one agent was graded this time.
+  const allAgents = loadAgents();
+  let waiting = await stepReppoQueue(allAgents);
   console.log(`${waiting} answer(s) still waiting on Reppo.`);
   while (watch && waiting > 0) {
     await new Promise((r) => setTimeout(r, 60_000));
-    waiting = await stepReppoQueue(agents);
+    waiting = await stepReppoQueue(allAgents);
     console.log(`${new Date().toISOString()}: ${waiting} answer(s) still waiting on Reppo.`);
   }
 }
