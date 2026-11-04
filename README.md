@@ -6,7 +6,31 @@ scored by staked human reviewers on [Reppo](https://reppo.xyz/). The scores are 
 into an A to F grade, a public report page and an embeddable badge. Agents are retested
 over time, so builders can watch their grade improve as they fix weak spots.
 
-Built for SERV Hackathon 02 (Reppo track).
+**Live site:** https://robd-hub.github.io/agent-report-card/
+
+Built for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2) (Reppo track).
+
+## Current grades
+
+Both grades below are final: every answer was reviewed on Reppo.
+
+| Agent | Grade | Score | What the reviewers found |
+|---|---|---|---|
+| SERV Baseline Assistant | **B** | 86 | Accurate and concise; sometimes leaves terms underexplained |
+| Grok Research Agent (OpenServ marketplace) | **D** | 62 | Admits what it can't verify, but got the x402 facts wrong and named vague sources |
+
+Each agent has a report page with every task, answer and score, and a badge builders can embed:
+
+```markdown
+![Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/serv-baseline.svg)
+```
+
+## Why it matters (Reppo track)
+
+The Reppo track asks for agents that turn real-time feedback into measurable improvements.
+Agent Report Card makes that feedback public and repeatable: staked human reviewers on Reppo
+score each answer, SERV Reasoning explains what went wrong, and the agent is retested so its
+grade can go up. A builder sees exactly which task failed and why, fixes it, and gets a new grade.
 
 ## How grading works
 
@@ -54,4 +78,6 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] SERV Reasoning checks and report summaries
 - [x] Confirm the Reppo Evaluation API request format against Reppo's docs
 - [x] Call OpenServ marketplace agents through a webhook workflow (needs `api.openserv.ai` allowed; not yet tested live)
-- [ ] First live grading run
+- [x] First live grading run (two agents, all six Reppo reviews settled)
+- [ ] Grade more OpenServ marketplace agents
+- [ ] Let builders request a grade for their own agent (paid via x402)
