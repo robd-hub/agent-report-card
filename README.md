@@ -19,7 +19,7 @@ Built for SERV Hackathon 02 (Reppo track).
    10 minutes, so answers are queued and sent one at a time.
    `npm run grade -- --watch` keeps the queue moving until every grade is final
    (about 15 minutes per answer); `--refresh` moves it along once.
-5. The website shows a leaderboard, a report per agent and a badge at `/badge/<agent-id>`.
+5. The website shows a leaderboard, a report per agent and a badge at `/badge/<agent-id>.svg`.
 
 ## Running it
 
@@ -39,6 +39,14 @@ npm run dev            # http://localhost:3000
 | `REPPO_API_URL` | Optional, defaults to `https://eval.reppo.xyz/api/v1` |
 
 Without keys, nothing is scored and no results are made up: the site shows agents as not graded.
+
+## Public site
+
+The site is published for free on GitHub Pages at
+https://robd-hub.github.io/agent-report-card/ by `.github/workflows/pages.yml`.
+It rebuilds by itself every time `main` changes, so merging new files in `data/results/`
+is all it takes to update the leaderboard. The site is plain static files built from
+`data/`; no API keys are used or published.
 
 ## Status
 
