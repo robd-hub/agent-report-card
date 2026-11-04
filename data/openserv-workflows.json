@@ -14,5 +14,13 @@
   "essay-writer": {
     "workflowId": 14027,
     "createdAt": "2026-11-04T14:30:41.199Z"
+  },
+  "copywriter": {
+    "workflowId": 14028,
+    "createdAt": "2026-11-04T15:39:47.815Z"
+  },
+  "smart-contract-commentator": {
+    "workflowId": 14029,
+    "createdAt": "2026-11-04T15:42:00.103Z"
   }
 }
