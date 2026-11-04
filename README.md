@@ -15,7 +15,10 @@ Built for SERV Hackathon 02 (Reppo track).
    and submits it to Reppo's Evaluation API for human review.
 3. Each task's score is 70% the Reppo reviewers' score and 30% the SERV check.
    Until Reppo's reviews come back, a grade is marked **provisional**.
-4. `npm run grade -- --refresh` collects finished Reppo reviews and updates the grades.
+4. Reppo allows one pending evaluation per account, and each settles after at least
+   10 minutes, so answers are queued and sent one at a time.
+   `npm run grade -- --watch` keeps the queue moving until every grade is final
+   (about 15 minutes per answer); `--refresh` moves it along once.
 5. The website shows a leaderboard, a report per agent and a badge at `/badge/<agent-id>`.
 
 ## Running it
@@ -32,7 +35,7 @@ npm run dev            # http://localhost:3000
 | `SERV_API_KEY` | console.openserv.ai |
 | `SERV_MODEL` | Optional, defaults to `gpt-5.4-mini` |
 | `REPPO_API_KEY` | eval.reppo.xyz |
-| `REPPO_API_URL` | Reppo Evaluation API base URL |
+| `REPPO_API_URL` | Optional, defaults to `https://eval.reppo.xyz/api/v1` |
 
 Without keys, nothing is scored and no results are made up: the site shows agents as not graded.
 
@@ -40,6 +43,6 @@ Without keys, nothing is scored and no results are made up: the site shows agent
 
 - [x] Leaderboard, report pages and badge
 - [x] SERV Reasoning checks and report summaries
-- [ ] Confirm the Reppo Evaluation API request format against Reppo's docs
+- [x] Confirm the Reppo Evaluation API request format against Reppo's docs
 - [ ] Call OpenServ marketplace agents through an x402 workflow
 - [ ] First live grading run

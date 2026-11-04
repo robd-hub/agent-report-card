@@ -30,8 +30,10 @@ export interface ServCheck {
 /** Reppo's human evaluation of one answer. */
 export type ReppoResult =
   | { status: "unconfigured" }
+  /** Waiting its turn: Reppo allows one pending evaluation per account. */
+  | { status: "queued" }
   | { status: "pending"; evalId: string }
-  | { status: "done"; evalId: string; score: number; critiques: string[] }
+  | { status: "done"; evalId: string; score: number; critiques: string[]; decision?: string; confidence?: string }
   | { status: "error"; message: string };
 
 export interface TaskResult {

@@ -4,7 +4,11 @@
  *
  *   npm run grade                 # grade every agent
  *   npm run grade -- serv-baseline  # grade one agent
- *   npm run grade -- --refresh    # only re-check pending Reppo evaluations
+ *   npm run grade -- --refresh    # move the Reppo queue along once and stop
+ *   npm run grade -- --watch      # keep moving the Reppo queue until every grade is final
+ *
+ * Reppo allows one pending evaluation per account and each takes at least
+ * 10 minutes to settle, so answers are queued and sent to Reppo one at a time.
  */
 import { runAgent } from "../src/lib/adapters";
 import { isProvisional, letterGrade, runScore } from "../src/lib/grade";
@@ -25,7 +29,7 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
       return;
     }
     const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
-    const reppo = await submitEvaluation({ prompt: task.prompt, criteria: task.criteria, output });
+    const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
     console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
     tasks.push({ taskId: task.id, output, serv, reppo });
   }
@@ -34,16 +38,50 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
   saveReport(report);
 }
 
-async function refreshAgent(agent: AgentConfig): Promise<void> {
-  const report = loadReport(agent.id);
-  const run = report.runs.at(-1);
-  if (!run || !run.provisional) return;
-  for (const t of run.tasks) {
-    if (t.reppo.status === "pending") t.reppo = await fetchEvaluation(t.reppo.evalId);
+/**
+ * Moves the Reppo queue along: checks the one pending evaluation, and if
+ * none is pending, submits the next queued answer. Returns how many answers
+ * are still waiting on Reppo across all agents.
+ */
+async function stepReppoQueue(agents: AgentConfig[]): Promise<number> {
+  const reports = agents.map((a) => ({ agent: a, report: loadReport(a.id) }));
+  const open = reports.flatMap(({ agent, report }) => {
+    const run = report.runs.at(-1);
+    if (!run) return [];
+    return run.tasks.map((t) => ({ agent, report, run, t }));
+  });
+
+  let busy = false;
+  for (const item of open.filter((o) => o.t.reppo.status === "pending")) {
+    const before = item.t.reppo;
+    item.t.reppo = await fetchEvaluation((before as { evalId: string }).evalId);
+    if (item.t.reppo.status === "pending") busy = true;
+    else {
+      console.log(`  ${item.agent.name} / ${item.t.taskId}: Reppo ${item.t.reppo.status === "done" ? item.t.reppo.score + "/100" : item.t.reppo.status}`);
+      await finish(item);
+    }
   }
-  report.runs[report.runs.length - 1] = await buildRun(agent, run.tasks, run.date);
-  saveReport(report);
-  console.log(`${agent.name}: ${report.runs.at(-1)!.provisional ? "still waiting on Reppo" : "all evaluations in"}`);
+
+  if (!busy) {
+    const next = open.find((o) => o.t.reppo.status === "queued");
+    if (next) {
+      const task = next.agent.tasks.find((x) => x.id === next.t.taskId)!;
+      const outcome = await submitEvaluation({ prompt: task.prompt, criteria: task.criteria, output: next.t.output });
+      if (outcome.status === "busy") console.log("  Reppo says an evaluation is already pending on this account; will retry.");
+      else {
+        next.t.reppo = outcome;
+        console.log(`  Sent ${next.agent.name} / ${next.t.taskId} to Reppo: ${outcome.status}${outcome.status === "error" ? ` (${outcome.message})` : ""}`);
+        saveReport(next.report);
+      }
+    }
+  }
+  return open.filter((o) => o.t.reppo.status === "queued" || o.t.reppo.status === "pending").length;
+}
+
+async function finish(item: { agent: AgentConfig; report: ReturnType<typeof loadReport>; run: GradingRun }) {
+  const idx = item.report.runs.indexOf(item.run);
+  item.report.runs[idx] = await buildRun(item.agent, item.run.tasks, item.run.date);
+  saveReport(item.report);
 }
 
 async function buildRun(agent: AgentConfig, tasks: TaskResult[], date = new Date().toISOString()): Promise<GradingRun> {
@@ -75,11 +113,20 @@ async function writeSummary(agent: AgentConfig, tasks: TaskResult[]): Promise<st
 async function main() {
   const args = process.argv.slice(2);
   const refresh = args.includes("--refresh");
+  const watch = args.includes("--watch");
   const only = args.filter((a) => !a.startsWith("--"));
   const agents = loadAgents().filter((a) => only.length === 0 || only.includes(a.id));
   if (!servConfigured()) console.log("Note: SERV_API_KEY is not set, so agents on SERV can't run and SERV checks are skipped.");
   if (!reppoConfigured()) console.log("Note: Reppo isn't configured, so grades stay provisional.");
-  for (const agent of agents) await (refresh ? refreshAgent(agent) : gradeAgent(agent));
+  if (!refresh && !watch) for (const agent of agents) await gradeAgent(agent);
+  if (!reppoConfigured()) return;
+  let waiting = await stepReppoQueue(agents);
+  console.log(`${waiting} answer(s) still waiting on Reppo.`);
+  while (watch && waiting > 0) {
+    await new Promise((r) => setTimeout(r, 60_000));
+    waiting = await stepReppoQueue(agents);
+    console.log(`${new Date().toISOString()}: ${waiting} answer(s) still waiting on Reppo.`);
+  }
 }
 
 main().catch((e) => {
