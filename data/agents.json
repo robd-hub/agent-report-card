@@ -47,5 +47,149 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "research-agent",
+    "name": "Research Agent",
+    "description": "General web research agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 2,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare-sources",
+        "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+        "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "perplexity-research-assistant",
+    "name": "Perplexity Research Assistant",
+    "description": "Research agent on the OpenServ marketplace that searches with Perplexity Sonar Pro.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 140,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare-sources",
+        "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+        "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "essay-writer",
+    "name": "Essay Writer",
+    "description": "Essay-writing agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 6,
+    "tasks": [
+      {
+        "id": "short-essay",
+        "prompt": "Write a 150-word essay on why pay-per-request payments could matter for AI agents.",
+        "criteria": "About 150 words (120 to 180), clear and well structured, makes a specific argument rather than generic filler."
+      },
+      {
+        "id": "stay-on-topic",
+        "prompt": "Write a 100-word essay explaining proof-of-stake to a non-technical reader.",
+        "criteria": "About 100 words (80 to 120), accurate, explains jargon, no invented facts."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "copywriter",
+    "name": "Copywriter",
+    "description": "Marketing copywriting agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 41,
+    "tasks": [
+      {
+        "id": "product-blurb",
+        "prompt": "Write a 60-word product description for an app that grades AI agents with A to F report cards.",
+        "criteria": "About 60 words (50 to 70), clear, persuasive, specific to grading AI agents, no invented statistics."
+      },
+      {
+        "id": "tagline",
+        "prompt": "Give three short taglines (under 8 words each) for a service that publishes trust grades for AI agents.",
+        "criteria": "Exactly three taglines, each under 8 words, distinct from each other, relevant to trust and grading."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "tokenomics-architect",
+    "name": "Tokenomics Architect",
+    "description": "Token economics design agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 934,
+    "tasks": [
+      {
+        "id": "fee-burn",
+        "prompt": "A platform sends 25% of its revenue to buy back and burn its token. In under 120 words, explain in plain English what that does and one risk.",
+        "criteria": "Under about 120 words, accurately explains buyback-and-burn reducing supply, names a genuine risk, plain English, no invented numbers."
+      },
+      {
+        "id": "utility",
+        "prompt": "Suggest two realistic utilities for a token used by a marketplace of AI agents.",
+        "criteria": "Gives two concrete, realistic utilities tied to marketplace usage, not generic hype."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "smart-contract-commentator",
+    "name": "Smart-Contract Commentator",
+    "description": "Explains Solidity code for non-experts, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 936,
+    "tasks": [
+      {
+        "id": "explain-transfer",
+        "prompt": "Explain in plain English what this Solidity does: function transfer(address to, uint256 amount) public returns (bool) { require(balances[msg.sender] >= amount); balances[msg.sender] -= amount; balances[to] += amount; return true; }",
+        "criteria": "Correctly says it moves tokens from the caller to another address, fails if the balance is too low, and is understandable to a non-expert."
+      },
+      {
+        "id": "spot-risk",
+        "prompt": "Is there anything risky about the transfer function above? Be brief.",
+        "criteria": "Gives an accurate, brief answer, for example no event emitted, no zero-address check, or noting it looks fine for a simple token. Must not invent a vulnerability that isn't there."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]
