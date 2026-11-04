@@ -65,7 +65,10 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
 
       <div className="card">
         <strong>Show this grade on your site</strong>
-        <pre>{`<img src="/badge/${agent.id}" alt="Agent Report Card grade" />`}</pre>
+        <p>
+          <img src={`${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`} alt="Agent Report Card grade" />
+        </p>
+        <pre>{`<img src="${process.env.NEXT_PUBLIC_SITE_URL}/badge/${agent.id}.svg" alt="Agent Report Card grade" />`}</pre>
       </div>
     </main>
   );

@@ -4,11 +4,12 @@
   "private": true,
   "description": "Independent grades for AI agents, scored by SERV Reasoning and staked human reviewers on Reppo.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "tsx scripts/badges.ts && next dev",
     "build": "next build",
     "start": "next start",
     "grade": "NODE_USE_ENV_PROXY=1 tsx scripts/grade.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prebuild": "tsx scripts/badges.ts"
   },
   "dependencies": {
     "@openserv-labs/client": "^2.5.3",
