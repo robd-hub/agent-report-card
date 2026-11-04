@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@openserv-labs/client": "^2.5.3",
+    "https-proxy-agent": "^7.0.6",
     "next": "15.5.29",
     "react": "19.1.10",
     "react-dom": "19.1.10"

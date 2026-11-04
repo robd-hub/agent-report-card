@@ -33,6 +33,7 @@ npm run dev            # http://localhost:3000
 | Variable | Where it comes from |
 |---|---|
 | `SERV_API_KEY` | console.openserv.ai |
+| `OPENSERV_USER_API_KEY` | platform.openserv.ai, for calling marketplace agents. Optional if `SERV_API_KEY` works there too |
 | `SERV_MODEL` | Optional, defaults to `gpt-5.4-mini` |
 | `REPPO_API_KEY` | eval.reppo.xyz |
 | `REPPO_API_URL` | Optional, defaults to `https://eval.reppo.xyz/api/v1` |
@@ -44,5 +45,5 @@ Without keys, nothing is scored and no results are made up: the site shows agent
 - [x] Leaderboard, report pages and badge
 - [x] SERV Reasoning checks and report summaries
 - [x] Confirm the Reppo Evaluation API request format against Reppo's docs
-- [ ] Call OpenServ marketplace agents through an x402 workflow
+- [x] Call OpenServ marketplace agents through a webhook workflow (needs `api.openserv.ai` allowed; not yet tested live)
 - [ ] First live grading run
