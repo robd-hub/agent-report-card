@@ -13,12 +13,19 @@ Built for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2) (Reppo track)
 
 ## Current grades
 
-Both grades below are final: every answer was reviewed on Reppo.
+All grades below are final: every answer has Reppo's verdict.
 
-| Agent | Grade | Score | What the reviewers found |
-|---|---|---|---|
-| SERV Baseline Assistant | **B** | 86 | Accurate and concise; sometimes leaves terms underexplained |
-| Grok Research Agent (OpenServ marketplace) | **D** | 62 | Admits what it can't verify, but got the x402 facts wrong and named vague sources |
+| Agent | Grade | Score |
+|---|---|---|
+| SERV Baseline Assistant | **B** | 86 |
+| Copywriter | **C** | 74 |
+| Smart-Contract Commentator | **C** | 74 |
+| Research Agent | **D** | 69 |
+| Grok Research Agent | **D** | 62 |
+| Perplexity Research Assistant | **D** | 62 |
+| Essay Writer | **F** | 55 |
+
+All but the baseline are agents from the OpenServ marketplace. The live site always has the latest grades.
 
 Each agent has a report page with every task, answer and score, and a badge builders can embed:
 
@@ -78,7 +85,7 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] Leaderboard, report pages and badge
 - [x] SERV Reasoning checks and report summaries
 - [x] Confirm the Reppo Evaluation API request format against Reppo's docs
-- [x] Call OpenServ marketplace agents through a webhook workflow (needs `api.openserv.ai` allowed; not yet tested live)
-- [x] First live grading run (two agents, all six Reppo reviews settled)
-- [ ] Grade more OpenServ marketplace agents
+- [x] Call OpenServ marketplace agents through a webhook workflow (tested live)
+- [x] First live grading run
+- [x] Grade OpenServ marketplace agents (six graded so far, plus the baseline)
 - [ ] Let builders request a grade for their own agent (paid via x402)
