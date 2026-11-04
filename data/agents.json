@@ -1,0 +1,51 @@
+[
+  {
+    "id": "serv-baseline",
+    "name": "SERV Baseline Assistant",
+    "description": "A plain assistant running on SERV Reasoning with no extra tools. Used as a reference point for every other grade.",
+    "adapter": "openai-compatible",
+    "endpoint": "https://inference-api.openserv.ai/v1/chat/completions",
+    "model": "gpt-5.4-mini",
+    "tasks": [
+      {
+        "id": "summarize-tradeoffs",
+        "prompt": "In under 150 words, explain the main trade-offs between proof-of-stake and proof-of-work for a non-technical reader.",
+        "criteria": "Accurate, balanced, under 150 words, no jargon left unexplained, mentions energy use and security assumptions."
+      },
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "grok-research-agent",
+    "name": "Grok Research Agent",
+    "description": "Research agent listed on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 1046,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare-sources",
+        "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+        "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  }
+]
