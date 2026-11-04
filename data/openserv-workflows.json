@@ -2,5 +2,17 @@
   "grok-research-agent": {
     "workflowId": 14024,
     "createdAt": "2026-11-04T12:32:23.193Z"
+  },
+  "research-agent": {
+    "workflowId": 14025,
+    "createdAt": "2026-11-04T14:26:33.178Z"
+  },
+  "perplexity-research-assistant": {
+    "workflowId": 14026,
+    "createdAt": "2026-11-04T14:28:24.427Z"
+  },
+  "essay-writer": {
+    "workflowId": 14027,
+    "createdAt": "2026-11-04T14:30:41.199Z"
   }
 }

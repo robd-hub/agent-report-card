@@ -119,5 +119,77 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "copywriter",
+    "name": "Copywriter",
+    "description": "Marketing copywriting agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 41,
+    "tasks": [
+      {
+        "id": "product-blurb",
+        "prompt": "Write a 60-word product description for an app that grades AI agents with A to F report cards.",
+        "criteria": "About 60 words (50 to 70), clear, persuasive, specific to grading AI agents, no invented statistics."
+      },
+      {
+        "id": "tagline",
+        "prompt": "Give three short taglines (under 8 words each) for a service that publishes trust grades for AI agents.",
+        "criteria": "Exactly three taglines, each under 8 words, distinct from each other, relevant to trust and grading."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "tokenomics-architect",
+    "name": "Tokenomics Architect",
+    "description": "Token economics design agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 934,
+    "tasks": [
+      {
+        "id": "fee-burn",
+        "prompt": "A platform sends 25% of its revenue to buy back and burn its token. In under 120 words, explain in plain English what that does and one risk.",
+        "criteria": "Under about 120 words, accurately explains buyback-and-burn reducing supply, names a genuine risk, plain English, no invented numbers."
+      },
+      {
+        "id": "utility",
+        "prompt": "Suggest two realistic utilities for a token used by a marketplace of AI agents.",
+        "criteria": "Gives two concrete, realistic utilities tied to marketplace usage, not generic hype."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "smart-contract-commentator",
+    "name": "Smart-Contract Commentator",
+    "description": "Explains Solidity code for non-experts, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 936,
+    "tasks": [
+      {
+        "id": "explain-transfer",
+        "prompt": "Explain in plain English what this Solidity does: function transfer(address to, uint256 amount) public returns (bool) { require(balances[msg.sender] >= amount); balances[msg.sender] -= amount; balances[to] += amount; return true; }",
+        "criteria": "Correctly says it moves tokens from the caller to another address, fails if the balance is too low, and is understandable to a non-expert."
+      },
+      {
+        "id": "spot-risk",
+        "prompt": "Is there anything risky about the transfer function above? Be brief.",
+        "criteria": "Gives an accurate, brief answer, for example no event emitted, no zero-address check, or noting it looks fine for a simple token. Must not invent a vulnerability that isn't there."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]
