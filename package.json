@@ -2,7 +2,7 @@
   "name": "agent-report-card",
   "version": "0.1.0",
   "private": true,
-  "description": "Independent grades for AI agents, scored by SERV Reasoning and staked human reviewers on Reppo.",
+  "description": "Independent grades for AI agents, checked by SERV Reasoning and judged independently on Reppo.",
   "scripts": {
     "dev": "tsx scripts/badges.ts && next dev",
     "build": "next build",

@@ -2,18 +2,50 @@
 
 Independent grades for AI agents. Each agent is given a set of realistic test tasks.
 Every answer is checked automatically by [SERV Reasoning](https://www.openserv.ai/) and
-scored by staked human reviewers on [Reppo](https://reppo.xyz/). The scores are combined
+judged independently on [Reppo](https://reppo.xyz/)'s evaluation network, so no
+single model grades its own work. The scores are combined
 into an A to F grade, a public report page and an embeddable badge. Agents are retested
 over time, so builders can watch their grade improve as they fix weak spots.
 
-Built for SERV Hackathon 02 (Reppo track).
+**Live site:** https://robd-hub.github.io/agent-report-card/
+
+Built for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2) (Reppo track).
+
+## Current grades
+
+All grades below are final: every answer has Reppo's verdict.
+
+| Agent | Grade | Score |
+|---|---|---|
+| SERV Baseline Assistant | **B** | 86 |
+| Copywriter | **C** | 74 |
+| Smart-Contract Commentator | **C** | 74 |
+| Research Agent | **D** | 69 |
+| Grok Research Agent | **D** | 62 |
+| Perplexity Research Assistant | **D** | 62 |
+| Essay Writer | **F** | 55 |
+
+All but the baseline are agents from the OpenServ marketplace. The live site always has the latest grades.
+
+Each agent has a report page with every task, answer and score, and a badge builders can embed:
+
+```markdown
+![Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/serv-baseline.svg)
+```
+
+## Why it matters (Reppo track)
+
+The Reppo track asks for agents that turn real-time feedback into measurable improvements.
+Agent Report Card makes that feedback public and repeatable: Reppo's independent judges
+score each answer against the task and return critiques and an accept, revise or reject call, SERV Reasoning explains what went wrong, and the agent is retested so its
+grade can go up. A builder sees exactly which task failed and why, fixes it, and gets a new grade.
 
 ## How grading works
 
 1. `data/agents.json` lists the agents and their test tasks.
 2. `npm run grade` sends each task to the agent, checks the answer with SERV Reasoning,
-   and submits it to Reppo's Evaluation API for human review.
-3. Each task's score is 70% the Reppo reviewers' score and 30% the SERV check.
+   and submits it to Reppo's Evaluation API for an independent verdict.
+3. Each task's score is 70% Reppo's score and 30% the SERV check.
    Until Reppo's reviews come back, a grade is marked **provisional**.
 4. Reppo allows one pending evaluation per account, and each settles after at least
    10 minutes, so answers are queued and sent one at a time.
@@ -53,5 +85,7 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] Leaderboard, report pages and badge
 - [x] SERV Reasoning checks and report summaries
 - [x] Confirm the Reppo Evaluation API request format against Reppo's docs
-- [x] Call OpenServ marketplace agents through a webhook workflow (needs `api.openserv.ai` allowed; not yet tested live)
-- [ ] First live grading run
+- [x] Call OpenServ marketplace agents through a webhook workflow (tested live)
+- [x] First live grading run
+- [x] Grade OpenServ marketplace agents (six graded so far, plus the baseline)
+- [ ] Let builders request a grade for their own agent (paid via x402)
