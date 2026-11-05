@@ -22,5 +22,21 @@
   "smart-contract-commentator": {
     "workflowId": 14029,
     "createdAt": "2026-11-04T15:42:00.103Z"
+  },
+  "general-assistant": {
+    "workflowId": 14030,
+    "createdAt": "2026-11-04T18:37:18.165Z"
+  },
+  "multilingual-assistant": {
+    "workflowId": 14031,
+    "createdAt": "2026-11-04T18:37:56.052Z"
+  },
+  "whitepaper-condenser": {
+    "workflowId": 14032,
+    "createdAt": "2026-11-04T18:39:34.953Z"
+  },
+  "code-quality-inspector": {
+    "workflowId": 14033,
+    "createdAt": "2026-11-04T18:52:27.984Z"
   }
 }
