@@ -38,5 +38,25 @@
   "code-quality-inspector": {
     "workflowId": 14033,
     "createdAt": "2026-11-04T18:52:27.984Z"
+  },
+  "fitbot": {
+    "workflowId": 14039,
+    "createdAt": "2026-11-05T08:44:42.566Z"
+  },
+  "coder": {
+    "workflowId": 14040,
+    "createdAt": "2026-11-05T08:46:29.271Z"
+  },
+  "lingua-guide": {
+    "workflowId": 14041,
+    "createdAt": "2026-11-05T08:47:18.790Z"
+  },
+  "it-customer-success-agent": {
+    "workflowId": 14042,
+    "createdAt": "2026-11-05T08:49:03.111Z"
+  },
+  "tokenomics-architect": {
+    "workflowId": 14043,
+    "createdAt": "2026-11-05T08:50:40.183Z"
   }
 }

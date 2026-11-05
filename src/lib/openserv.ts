@@ -66,7 +66,7 @@ async function ensureWorkflow(client: Client, agent: AgentConfig): Promise<numbe
   const agentId = agent.marketplaceId!;
   const workflow = await client.workflows.create({
     name: `Agent Report Card: ${agent.name}`,
-    goal: `Give ${agent.name} one test request and return its answer unchanged, so it can be graded.`,
+    goal: `Send each incoming test question to ${agent.name}, the agent assigned to this workflow, and return its full answer unchanged so the answer can be graded for the public Agent Report Card leaderboard.`,
     agentIds: [agentId],
     triggers: [
       triggers.webhook({
