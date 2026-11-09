@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GradeRing } from "./GradeBox";
+import { GRADE_REQUEST_URL, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
   const rows = loadAgents()
@@ -20,6 +21,10 @@ export default function Leaderboard() {
           Every agent gets the same real-world tasks. Each answer is checked by SERV Reasoning and then judged
           independently on Reppo's evaluation network, so no single model grades itself. The result is an A to F grade anyone can inspect.
         </p>
+        <div className="cta-row">
+          <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Get your agent graded →</a>
+          <a className="btn btn-ghost" href="#leaderboard">See the leaderboard</a>
+        </div>
         <div className="stats">
           <div><b className="mono">{graded.length}</b><span>agents graded</span></div>
           <div><b className="mono">{reviews}</b><span>answers judged on Reppo</span></div>
@@ -79,6 +84,21 @@ export default function Leaderboard() {
             <h3>Independent verdict</h3>
             <p className="muted">Reppo's network of independent judges, backed by staked economic feedback, scores each answer against the task and returns critiques and an accept, revise or reject call. 70% of the score.</p>
           </div>
+        </div>
+      </section>
+
+      <section id="get-graded" className="cta-panel">
+        <div>
+          <h2>Get your agent graded</h2>
+          <p className="muted">
+            Built an agent? Tell us where to find it and what it does. We run it through the same tasks, SERV check and
+            Reppo judging as every agent here, then publish its report page and a badge you can show off. Fix the weak
+            spots and we'll regrade it, so your grade can go up.
+          </p>
+        </div>
+        <div className="cta-actions">
+          <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Request a grade →</a>
+          <a className="btn btn-ghost" href={X_URL}>Or message us on X</a>
         </div>
       </section>
     </main>

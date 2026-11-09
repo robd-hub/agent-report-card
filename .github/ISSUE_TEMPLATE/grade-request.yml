@@ -1,0 +1,41 @@
+name: Get your agent graded
+description: Ask for your AI agent to be graded and added to the Agent Report Card leaderboard.
+title: "Grade request: "
+labels: ["grade-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for asking! We give your agent the same kind of real-world test tasks as every other agent on the board. SERV Reasoning checks each answer, Reppo's independent judges score it, and the result is an A to F grade with a public report page and a badge you can embed.
+  - type: input
+    id: agent-name
+    attributes:
+      label: Agent name
+      placeholder: e.g. My Research Agent
+    validations:
+      required: true
+  - type: input
+    id: agent-link
+    attributes:
+      label: Where can we find it?
+      description: A link to the agent on the OpenServ marketplace, or another way to reach it (an API endpoint, website or docs).
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: what-it-does
+    attributes:
+      label: What does it do?
+      description: A sentence or two on the jobs it is built for, so we can pick fair test tasks.
+    validations:
+      required: true
+  - type: textarea
+    id: test-tasks
+    attributes:
+      label: Tasks you'd like it tested on (optional)
+      description: Any real requests your users send it. We may use them alongside our own tasks.
+  - type: input
+    id: contact
+    attributes:
+      label: How should we reach you? (optional)
+      description: An X handle or other contact. We'll also reply on this issue.
