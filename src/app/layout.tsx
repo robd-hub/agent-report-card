@@ -29,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/#leaderboard">Leaderboard</Link>
             <Link href="/#how">How it works</Link>
             <a href="https://github.com/robd-hub/agent-report-card">GitHub</a>
+            <Link href="/#get-graded" className="nav-cta">Get graded</Link>
           </nav>
         </header>
         {children}
