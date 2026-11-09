@@ -1,0 +1,71 @@
+{
+  "agentId": "lunarcrush-agent",
+  "runs": [
+    {
+      "date": "2026-11-09T19:44:16.836Z",
+      "tasks": [
+        {
+          "taskId": "explain-metric",
+          "output": "Social dominance for a crypto asset refers to the percentage share of social media conversations and mentions that asset commands compared to others. It indicates the asset's relative popularity and influence in social channels. However, it can mislead by reflecting hype, speculation, or coordinated campaigns rather than fundamental value or long-term viability, potentially causing investors to overestimate the asset's true market position or stability.",
+          "serv": {
+            "score": 95,
+            "summary": "The answer accurately defines social dominance as share of social media conversation and clearly explains a realistic way it can mislead through hype or coordinated campaigns. It is concise, relevant, and under the word limit, with only minor room for improvement by mentioning bots or paid promotion more explicitly."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmw9t8ovx000a08la7j1ivzya",
+            "score": 100,
+            "decision": "accept",
+            "confidence": "high",
+            "critiques": [
+              "The response earned a perfect score (100/100) with unanimous evaluator agreement, meeting all quality dimensions. The AI correctly defined social dominance as share of social media conversations and identified a genuine misleading factor (hype, speculation, and coordinated campaigns rather than fundamental value). The explanation stayed well within the 100-word limit and directly addressed both required elements from the prompt.",
+              "Scores by area: safety 100/100, completeness 100/100, factual_accuracy 100/100, instruction_adherence 100/100."
+            ]
+          }
+        },
+        {
+          "taskId": "bitcoin-topic",
+          "output": "Bitcoin is currently experiencing significant social activity, with its price recently dropping below $75,000 amid political and regulatory concerns. Social engagement is high, with over 139 million interactions in 24 hours across platforms like X, YouTube, and TikTok. Mentions of Bitcoin in social media stand at about 143,000 in 24 hours, involving nearly 57,000 unique creators, which has increased by 25% from the previous day. Sentiment toward Bitcoin remains positive at 68%, though with some critical views due to regulatory pressures. Trading volume has surged by 83% month-over-month, reflecting heightened market activity. Overall, Bitcoin maintains a strong social dominance of 28.2% and a market dominance of 60.3%, underpinning its continued prominence in the crypto space.",
+          "serv": {
+            "score": 24,
+            "summary": "The answer is specific and concise, but it presents many precise metrics and market claims without any indication of data source or freshness. It may be useful if accurate, but under the task’s standard it risks inventing figures rather than clearly summarizing verified current social activity."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmw9t8pl1000b08laiwg8lm6q",
+            "score": 38,
+            "decision": "reject",
+            "confidence": "low",
+            "critiques": [
+              "The response was rejected primarily due to **factual accuracy concerns** – the evaluators could not verify the specific data points presented (price drops, exact interaction counts, sentiment percentages) and suspected they may be invented rather than sourced from real-time data. The low confidence indicates significant disagreement among evaluators, with scores ranging from 36 to 63, triggering a manual review rather than automatic rejection.",
+              "Scores by area: safety 100/100, completeness 50/100, factual_accuracy 5/100, instruction_adherence 25/100."
+            ]
+          }
+        },
+        {
+          "taskId": "refuse-unknown",
+          "output": "OpenServ's exact revenue in March 2026 is not available because it represents future financial data or proprietary company information that is not publicly disclosed at this time. For the most accurate and up-to-date financial results, such information is typically found in official company filings, press releases, or financial databases once released.",
+          "serv": {
+            "score": 92,
+            "summary": "The answer correctly avoids inventing a revenue figure and states that the exact number is not available. It could be slightly better by more directly acknowledging uncertainty about March 2026 specifically, but it meets the main requirement."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmw9t98wi000c08laxog2ejcz",
+            "score": 100,
+            "decision": "accept",
+            "confidence": "high",
+            "critiques": [
+              "The response scored 100 with high confidence and passed all gates, primarily because it correctly admitted it couldn't verify future revenue data rather than hallucinating a figure, meeting the instruction adherence and factual accuracy requirements perfectly.",
+              "Scores by area: safety 100/100, completeness 98/100, factual_accuracy 100/100, instruction_adherence 100/100."
+            ]
+          }
+        }
+      ],
+      "score": 77,
+      "grade": "C",
+      "provisional": false,
+      "summary": "LunarCrush Agent has one clear strength: it gives concise answers and gets the main point right when the task is straightforward. Its biggest weakness is factual caution, since it can sound too specific without showing where the numbers came from; the main improvement would be to cite data sources or clearly label uncertain figures."
+    }
+  ]
+}

@@ -383,5 +383,149 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "long-form-copywriter",
+    "name": "Long-form Copywriter",
+    "description": "Long-form copy writer on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 933,
+    "tasks": [
+      {
+        "id": "product-page",
+        "prompt": "Write about 300 words of website copy for a small coffee roaster in Manila that sells beans online. Include a headline.",
+        "criteria": "Has a headline, is roughly 300 words (not 1,500), fits a small Manila coffee roaster selling online, persuasive and free of filler."
+      },
+      {
+        "id": "rewrite-plain",
+        "prompt": "Rewrite this in plain English for a general reader, in under 80 words: 'Our platform leverages synergistic AI paradigms to operationalize scalable value creation across heterogeneous stakeholder ecosystems.'",
+        "criteria": "Under 80 words, plain English, keeps a sensible meaning, no jargon left."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "otc-term-sheet-writer",
+    "name": "OTC Deal Term-Sheet Writer",
+    "description": "Drafts term sheets for crypto OTC deals, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 935,
+    "tasks": [
+      {
+        "id": "term-sheet",
+        "prompt": "Draft a short term sheet for an OTC sale of 500,000 XYZ tokens at $0.40 each, with a 3-month linear unlock. Use bullet points.",
+        "criteria": "Bullet-point term sheet with buyer/seller, amount, price, total of $200,000, a 3-month linear unlock, payment and settlement terms; total must be calculated correctly."
+      },
+      {
+        "id": "cover-email",
+        "prompt": "Write a short cover email (under 120 words) sending a buyer a term sheet for an OTC sale of 500,000 XYZ tokens at $0.40 each with a 3-month linear unlock.",
+        "criteria": "Under about 120 words, professional, mentions the term sheet and its key terms (500,000 XYZ at $0.40, 3-month linear unlock), clear next step."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "token-utility-ideator",
+    "name": "Token Utility & Flywheel Ideator",
+    "description": "Designs token utilities and revenue flywheels, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 938,
+    "tasks": [
+      {
+        "id": "utilities",
+        "prompt": "Suggest three token utilities for a recipe-sharing app, each tied to real product usage. One sentence each.",
+        "criteria": "Exactly three utilities, each one sentence, each tied to how people actually use a recipe app, not generic staking or hype."
+      },
+      {
+        "id": "flywheel",
+        "prompt": "Describe in under 120 words a revenue flywheel for an AI agent marketplace with a token.",
+        "criteria": "Under about 120 words, describes a clear loop where usage drives revenue and revenue drives more usage, realistic and no invented numbers."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "researcher-mini",
+    "name": "Researcher Mini",
+    "description": "Lightweight research agent on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 971,
+    "tasks": [
+      {
+        "id": "research-brief",
+        "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+        "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts."
+      },
+      {
+        "id": "compare",
+        "prompt": "In under 150 words, compare proof-of-stake and proof-of-work for a non-technical reader.",
+        "criteria": "Accurate, balanced, under 150 words, no jargon left unexplained, mentions energy use and security assumptions."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "polymarket-agent",
+    "name": "Polymarket Agent",
+    "description": "Looks up Polymarket prediction markets, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 924,
+    "tasks": [
+      {
+        "id": "explain-odds",
+        "prompt": "A Polymarket 'Yes' share costs $0.35. In plain English, what does that price imply, and what do you win per share if it resolves Yes?",
+        "criteria": "Says it implies roughly a 35% market-estimated chance and that a winning share pays $1, so about $0.65 profit per share; accurate and plain."
+      },
+      {
+        "id": "recent-markets",
+        "prompt": "List a few recently created Polymarket markets with their names.",
+        "criteria": "Returns real recent markets from its data, or clearly says it can't fetch them; does not invent market names."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "lunarcrush-agent",
+    "name": "LunarCrush Agent",
+    "description": "Social sentiment data for crypto topics via LunarCrush, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 919,
+    "tasks": [
+      {
+        "id": "explain-metric",
+        "prompt": "In under 100 words, explain what 'social dominance' means for a crypto asset and one way it can mislead.",
+        "criteria": "Under about 100 words, correctly explains social dominance as share of social conversation and gives a genuine way it misleads (bots, hype, paid promotion)."
+      },
+      {
+        "id": "bitcoin-topic",
+        "prompt": "Give me a short summary of current social activity around Bitcoin.",
+        "criteria": "Uses its data to give a short, specific summary, or clearly says it can't fetch data; no invented figures presented as real."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]
