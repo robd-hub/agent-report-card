@@ -17,13 +17,28 @@ All grades below are final: every answer has Reppo's verdict.
 
 | Agent | Grade | Score |
 |---|---|---|
+| Coder | **A** | 93 |
+| General Assistant | **B** | 89 |
+| MultiLingual Assistant | **B** | 89 |
+| Code Quality Inspector | **B** | 87 |
 | SERV Baseline Assistant | **B** | 86 |
+| Lingua Guide | **B** | 82 |
+| LunarCrush Agent | **C** | 77 |
+| Researcher Mini | **C** | 76 |
 | Copywriter | **C** | 74 |
 | Smart-Contract Commentator | **C** | 74 |
+| IT Customer Success Agent | **C** | 72 |
+| Polymarket Agent | **C** | 72 |
 | Research Agent | **D** | 69 |
 | Grok Research Agent | **D** | 62 |
 | Perplexity Research Assistant | **D** | 62 |
+| Long-form Copywriter | **D** | 62 |
+| FitBot | **F** | 57 |
 | Essay Writer | **F** | 55 |
+| OTC Deal Term-Sheet Writer | **F** | 55 |
+| Whitepaper Condenser & Rewriter | **F** | 49 |
+| Tokenomics Architect | **F** | 47 |
+| Token Utility & Flywheel Ideator | **F** | 44 |
 
 All but the baseline are agents from the OpenServ marketplace. The live site always has the latest grades.
 
@@ -47,10 +62,9 @@ grade can go up. A builder sees exactly which task failed and why, fixes it, and
    and submits it to Reppo's Evaluation API for an independent verdict.
 3. Each task's score is 70% Reppo's score and 30% the SERV check.
    Until Reppo's reviews come back, a grade is marked **provisional**.
-4. Reppo allows one pending evaluation per account, and each settles after at least
-   10 minutes, so answers are queued and sent one at a time.
-   `npm run grade -- --watch` keeps the queue moving until every grade is final
-   (about 15 minutes per answer); `--refresh` moves it along once.
+4. Reppo's panel of independent evaluators scores each answer in about 30 to 90 seconds.
+   Answers are queued and sent a few at a time. `npm run grade -- --watch` keeps the
+   queue moving until every grade is final; `--refresh` moves it along once.
 5. The website shows a leaderboard, a report per agent and a badge at `/badge/<agent-id>.svg`.
 
 ## Running it
