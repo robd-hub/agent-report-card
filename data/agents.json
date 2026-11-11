@@ -527,5 +527,245 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "json-parser",
+    "name": "Json Parser",
+    "description": "Reads JSON and extracts key data, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 65,
+    "tasks": [
+      {
+        "id": "extract-fields",
+        "prompt": "From this JSON, list each user's name and city, and say how many users are active: {\"users\":[{\"name\":\"Ana\",\"active\":true,\"address\":{\"city\":\"Lisbon\"}},{\"name\":\"Ben\",\"active\":false,\"address\":{\"city\":\"Leeds\"}},{\"name\":\"Chi\",\"active\":true,\"address\":{\"city\":\"Lagos\"}}]}",
+        "criteria": "Lists Ana/Lisbon, Ben/Leeds, Chi/Lagos and says 2 users are active. No invented fields."
+      },
+      {
+        "id": "broken-json",
+        "prompt": "Is this valid JSON? If not, say what is wrong and give a fixed version: {\"id\": 7, \"tags\": [\"a\", \"b\",], name: \"test\"}",
+        "criteria": "Says it is invalid, names both problems (trailing comma after \"b\", unquoted key name) and gives a corrected valid JSON object."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "data-analyst-agent",
+    "name": "Data Analyst Agent",
+    "description": "Explores, queries and charts CSV data, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 833,
+    "tasks": [
+      {
+        "id": "csv-stats",
+        "prompt": "Here is a small CSV:\nregion,sales\nNorth,120\nSouth,80\nEast,150\nWest,50\nGive the total, the mean, the median, and the region with the highest sales.",
+        "criteria": "Total 400, mean 100, median 100, highest East (150). All numbers correct."
+      },
+      {
+        "id": "write-sql",
+        "prompt": "Write a SQL query that returns the top 3 customers by total order value from a table orders(customer_id, amount, created_at), only counting orders from 2025.",
+        "criteria": "A correct query: filters 2025 orders, GROUP BY customer_id, SUM(amount), ORDER BY total DESC, LIMIT 3 (or equivalent)."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "polymarket-data-analysis-assistant",
+    "name": "Polymarket Data Analysis Assistant",
+    "description": "Summarises Polymarket trading data and spots anomalies, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 957,
+    "tasks": [
+      {
+        "id": "vwap",
+        "prompt": "Three trades on one market: 100 shares at $0.40, 300 shares at $0.50, 100 shares at $0.60. What is the volume-weighted average price (VWAP) and the total volume in shares?",
+        "criteria": "VWAP $0.50 (250/500) and 500 shares. Shows or explains the calculation."
+      },
+      {
+        "id": "anomaly",
+        "prompt": "Spot anything suspicious in these trades: (1) wallet 0xA buys 50 from 0xB at 0.55; (2) wallet 0xC buys 20 from 0xC at 0.90; (3) wallet 0xD buys 30 from 0xE at 1.40; (4) wallet 0xA buys 50 from 0xB at 0.55 (same timestamp as 1).",
+        "criteria": "Flags trade 2 as a self-trade, trade 3 as out of range (price above $1), and trade 4 as a likely duplicate of trade 1."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "sport-markets-agent",
+    "name": "Sport Markets Agent",
+    "description": "Finds matching sports betting markets on Polymarket and Kalshi, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 959,
+    "tasks": [
+      {
+        "id": "find-markets",
+        "prompt": "Find sports betting markets on Polymarket or Kalshi for NBA games happening today, and list a few.",
+        "criteria": "Returns real markets from its data with names or slugs, or clearly says it found none or can't fetch data; no invented markets presented as real."
+      },
+      {
+        "id": "explain-odds",
+        "prompt": "In under 100 words, explain what a price of $0.62 on a 'Yes' share means in a sports prediction market.",
+        "criteria": "Explains it as roughly a 62% implied probability and that a winning share pays $1, so profit is $0.38 per share; notes fees/spread or that it's not a guarantee."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "dome-polymarket-price-agent",
+    "name": "Dome Polymarket Price Agent",
+    "description": "Fetches current or historical Polymarket token prices, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 960,
+    "tasks": [
+      {
+        "id": "missing-token",
+        "prompt": "What is the current price on Polymarket for the 'Yes' side of the next US presidential election market?",
+        "criteria": "Either fetches a real price and says which market/token it used, or explains it needs a specific token_id and asks for it; no invented price."
+      },
+      {
+        "id": "explain-token",
+        "prompt": "In under 80 words, explain what a Polymarket token_id is and where a user can find one.",
+        "criteria": "Explains a token_id identifies one outcome share (e.g. Yes or No) of a market and gives a real way to find it (Polymarket API/market data, CLOB, or page source)."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "youtube-video-understanding-agent",
+    "name": "Youtube Video Understanding Agent",
+    "description": "Summarises and answers questions about YouTube videos, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 970,
+    "tasks": [
+      {
+        "id": "summarize-video",
+        "prompt": "Summarize this YouTube video in two sentences: https://www.youtube.com/watch?v=jNQXAC9IVRw",
+        "criteria": "Correctly describes 'Me at the zoo': a short clip of a man (Jawed Karim) at a zoo in front of elephants commenting on their long trunks. Not invented content."
+      },
+      {
+        "id": "bad-link",
+        "prompt": "What is this video about? https://www.youtube.com/watch?v=invalid0000",
+        "criteria": "Says the link is invalid or the video can't be found, rather than inventing a summary."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "hyperliquid-btc-data-agent",
+    "name": "Hyperliquid BTC Data Agent",
+    "description": "Fetches BTC market data from Hyperliquid, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 997,
+    "tasks": [
+      {
+        "id": "btc-price",
+        "prompt": "What is the current BTC price and 24h funding rate on Hyperliquid?",
+        "criteria": "Uses its data to give a current price and funding rate with a time or source, or clearly says it can't fetch data; no invented figures presented as real."
+      },
+      {
+        "id": "explain-funding",
+        "prompt": "In under 100 words, explain what a positive funding rate on a perpetual futures market means for longs and shorts.",
+        "criteria": "Explains longs pay shorts when funding is positive, that it keeps the perp price near spot, and that it signals more demand for longs."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "wenlambo-alpha-designer",
+    "name": "WenLamboAlphaDesigner",
+    "description": "Generates trading decisions, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 998,
+    "tasks": [
+      {
+        "id": "decision",
+        "prompt": "Should I buy, sell or hold ETH right now? Give a decision and your main reasons in under 120 words.",
+        "criteria": "Gives a clear decision with concrete, sensible reasoning, is honest about uncertainty and data limits, and includes a risk note. No invented data presented as real."
+      },
+      {
+        "id": "position-size",
+        "prompt": "I have $1,000 and want to risk at most 2% per trade. My stop loss is 5% below entry. How big should my position be?",
+        "criteria": "Correct math: risk $20, position $400 (20 / 0.05). Explains briefly."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "rest-api-helper",
+    "name": "REST API helper",
+    "description": "Helps with REST API calls, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 1021,
+    "tasks": [
+      {
+        "id": "status-codes",
+        "prompt": "In under 100 words, explain the difference between HTTP 401, 403 and 404 and when an API should return each.",
+        "criteria": "401 = not authenticated / missing or bad credentials, 403 = authenticated but not allowed, 404 = resource not found (sometimes used to hide existence). Accurate and concise."
+      },
+      {
+        "id": "design-endpoint",
+        "prompt": "Design REST endpoints for a simple to-do list: list, create, update and delete tasks. Give the method and path for each.",
+        "criteria": "GET /tasks, POST /tasks, PUT or PATCH /tasks/{id}, DELETE /tasks/{id} (or close equivalent). Sensible and consistent."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
+  },
+  {
+    "id": "twitter-scraping-agent",
+    "name": "Twitter Scraping Agent",
+    "description": "Collects recent tweets from accounts, keywords or hashtags, on the OpenServ marketplace.",
+    "adapter": "openserv-marketplace",
+    "marketplaceId": 830,
+    "tasks": [
+      {
+        "id": "recent-tweets",
+        "prompt": "Get the three most recent tweets from @openservai and summarise each in one line.",
+        "criteria": "Returns real recent tweets with dates or links, or clearly says it can't fetch them; no invented tweets presented as real."
+      },
+      {
+        "id": "hashtag",
+        "prompt": "Collect a few recent tweets with the hashtag #AIagents and tell me the main themes.",
+        "criteria": "Uses real tweets to name themes, or clearly says it can't fetch them; no invented tweets presented as real."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]

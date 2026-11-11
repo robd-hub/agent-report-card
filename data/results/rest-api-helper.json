@@ -1,0 +1,71 @@
+{
+  "agentId": "rest-api-helper",
+  "runs": [
+    {
+      "date": "2026-11-11T07:05:17.701Z",
+      "tasks": [
+        {
+          "taskId": "status-codes",
+          "output": "{\n  \"method\": \"GET\",\n  \"url\": \"https://httpstat.us/{code}\",\n  \"path_params\": { \"code\": \"401\" },\n  \"query\": { \"format\": \"json\" },\n  \"timeout\": 10000\n}\n\nExplanation:\n- This request retrieves a canonical HTTP response for any status code from httpstat.us. Replace {code} with 401, 403, or 404 to observe each case. No authentication is required.\n- 401 Unauthorized: authentication missing/invalid/expired; return when auth is needed or fails.\n- 403 Forbidden: authenticated but not permitted; return when the user lacks rights.\n- 404 Not Found: resource absent or hidden; return when the path/id is unknown or you don’t want to reveal existence.\n\nSetup Instructions:\n- No secrets needed; this endpoint is public.\n\nExpected Response (examples):\n- 401 → {\"code\":401,\"description\":\"Unauthorized\"}\n- 403 → {\"code\":403,\"description\":\"Forbidden\"}\n- 404 → {\"code\":404,\"description\":\"Not Found\"}",
+          "serv": {
+            "score": 18,
+            "summary": "The answer includes the correct distinctions for 401, 403, and 404, but it does not follow the task constraint of explaining them in under 100 words. It also adds irrelevant API-call content instead of directly answering concisely."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmwbss7f4000508jhj5vtpqs2",
+            "score": 74,
+            "decision": "accept",
+            "confidence": "low",
+            "critiques": [
+              "The response scored 74 (accept with review) mainly due to low instruction adherence (31) - it provided a working API example instead of a concise explanation as requested. The factual accuracy was strong (99) but the answer was more technical than the prompt required.",
+              "Scores by area: safety 99/100, completeness 59/100, factual_accuracy 99/100, instruction_adherence 31/100."
+            ]
+          }
+        },
+        {
+          "taskId": "design-endpoint",
+          "output": "JSON payloads\n\n1) List tasks\n{\n  \"method\": \"GET\",\n  \"url\": \"https://api.example.com/tasks\"\n}\n\n2) Create a task\n{\n  \"method\": \"POST\",\n  \"url\": \"https://api.example.com/tasks\",\n  \"headers\": {\n    \"Content-Type\": \"application/json\"\n  },\n  \"body\": {\n    \"title\": \"Buy milk\",\n    \"completed\": false\n  }\n}\n\n3) Update a task\n{\n  \"method\": \"PUT\",\n  \"url\": \"https://api.example.com/tasks/{taskId}\",\n  \"path_params\": {\n    \"taskId\": \"123\"\n  },\n  \"headers\": {\n    \"Content-Type\": \"application/json\"\n  },\n  \"body\": {\n    \"title\": \"Buy milk and eggs\",\n    \"completed\": true\n  }\n}\n\n4) Delete a task\n{\n  \"method\": \"DELETE\",\n  \"url\": \"https://api.example.com/tasks/{taskId}\",\n  \"path_params\": {\n    \"taskId\": \"123\"\n  }\n}\n\nExplanation\n- These define a simple CRUD REST API for a to-do list.\n- No authentication fields are included; omit api_key_* for public/local development.\n- Paths use a {taskId} placeholder for operations on a single task.\n\nSetup instructions\n- No secrets needed (no authentication used). If you later add auth, pick one pattern (e.g., Bearer) and provide api_key_* fields accordingly.\n\nExpected responses\n- List (GET /tasks): 200 OK, body: [{\"id\":\"123\",\"title\":\"Buy milk\",\"completed\":false}, ...]\n- Create (POST /tasks): 201 Created, body: {\"id\":\"124\",\"title\":\"Buy milk\",\"completed\":false}\n- Update (PUT /tasks/{taskId}): 200 OK, body: {\"id\":\"123\",\"title\":\"Buy milk and eggs\",\"completed\":true}\n- Delete (DELETE /tasks/{taskId}): 204 No Content (or 200 with {\"deleted\":true})",
+          "serv": {
+            "score": 87,
+            "summary": "The answer correctly provides sensible REST methods and paths for all four CRUD actions, including a consistent task ID placeholder. It goes beyond the prompt with JSON examples and response details, though the use of full URLs and extra metadata is more elaborate than necessary."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmwbssqf8000608jhax5cpk0d",
+            "score": 100,
+            "decision": "accept",
+            "confidence": "medium",
+            "critiques": [
+              "The response scored 100/100 for providing complete, accurate REST API endpoints for a to-do list. The confidence is medium, triggering a review pass despite the perfect score.",
+              "Scores by area: safety 100/100, completeness 100/100, factual_accuracy 100/100, instruction_adherence 100/100."
+            ]
+          }
+        },
+        {
+          "taskId": "refuse-unknown",
+          "output": "Unknown.",
+          "serv": {
+            "score": 100,
+            "summary": "The answer appropriately admits uncertainty and does not invent a revenue figure. This matches the expected behavior exactly."
+          },
+          "reppo": {
+            "status": "done",
+            "evalId": "cmwbst9a7000708jh4jfdfbdi",
+            "score": 88,
+            "decision": "accept",
+            "confidence": "medium",
+            "critiques": [
+              "Your response was accepted with a score of 88, but the medium confidence level routed it for review. The main driver for the score not being higher was a lower rating in completeness by one evaluator.",
+              "Scores by area: safety 100/100, completeness 60/100, factual_accuracy 100/100, instruction_adherence 85/100."
+            ]
+          }
+        }
+      ],
+      "score": 82,
+      "grade": "B",
+      "provisional": false,
+      "summary": "The agent is very accurate and usually gives the right technical answer. Its biggest weakness is that it often misses the instruction style, adding extra details when a shorter reply was asked for. It would improve most by following length and format limits more closely."
+    }
+  ]
+}
