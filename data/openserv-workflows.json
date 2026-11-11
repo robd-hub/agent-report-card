@@ -82,5 +82,45 @@
   "lunarcrush-agent": {
     "workflowId": 14055,
     "createdAt": "2026-11-09T19:42:54.542Z"
+  },
+  "json-parser": {
+    "workflowId": 14065,
+    "createdAt": "2026-11-11T06:51:12.646Z"
+  },
+  "data-analyst-agent": {
+    "workflowId": 14066,
+    "createdAt": "2026-11-11T06:52:37.414Z"
+  },
+  "polymarket-data-analysis-assistant": {
+    "workflowId": 14067,
+    "createdAt": "2026-11-11T06:53:19.876Z"
+  },
+  "sport-markets-agent": {
+    "workflowId": 14068,
+    "createdAt": "2026-11-11T06:55:30.730Z"
+  },
+  "dome-polymarket-price-agent": {
+    "workflowId": 14069,
+    "createdAt": "2026-11-11T06:56:36.658Z"
+  },
+  "youtube-video-understanding-agent": {
+    "workflowId": 14070,
+    "createdAt": "2026-11-11T06:58:14.375Z"
+  },
+  "hyperliquid-btc-data-agent": {
+    "workflowId": 14071,
+    "createdAt": "2026-11-11T06:59:11.020Z"
+  },
+  "wenlambo-alpha-designer": {
+    "workflowId": 14072,
+    "createdAt": "2026-11-11T07:00:11.982Z"
+  },
+  "rest-api-helper": {
+    "workflowId": 14073,
+    "createdAt": "2026-11-11T07:02:16.120Z"
+  },
+  "twitter-scraping-agent": {
+    "workflowId": 14074,
+    "createdAt": "2026-11-11T07:05:24.647Z"
   }
 }
