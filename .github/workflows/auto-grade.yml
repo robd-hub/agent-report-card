@@ -1,0 +1,101 @@
+# Grades a paid request automatically when someone opens (or edits) a
+# "Get your agent graded" issue. scripts/auto-grade.ts checks the USDC payment
+# on Base, grades the agent, and writes a reply. This workflow commits the new
+# results, replies on the issue, closes it when the grade is final, and
+# republishes the site.
+#
+# Needs three repository secrets (Settings > Secrets and variables > Actions):
+#   SERV_API_KEY, REPPO_API_KEY, OPENSERV_USER_API_KEY
+name: Auto-grade paid requests
+
+on:
+  issues:
+    types: [opened, edited, reopened, labeled]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+# One request at a time: each run commits to main and spends Reppo credits.
+concurrency:
+  group: auto-grade
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    if: github.event.issue.state == 'open' && contains(github.event.issue.labels.*.name, 'grade-request') && !contains(github.event.issue.labels.*.name, 'needs-attention')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - id: grade
+        name: Check payment and grade
+        run: npx tsx scripts/auto-grade.ts
+        env:
+          # Passed as environment variables, never pasted into the script,
+          # because the issue text is written by whoever opened the issue.
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          COMMENT_FILE: ${{ runner.temp }}/comment.md
+          SERV_API_KEY: ${{ secrets.SERV_API_KEY }}
+          REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}
+          OPENSERV_USER_API_KEY: ${{ secrets.OPENSERV_USER_API_KEY }}
+
+      - name: Save results
+        run: |
+          git config user.name "agent-report-card-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No data changes to save."
+          else
+            git commit -m "Grade request #${ISSUE_NUMBER}"
+            git pull --rebase origin main
+            git push origin HEAD:main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+        id: save
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+      - name: Reply on the request
+        if: always() && steps.grade.outcome != 'skipped'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          OUTCOME: ${{ steps.grade.outputs.outcome }}
+          COMMENT_FILE: ${{ runner.temp }}/comment.md
+        run: |
+          if [ -f "$COMMENT_FILE" ]; then
+            gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$COMMENT_FILE"
+          fi
+          case "$OUTCOME" in
+            graded)
+              gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY"
+              gh label create graded --repo "$GITHUB_REPOSITORY" --color 0E8A16 --description "Graded by the bot" 2>/dev/null || true
+              gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label graded || true
+              ;;
+            rejected)
+              ;;
+            *)
+              gh label create needs-attention --repo "$GITHUB_REPOSITORY" --color D93F0B --description "The grading bot needs the maintainer" 2>/dev/null || true
+              gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label needs-attention
+              ;;
+          esac
+
+      # A push made with the workflow's own token doesn't start other
+      # workflows, so start the site build directly.
+      - name: Republish the site
+        if: steps.save.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main

@@ -20,7 +20,7 @@ body:
     id: agent-link
     attributes:
       label: Where can we find it?
-      description: A link to the agent on the OpenServ marketplace, or another way to reach it (an API endpoint, website or docs).
+      description: The agent's OpenServ marketplace link (or its agent number). Marketplace agents are graded automatically within about an hour. For anything else, add a link and we'll reply here.
       placeholder: https://
     validations:
       required: true
