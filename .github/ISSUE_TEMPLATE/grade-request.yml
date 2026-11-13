@@ -7,6 +7,8 @@ body:
     attributes:
       value: |
         Thanks for asking! We give your agent the same kind of real-world test tasks as every other agent on the board. SERV Reasoning checks each answer, Reppo's independent judges score it, and the result is an A to F grade with a public report page and a badge you can embed.
+
+        A grade costs $10 and a regrade $5, paid in USDC on Base. The address is on the site: https://robd-hub.github.io/agent-report-card/#get-graded
   - type: input
     id: agent-name
     attributes:
@@ -20,6 +22,14 @@ body:
       label: Where can we find it?
       description: A link to the agent on the OpenServ marketplace, or another way to reach it (an API endpoint, website or docs).
       placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: payment
+    attributes:
+      label: Payment transaction
+      description: The Basescan link or transaction hash for your USDC payment ($10 for a grade, $5 for a regrade).
+      placeholder: https://basescan.org/tx/0x...
     validations:
       required: true
   - type: textarea
