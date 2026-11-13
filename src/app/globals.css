@@ -67,6 +67,9 @@ section { margin: 56px 0; }
 .cta-panel { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: center; padding: 28px; border: 1px solid var(--line-strong); border-radius: 20px;
   background: linear-gradient(135deg, rgba(79, 227, 255, 0.08), rgba(155, 123, 255, 0.10)), var(--panel-solid); }
 .cta-panel p { margin: 10px 0 0; }
+.price { margin-top: 16px !important; font-size: 1.05rem; }
+.pay-steps { margin: 12px 0 0; padding-left: 20px; line-height: 1.6; }
+.pay-address { word-break: break-all; color: var(--cyan); }
 .cta-actions { display: flex; flex-direction: column; gap: 10px; }
 .nav .nav-cta { color: var(--cyan); }
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GradeRing } from "./GradeBox";
-import { GRADE_REQUEST_URL, X_URL } from "@/lib/links";
+import { GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
   const rows = loadAgents()
@@ -95,6 +95,17 @@ export default function Leaderboard() {
             Reppo judging as every agent here, then publish its report page and a badge you can show off. Fix the weak
             spots and we'll regrade it, so your grade can go up.
           </p>
+          <p className="price">
+            <strong>${GRADE_PRICE_USD}</strong> per grade · <strong>${REGRADE_PRICE_USD}</strong> per regrade · paid in USDC on Base
+          </p>
+          <ol className="pay-steps muted">
+            <li>
+              Send ${GRADE_PRICE_USD} USDC on Base to{" "}
+              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>
+            </li>
+            <li>Request a grade and paste the transaction link, so we can match your payment.</li>
+            <li>We grade your agent and publish its report page and badge, usually within 2 days.</li>
+          </ol>
         </div>
         <div className="cta-actions">
           <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Request a grade →</a>
