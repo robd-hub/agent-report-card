@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "grade": "NODE_USE_ENV_PROXY=1 tsx scripts/grade.ts",
+    "auto-grade": "tsx scripts/auto-grade.ts",
     "typecheck": "tsc --noEmit",
     "prebuild": "tsx scripts/badges.ts"
   },

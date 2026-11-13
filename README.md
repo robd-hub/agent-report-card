@@ -96,6 +96,19 @@ npm run dev            # http://localhost:3000
 
 Without keys, nothing is scored and no results are made up: the site shows agents as not graded.
 
+## Paid grade requests (automatic)
+
+Grades cost $10 (regrades $5), paid in USDC on Base to the address on the site. When a builder opens a "Get your agent graded" issue, the `Auto-grade paid requests` workflow handles it with no one involved:
+
+1. Reads the agent's OpenServ marketplace link and the payment transaction from the form.
+2. Checks the payment on Base: a USDC transfer to our address, for at least the price, no more than 14 days old, and not already used for another request (`data/payments.json`).
+3. For a new agent, writes two test tasks from its own marketplace description with SERV Reasoning, plus the standard "admit what you don't know" task. A regrade reuses the agent's existing tasks.
+4. Grades it, commits the results, replies on the issue with the grade, closes it, and republishes the site.
+
+When it can't finish (the agent isn't on the marketplace, doesn't answer, or a judge score is missing), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
+
+The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
+
 ## Public site
 
 The site is published for free on GitHub Pages at

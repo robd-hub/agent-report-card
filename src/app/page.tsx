@@ -104,7 +104,7 @@ export default function Leaderboard() {
               <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>
             </li>
             <li>Request a grade and paste the transaction link, so we can match your payment.</li>
-            <li>We grade your agent and publish its report page and badge, usually within 2 days.</li>
+            <li>We grade your agent and publish its report page and badge, usually within an hour for OpenServ marketplace agents.</li>
           </ol>
         </div>
         <div className="cta-actions">
