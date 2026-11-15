@@ -24,8 +24,10 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { isPublicHttpsUrl } from "../src/lib/adapters";
 import { loadAgents, loadReport } from "../src/lib/data";
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
+import { taskScore } from "../src/lib/grade";
 import { checkPayment, findTxHash, savePayment } from "../src/lib/payment";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
@@ -70,6 +72,23 @@ interface MarketplaceAgent {
   capabilities_description?: string;
   usage_instructions?: string;
   expected_output?: string;
+}
+
+/**
+ * An agent on its own server, from a public https link that isn't an OpenServ
+ * page. Addresses ending in /chat/completions are called OpenAI-style (with
+ * the model named on the form); anything else gets POST {"prompt": "..."}.
+ */
+export function findEndpoint(text: string, model: string): { endpoint: string; adapter: "openai-compatible" | "http-json"; model?: string } | null {
+  const url = text.trim().split(/\s+/)[0] ?? "";
+  if (!isPublicHttpsUrl(url) || /(^|\.)openserv\.ai$/i.test(new URL(url).hostname)) return null;
+  const clean = new URL(url);
+  clean.hash = "";
+  if (/\/chat\/completions\/?$/.test(clean.pathname)) {
+    const m = model.trim().slice(0, 100);
+    return m ? { endpoint: clean.toString(), adapter: "openai-compatible", model: m } : null;
+  }
+  return { endpoint: clean.toString(), adapter: "http-json" };
 }
 
 export async function fetchMarketplaceAgent(id: number): Promise<MarketplaceAgent | null> {
@@ -194,11 +213,14 @@ async function main() {
   const suggested = firstSuggestedTask(form["Tasks you'd like it tested on (optional)"] ?? "");
 
   const marketplaceId = findMarketplaceId(link);
-  if (!marketplaceId) {
+  const modelName = form["Model name (OpenAI-style endpoints only)"] ?? "";
+  const endpoint = marketplaceId ? null : findEndpoint(link, modelName);
+  if (!marketplaceId && !endpoint) {
     return finish(
       "needs-attention",
-      "Thanks for your request! The automatic grader can only reach agents listed on the OpenServ marketplace, and we couldn't find a marketplace agent in your link. " +
-        "If your agent is on the marketplace, edit this request and paste its marketplace link or its agent number. Otherwise, the maintainer will reply here about grading it another way.",
+      "Thanks for your request! The automatic grader can reach agents on the OpenServ marketplace, or agents with a public https address that answers a POST request " +
+        '(`{"prompt": "..."}` in, the answer out as JSON or text; or an OpenAI-style `/chat/completions` address plus its model name). ' +
+        "We couldn't find either in your link. Edit this request with the right link, or the maintainer will reply here about grading it another way.",
     );
   }
 
@@ -211,7 +233,9 @@ async function main() {
   }
 
   const agents = loadAgents();
-  let agent = agents.find((a) => a.adapter === "openserv-marketplace" && a.marketplaceId === marketplaceId);
+  let agent = marketplaceId
+    ? agents.find((a) => a.adapter === "openserv-marketplace" && a.marketplaceId === marketplaceId)
+    : agents.find((a) => a.endpoint === endpoint!.endpoint);
   const isRegrade = Boolean(agent);
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
@@ -228,7 +252,35 @@ async function main() {
     return finish("rejected", `We couldn't confirm the payment for this request: ${payment.reason}\n\nOnce that's fixed, edit this request and the grader will check again.`);
   }
 
-  if (!agent) {
+  if (!agent && endpoint) {
+    // Off the marketplace, the requester's own form is all we know about the agent.
+    const name = (form["Agent name"] ?? "").replace(/[\r\n]+/g, " ").trim().slice(0, 80) || new URL(endpoint.endpoint).hostname;
+    const about: MarketplaceAgent = { id: 0, name, capabilities_description: (form["What does it do?"] ?? "").slice(0, 4000) };
+    let written: Awaited<ReturnType<typeof writeTasks>>;
+    try {
+      written = await writeTasks(about, suggested);
+    } catch (e) {
+      return finish(
+        "needs-attention",
+        `Your payment of ${payment.amountUsd} USDC arrived, thank you. We couldn't prepare test tasks for ${name} automatically (${(e as Error).message}), so the maintainer will finish this one by hand and reply here.`,
+      );
+    }
+    let id = slugify(name);
+    for (let k = 2; agents.some((a) => a.id === id); k++) id = `${slugify(name)}-${k}`;
+    agent = {
+      id,
+      name,
+      description: written.description.replace(/, on the OpenServ marketplace\.$/, "."),
+      adapter: endpoint.adapter,
+      endpoint: endpoint.endpoint,
+      ...(endpoint.model ? { model: endpoint.model } : {}),
+      tasks: written.tasks,
+    };
+    agents.push(agent);
+    saveAgents(agents);
+  }
+
+  if (!agent && marketplaceId) {
     const market = await fetchMarketplaceAgent(marketplaceId);
     if (!market) {
       return finish(
@@ -252,6 +304,8 @@ async function main() {
     agents.push(agent);
     saveAgents(agents);
   }
+
+  if (!agent) return finish("needs-attention", "Something went wrong while setting up this request. The maintainer has been notified and will reply here.");
 
   // Record the payment before grading, so the same transaction can't be used twice.
   savePayment({
@@ -278,22 +332,28 @@ async function main() {
   if (!run) {
     return finish(
       "needs-attention",
-      `Your payment of ${payment.amountUsd} USDC arrived, thank you. We tried to grade ${agent.name}, but it didn't answer our test tasks through the OpenServ marketplace. ` +
+      `Your payment of ${payment.amountUsd} USDC arrived, thank you. We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : `at ${agent.endpoint}`} (each was tried twice). ` +
         "The maintainer will look into it and reply here, and will retry or refund.",
     );
   }
 
+  const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const lines = run.tasks.map((t) => {
     const task = agent!.tasks.find((x) => x.id === t.taskId);
     const reppo = t.reppo.status === "done" ? `${t.reppo.score}/100` : "not finished";
-    return `| ${task?.prompt.replace(/\|/g, "/").replace(/\s+/g, " ").slice(0, 90) ?? t.taskId} | ${t.serv ? `${t.serv.score}/100` : "skipped"} | ${reppo} |`;
+    const now = taskScore(t);
+    const was = previous?.tasks.find((p) => p.taskId === t.taskId);
+    const before = was ? taskScore(was) : null;
+    const change = previous ? ` ${before === null ? "new" : now === null ? "–" : `${Math.round(before)} → ${Math.round(now)}`} |` : "";
+    return `| ${task?.prompt.replace(/\|/g, "/").replace(/\s+/g, " ").slice(0, 90) ?? t.taskId} | ${t.serv ? `${t.serv.score}/100` : "skipped"} | ${reppo} |${change}`;
   });
   const gradeLine = run.grade ? `**${run.grade}** (${run.score}/100)` : "not available yet";
+  const wasLine = previous?.grade ? ` Last time: ${previous.grade} (${previous.score}/100).` : "";
   const comment = [
-    `${agent.name} has been ${isRegrade ? "regraded" : "graded"}: ${gradeLine}${run.provisional ? ", provisional until every judge score is in" : ""}.`,
+    `${agent.name} has been ${isRegrade ? "regraded" : "graded"}: ${gradeLine}${run.provisional ? ", provisional until every judge score is in" : ""}.${wasLine}`,
     "",
-    "| Task | SERV check | Reppo judges |",
-    "| --- | --- | --- |",
+    previous ? "| Task | SERV check | Reppo judges | Task score, before → now |" : "| Task | SERV check | Reppo judges |",
+    previous ? "| --- | --- | --- | --- |" : "| --- | --- | --- |",
     ...lines,
     "",
     run.summary ? `**Verdict:** ${run.summary}` : "",

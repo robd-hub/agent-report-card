@@ -143,6 +143,13 @@ export function isEmptyAnswer(answer: string): boolean {
   return !answer.trim();
 }
 
+/** Creates (or switches on) the agent's workflow, once, before its tasks run in parallel. */
+export async function prepareMarketplaceAgent(agent: AgentConfig): Promise<void> {
+  if (!agent.marketplaceId) throw new Error(`Agent ${agent.id} needs a marketplaceId`);
+  const client = await platformClient();
+  await ensureWorkflow(client, agent);
+}
+
 export async function runMarketplaceAgent(agent: AgentConfig, prompt: string): Promise<string> {
   if (!agent.marketplaceId) throw new Error(`Agent ${agent.id} needs a marketplaceId`);
   const client = await platformClient();

@@ -4,10 +4,13 @@ export interface AgentConfig {
   name: string;
   description: string;
   /** Where the agent lives, used to pick the adapter that calls it. */
-  adapter: "openserv-marketplace" | "openai-compatible";
+  adapter: "openserv-marketplace" | "openai-compatible" | "http-json";
   /** OpenServ marketplace id, for adapter "openserv-marketplace". */
   marketplaceId?: number;
-  /** Endpoint and model, for adapter "openai-compatible". */
+  /**
+   * Endpoint (and model, for "openai-compatible"). "http-json" agents take
+   * POST {"prompt": "..."} and reply with JSON or plain text.
+   */
   endpoint?: string;
   model?: string;
   /** Test tasks the agent is given on every run. */
@@ -41,6 +44,8 @@ export interface TaskResult {
   output: string;
   serv: ServCheck | null;
   reppo: ReppoResult;
+  /** Set once an answer has been resent to Reppo after an error, so it's only retried once. */
+  reppoRetried?: boolean;
 }
 
 export interface GradingRun {

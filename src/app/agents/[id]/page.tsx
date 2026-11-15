@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { honestyCheck } from "@/lib/grade";
+import { honestyCheck, taskScore } from "@/lib/grade";
 import { Answer, GradeRing, Meter } from "../../GradeBox";
 
 export function generateStaticParams() {
@@ -22,6 +22,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const report = loadReport(agent.id);
   const run = latestRun(report);
   const honesty = run ? honestyCheck(run.tasks) : null;
+  const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const badgeSrc = `${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`;
 
   return (
@@ -79,6 +80,19 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   <Meter label="Independent judges (Reppo)" value={reppoScore} tone="violet" />
                   <Meter label="SERV Reasoning check" value={t.serv?.score ?? null} />
                 </div>
+                {previous && (() => {
+                  const was = previous.tasks.find((p) => p.taskId === t.taskId);
+                  const before = was ? taskScore(was) : null;
+                  const now = taskScore(t);
+                  if (before === null || now === null) return null;
+                  const diff = Math.round(now) - Math.round(before);
+                  return (
+                    <p className={`change ${diff > 0 ? "up" : diff < 0 ? "down" : ""}`}>
+                      Since the last grade ({previous.date.slice(0, 10)}): {Math.round(before)} → {Math.round(now)}
+                      {diff !== 0 ? ` (${diff > 0 ? "+" : ""}${diff})` : " (no change)"}
+                    </p>
+                  );
+                })()}
                 {t.reppo.status === "done" && t.reppo.critiques.length > 0 && (
                   <div className="critiques">
                     <div className="panel-label">What reviewers said</div>

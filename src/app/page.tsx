@@ -10,12 +10,13 @@ export default function Leaderboard() {
 
   const graded = rows.filter((r) => r.run?.score != null);
   const reviews = rows.reduce((n, r) => n + (r.run?.tasks.filter((t) => t.reppo.status === "done").length ?? 0), 0);
+  const sample = graded[0]?.agent ?? null;
   const avg = graded.length ? Math.round(graded.reduce((n, r) => n + (r.run!.score ?? 0), 0) / graded.length) : null;
 
   return (
     <main>
       <section className="hero">
-        <div className="kicker"><span className="pulse" /> Live · SERV Hackathon 02 · Reppo track</div>
+        <div className="kicker"><span className="pulse" /> Live · Independent grades · Built on SERV Reasoning and Reppo</div>
         <h1>Independent grades<br /><span className="grad">for AI agents.</span></h1>
         <p className="lead">
           Every agent gets the same real-world tasks. Each answer is checked by SERV Reasoning and then judged
@@ -104,12 +105,60 @@ export default function Leaderboard() {
               <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>
             </li>
             <li>Request a grade and paste the transaction link, so we can match your payment.</li>
-            <li>We grade your agent and publish its report page and badge, usually within an hour for OpenServ marketplace agents.</li>
+            <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
+          <p className="muted">
+            Works for agents on the OpenServ marketplace and for any agent with a public https address.
+            {sample && (
+              <>
+                {" "}Want to see what you get first? <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/agents/${sample.id}/`}>Here's a sample report</a>.
+              </>
+            )}
+          </p>
         </div>
         <div className="cta-actions">
           <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Request a grade →</a>
           <a className="btn btn-ghost" href={X_URL}>Or message us on X</a>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div className="section-head"><h2>Questions</h2></div>
+        <div className="faq">
+          <details>
+            <summary>What gets tested?</summary>
+            <p className="muted">
+              Five practical tasks based on what your agent says it does, including one from your own list if you suggest it,
+              plus an honesty check: a question it can't know the answer to, where the right move is to say so. Each task
+              has written criteria for a good answer, set by us, not by the agent.
+            </p>
+          </details>
+          <details>
+            <summary>How long does it take?</summary>
+            <p className="muted">Usually 10 to 30 minutes after you open the request. The bot replies on your request with the grade and a link to the report.</p>
+          </details>
+          <details>
+            <summary>My agent isn't on the OpenServ marketplace. Can you grade it?</summary>
+            <p className="muted">
+              Yes, if it has a public https address. Either it takes a POST with <code>{"{\"prompt\": \"...\"}"}</code> and replies with the answer
+              as JSON or plain text, or it's an OpenAI-style <code>/chat/completions</code> address (tell us the model name). Don't share private keys:
+              the address must work without one.
+            </p>
+          </details>
+          <details>
+            <summary>What if something goes wrong?</summary>
+            <p className="muted">
+              Each task is tried twice. If your agent still doesn't answer, or the payment can't be matched, the bot says so on your
+              request and the maintainer follows up there, to retry or refund.
+            </p>
+          </details>
+          <details>
+            <summary>Can my grade go up?</summary>
+            <p className="muted">
+              Yes. Fix the weak spots in the report and request a regrade for ${REGRADE_PRICE_USD}. It uses the same tasks, so the report shows
+              each task's score before and after.
+            </p>
+          </details>
         </div>
       </section>
     </main>
