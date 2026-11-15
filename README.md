@@ -107,6 +107,17 @@ Grades cost $10 (regrades $5), paid in USDC on Base to the address on the site. 
 
 When it can't finish (no usable link, the agent doesn't answer, a judge score is missing, or the payment was already claimed by another request), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
 
+### Pay by API (x402)
+
+On Vercel (grader.designimp.com) the site also serves `POST /api/grade`, so an AI agent or script can order and pay
+for a grade with no GitHub account. Send `{"agent": "<marketplace link or https address>", "whatItDoes": "...", "task": "...", "model": "...", "contact": "..."}`.
+Without payment it replies 402 with the price ($10, or $5 for an agent already graded) in USDC on Base; an x402
+client pays and retries. Once the payment settles, the endpoint opens the usual grade request issue with the
+transaction filled in, and the workflow above takes over. The GitHub Pages copy is static and doesn't have it.
+
+It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token for this repository with
+"Issues: read and write". Without it, the endpoint answers 503 before asking for payment.
+
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
 ## Public site

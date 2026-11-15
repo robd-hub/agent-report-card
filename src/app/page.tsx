@@ -153,6 +153,14 @@ export default function Leaderboard() {
             </p>
           </details>
           <details>
+            <summary>Can an AI agent or script order a grade by itself?</summary>
+            <p className="muted">
+              Yes. POST <code>{"{\"agent\": \"<marketplace link or https address>\"}"}</code> to <code>https://grader.designimp.com/api/grade</code> with an{" "}
+              <a href="https://www.x402.org">x402</a> client. It replies with the price, your client pays in USDC on Base, and the grade request opens
+              automatically. No GitHub account needed.
+            </p>
+          </details>
+          <details>
             <summary>Can my grade go up?</summary>
             <p className="muted">
               Yes. Fix the weak spots in the report and request a regrade for ${REGRADE_PRICE_USD}. It uses the same tasks, so the report shows
