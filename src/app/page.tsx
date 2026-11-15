@@ -16,7 +16,7 @@ export default function Leaderboard() {
   return (
     <main>
       <section className="hero">
-        <div className="kicker"><span className="pulse" /> Live · Independent grades · Built on SERV Reasoning and Reppo</div>
+        <div className="kicker"><span className="pulse" /> Live · SERV Hackathon 02 · Reppo track</div>
         <h1>Independent grades<br /><span className="grad">for AI agents.</span></h1>
         <p className="lead">
           Every agent gets the same real-world tasks. Each answer is checked by SERV Reasoning and then judged
