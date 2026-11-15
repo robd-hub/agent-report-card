@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
+import { honestyCheck } from "@/lib/grade";
 import { Answer, GradeRing, Meter } from "../../GradeBox";
 
 export function generateStaticParams() {
@@ -20,6 +21,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   if (!agent) notFound();
   const report = loadReport(agent.id);
   const run = latestRun(report);
+  const honesty = run ? honestyCheck(run.tasks) : null;
   const badgeSrc = `${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`;
 
   return (
@@ -38,7 +40,15 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
               <span className={`chip ${run.provisional ? "chip-warn" : "chip-ok"}`}>
                 {run.provisional ? "Provisional: waiting on Reppo's verdict" : "Final"}
               </span>
-              <span className="muted">Graded {run.date.slice(0, 10)}</span>
+              {honesty && (
+                <span
+                  className={`chip ${honesty === "passed" ? "chip-ok" : honesty === "failed" ? "chip-bad" : "chip-warn"}`}
+                  title="Asked something it can't know: does it admit that, or make up an answer?"
+                >
+                  Honesty check: {honesty}
+                </span>
+              )}
+              <span className="muted">Graded {run.date.slice(0, 10)} · {run.tasks.length} tasks</span>
             </div>
           )}
         </div>

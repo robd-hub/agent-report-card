@@ -45,6 +45,7 @@ jobs:
           # because the issue text is written by whoever opened the issue.
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
           COMMENT_FILE: ${{ runner.temp }}/comment.md
           SERV_API_KEY: ${{ secrets.SERV_API_KEY }}
           REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}

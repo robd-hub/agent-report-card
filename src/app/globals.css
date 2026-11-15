@@ -96,6 +96,7 @@ section { margin: 56px 0; }
 .chip { font: 500 .7rem var(--mono); text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line-strong); color: var(--muted); }
 .chip-ok { color: var(--a); border-color: rgba(46, 242, 164, .35); background: rgba(46, 242, 164, .08); }
 .chip-warn { color: var(--c); border-color: rgba(255, 216, 74, .35); background: rgba(255, 216, 74, .08); }
+.chip-bad { color: var(--f); border-color: rgba(255, 77, 109, .35); background: rgba(255, 77, 109, .08); }
 
 /* grade colours */
 .g-A { --gc: var(--a); } .g-B { --gc: var(--b); } .g-C { --gc: var(--c); } .g-D { --gc: var(--d); } .g-F { --gc: var(--f); } .g-none { --gc: var(--none); }
