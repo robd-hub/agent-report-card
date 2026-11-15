@@ -23,6 +23,8 @@ export interface PaymentRecord {
   amountUsd: number;
   from: string;
   date: string;
+  /** GitHub login of whoever opened the request. */
+  requester?: string;
 }
 
 export function loadPayments(): PaymentRecord[] {
@@ -44,7 +46,7 @@ export function findTxHash(text: string): string | null {
 
 export type PaymentCheck =
   | { ok: true; amountUsd: number; from: string; paidAt: Date }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; alreadyUsed?: boolean };
 
 interface Log {
   address: string;
@@ -78,7 +80,7 @@ const topicAddress = (topic: string) => "0x" + topic.slice(-40).toLowerCase();
 /** Verifies the payment. `minUsd` is the price for this request. */
 export async function checkPayment(tx: string, minUsd: number, rpc: Rpc = baseRpc(), now = new Date()): Promise<PaymentCheck> {
   const used = loadPayments().find((p) => p.tx === tx);
-  if (used) return { ok: false, reason: `This payment was already used for request #${used.issue}.` };
+  if (used) return { ok: false, alreadyUsed: true, reason: `This payment was already used for request #${used.issue}.` };
 
   const receipt = (await rpc("eth_getTransactionReceipt", [tx])) as Receipt | null;
   if (!receipt) return { ok: false, reason: "That transaction wasn't found on Base. Check it's a Base transaction (not Ethereum) and that it has confirmed." };

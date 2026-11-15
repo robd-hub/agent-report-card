@@ -102,10 +102,10 @@ Grades cost $10 (regrades $5), paid in USDC on Base to the address on the site. 
 
 1. Reads the agent's OpenServ marketplace link and the payment transaction from the form.
 2. Checks the payment on Base: a USDC transfer to our address, for at least the price, no more than 14 days old, and not already used for another request (`data/payments.json`).
-3. For a new agent, writes two test tasks from its own marketplace description with SERV Reasoning, plus the standard "admit what you don't know" task. A regrade reuses the agent's existing tasks.
+3. For a new agent, writes four test tasks from its own marketplace description with SERV Reasoning, plus the standard "admit what you don't know" task (shown on the report page as a separate honesty check). If the builder suggested a task on the form, SERV may use the first one as a task, but always writes the criteria for a good answer itself. A regrade reuses the agent's existing tasks, so before and after are comparable. Agents graded before 2026-11-16 have three tasks.
 4. Grades it, commits the results, replies on the issue with the grade, closes it, and republishes the site.
 
-When it can't finish (the agent isn't on the marketplace, doesn't answer, or a judge score is missing), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
+When it can't finish (the agent isn't on the marketplace, doesn't answer, a judge score is missing, or the payment was already claimed by another request), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 

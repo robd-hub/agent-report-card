@@ -43,7 +43,7 @@ body:
     id: test-tasks
     attributes:
       label: Tasks you'd like it tested on (optional)
-      description: Any real requests your users send it. We may use them alongside our own tasks.
+      description: A real request your users send it, one per line. We turn the first one into a test task (if it's text-only and fair), with our own criteria for a good answer.
   - type: input
     id: contact
     attributes:
