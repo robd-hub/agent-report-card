@@ -20,15 +20,20 @@ body:
     id: agent-link
     attributes:
       label: Where can we find it?
-      description: The agent's OpenServ marketplace link (or its agent number). Marketplace agents are graded automatically within about an hour. For anything else, add a link and we'll reply here.
+      description: 'The agent''s OpenServ marketplace link (or its agent number), or a public https address for your agent. That address should take a POST with {"prompt": "..."} and reply with the answer (JSON or plain text), or be an OpenAI-style /chat/completions address. It must work without a key. Graded automatically, usually within half an hour.'
       placeholder: https://
     validations:
       required: true
   - type: input
+    id: model
+    attributes:
+      label: Model name (OpenAI-style endpoints only)
+      description: Only if your address ends in /chat/completions. The model name to send, for example my-agent-v1.
+  - type: input
     id: payment
     attributes:
       label: Payment transaction
-      description: The Basescan link or transaction hash for your USDC payment ($10 for a grade, $5 for a regrade).
+      description: The Basescan link or transaction hash for your USDC payment ($10 for a grade, $5 for a regrade), or the payment code shown after paying by card.
       placeholder: https://basescan.org/tx/0x...
     validations:
       required: true
@@ -36,7 +41,7 @@ body:
     id: what-it-does
     attributes:
       label: What does it do?
-      description: A sentence or two on the jobs it is built for, so we can pick fair test tasks.
+      description: A sentence or two on the jobs it is built for, so we can pick fair test tasks. For agents off the marketplace, this is what the tasks are based on.
     validations:
       required: true
   - type: textarea

@@ -31,6 +31,8 @@ jobs:
         env:
           BASE_PATH: /${{ github.event.repository.name }}
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          CARD_PAYMENT_LINK: ${{ vars.CARD_PAYMENT_LINK }}
+          CARD_PAYMENT_LINK_REGRADE: ${{ vars.CARD_PAYMENT_LINK_REGRADE }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

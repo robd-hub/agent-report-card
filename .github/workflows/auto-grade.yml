@@ -50,6 +50,9 @@ jobs:
           SERV_API_KEY: ${{ secrets.SERV_API_KEY }}
           REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}
           OPENSERV_USER_API_KEY: ${{ secrets.OPENSERV_USER_API_KEY }}
+          # Optional, for card payments through Stripe.
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          CARD_PAYMENTS: ${{ vars.CARD_PAYMENT_LINK }}
 
       - name: Save results
         run: |

@@ -100,12 +100,37 @@ Without keys, nothing is scored and no results are made up: the site shows agent
 
 Grades cost $10 (regrades $5), paid in USDC on Base to the address on the site. When a builder opens a "Get your agent graded" issue, the `Auto-grade paid requests` workflow handles it with no one involved:
 
-1. Reads the agent's OpenServ marketplace link and the payment transaction from the form.
+1. Reads the agent's link and the payment transaction from the form. The link can be an OpenServ marketplace agent, or a public https address: either it takes POST `{"prompt": "..."}` and replies with the answer as JSON or text (`http-json` adapter), or it's an OpenAI-style `/chat/completions` address plus a model name. Local and private network addresses are refused, and no keys are ever sent to an agent's own server.
 2. Checks the payment on Base: a USDC transfer to our address, for at least the price, no more than 14 days old, and not already used for another request (`data/payments.json`).
 3. For a new agent, writes four test tasks from its own marketplace description with SERV Reasoning, plus the standard "admit what you don't know" task (shown on the report page as a separate honesty check). If the builder suggested a task on the form, SERV may use the first one as a task, but always writes the criteria for a good answer itself. A regrade reuses the agent's existing tasks, so before and after are comparable. Agents graded before 2026-11-16 have three tasks.
-4. Grades it, commits the results, replies on the issue with the grade, closes it, and republishes the site.
+4. Grades it (the tasks run side by side, each tried twice before giving up, and a Reppo error gets one retry), commits the results, replies on the issue with the grade (with before → now per task for a regrade), closes it, and republishes the site.
 
-When it can't finish (the agent isn't on the marketplace, doesn't answer, a judge score is missing, or the payment was already claimed by another request), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
+When it can't finish (no usable link, the agent doesn't answer, a judge score is missing, or the payment was already claimed by another request), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
+
+### Pay by API (x402)
+
+On Vercel (grader.designimp.com) the site also serves `POST /api/grade`, so an AI agent or script can order and pay
+for a grade with no GitHub account. Send `{"agent": "<marketplace link or https address>", "whatItDoes": "...", "task": "...", "model": "...", "contact": "..."}`.
+Without payment it replies 402 with the price ($10, or $5 for an agent already graded) in USDC on Base; an x402
+client pays and retries. Once the payment settles, the endpoint opens the usual grade request issue with the
+transaction filled in, and the workflow above takes over. The GitHub Pages copy is static and doesn't have it.
+
+It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token for this repository with
+"Issues: read and write". Without it, the endpoint answers 503 before asking for payment.
+
+### Pay by card (Stripe)
+
+Ready to switch on, for buyers without crypto:
+1. In Stripe, create two Payment Links: $10 "Agent Report Card grade" and $5 "Agent Report Card regrade". For each,
+   under "After payment" choose "Don't show confirmation page" and redirect to
+   `https://grader.designimp.com/paid/?session={CHECKOUT_SESSION_ID}`.
+2. Add the repository secret `STRIPE_SECRET_KEY` (a restricted key with "Checkout Sessions: read" is enough).
+3. Add repository variables `CARD_PAYMENT_LINK` and `CARD_PAYMENT_LINK_REGRADE` (the two link URLs), and the same
+   two as environment variables in the Vercel project, so both copies of the site show the card option.
+
+After paying, the buyer sees a payment code (the Stripe checkout id) and a request form with it filled in. The bot
+checks with Stripe that it was paid, in US dollars, for at least the price, within 14 days, and not used before.
+Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 

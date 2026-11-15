@@ -11,29 +11,48 @@
  * Reppo scores each answer in about 30-90 seconds. Answers are queued and
  * sent a few at a time, so a big batch doesn't reserve all our credits at once.
  */
-import { runAgent } from "../src/lib/adapters";
+import { prepareAgent, runAgent } from "../src/lib/adapters";
 import { isProvisional, letterGrade, runScore } from "../src/lib/grade";
 import { loadAgents, loadReport, saveReport } from "../src/lib/data";
 import { fetchEvaluation, reppoConfigured, submitEvaluation } from "../src/lib/reppo";
 import { servCheck, servChat, servConfigured } from "../src/lib/serv";
 import type { AgentConfig, GradingRun, TaskResult } from "../src/lib/types";
 
+/** Runs one task, trying once more if the agent errors or times out. */
+async function runWithRetry(agent: AgentConfig, prompt: string): Promise<string> {
+  try {
+    return await runAgent(agent, prompt);
+  } catch (e) {
+    console.log(`  retrying after: ${(e as Error).message}`);
+    await new Promise((r) => setTimeout(r, 10_000));
+    return runAgent(agent, prompt);
+  }
+}
+
 async function gradeAgent(agent: AgentConfig): Promise<void> {
   console.log(`\nGrading ${agent.name}`);
-  const tasks: TaskResult[] = [];
-  for (const task of agent.tasks) {
-    let output: string;
-    try {
-      output = await runAgent(agent, task.prompt);
-    } catch (e) {
-      console.log(`  ${task.id}: could not run (${(e as Error).message})`);
-      return;
-    }
-    const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
-    const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
-    console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
-    tasks.push({ taskId: task.id, output, serv, reppo });
-  }
+  // Set up anything the agent needs (such as its OpenServ workflow) once, before
+  // the tasks run side by side, so parallel tasks don't each create one.
+  await prepareAgent(agent);
+  let failed = false;
+  const tasks: TaskResult[] = await Promise.all(
+    agent.tasks.map(async (task) => {
+      let output = "";
+      try {
+        output = await runWithRetry(agent, task.prompt);
+      } catch (e) {
+        console.log(`  ${task.id}: could not run (${(e as Error).message})`);
+        failed = true;
+        return null as unknown as TaskResult;
+      }
+      const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
+      const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
+      console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
+      return { taskId: task.id, output, serv, reppo };
+    }),
+  );
+  // A grade with a missing task wouldn't be fair, so don't save a partial run.
+  if (failed) return;
   const report = loadReport(agent.id);
   report.runs.push(await buildRun(agent, tasks));
   saveReport(report);
@@ -54,6 +73,15 @@ async function stepReppoQueue(agents: AgentConfig[]): Promise<number> {
     if (!run) return [];
     return run.tasks.map((t) => ({ agent, report, run, t }));
   });
+
+  // Give each answer one more try at Reppo after an error, unless we're out of credits.
+  for (const item of open.filter((o) => o.t.reppo.status === "error" && !o.t.reppoRetried)) {
+    if (/out of reppo credits/i.test((item.t.reppo as { message: string }).message)) continue;
+    console.log(`  ${item.agent.name} / ${item.t.taskId}: retrying at Reppo after an error`);
+    item.t.reppo = { status: "queued" };
+    item.t.reppoRetried = true;
+    saveReport(item.report);
+  }
 
   let inFlight = 0;
   for (const item of open.filter((o) => o.t.reppo.status === "pending")) {
