@@ -19,6 +19,9 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: process.env.BASE_PATH || "",
     NEXT_PUBLIC_SITE_URL: process.env.SITE_URL || "",
+    // Stripe Payment Links for paying by card. The card option only shows when set.
+    NEXT_PUBLIC_CARD_LINK: process.env.CARD_PAYMENT_LINK || "",
+    NEXT_PUBLIC_CARD_LINK_REGRADE: process.env.CARD_PAYMENT_LINK_REGRADE || "",
   },
 };
 export default nextConfig;

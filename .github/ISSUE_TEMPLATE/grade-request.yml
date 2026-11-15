@@ -33,7 +33,7 @@ body:
     id: payment
     attributes:
       label: Payment transaction
-      description: The Basescan link or transaction hash for your USDC payment ($10 for a grade, $5 for a regrade).
+      description: The Basescan link or transaction hash for your USDC payment ($10 for a grade, $5 for a regrade), or the payment code shown after paying by card.
       placeholder: https://basescan.org/tx/0x...
     validations:
       required: true

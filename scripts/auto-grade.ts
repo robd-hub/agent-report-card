@@ -203,7 +203,8 @@ async function main() {
   if (!tx) {
     return finish(
       "rejected",
-      `We couldn't find a payment transaction in your request. Send ${GRADE_PRICE_USD} USDC on Base to \`${PAY_ADDRESS}\` (${REGRADE_PRICE_USD} USDC for a regrade), then edit this request and paste the Basescan link.`,
+      `We couldn't find a payment in your request. Send ${GRADE_PRICE_USD} USDC on Base to \`${PAY_ADDRESS}\` (${REGRADE_PRICE_USD} USDC for a regrade), then edit this request and paste the Basescan link` +
+        (process.env.CARD_PAYMENTS ? ", or pay by card on the site and paste the payment code it shows." : "."),
     );
   }
 
@@ -215,6 +216,7 @@ async function main() {
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
   const payment = await checkPayment(tx, price);
+  if (!payment.ok && payment.needsMaintainer) return finish("needs-attention", payment.reason);
   if (!payment.ok && payment.alreadyUsed) {
     // Transactions are public, so someone could paste another buyer's payment.
     // Don't just turn the second claimant away: let the maintainer decide.

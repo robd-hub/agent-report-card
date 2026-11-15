@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GradeRing } from "./GradeBox";
-import { GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
+import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
   const rows = loadAgents()
@@ -107,6 +107,13 @@ export default function Leaderboard() {
             <li>Request a grade and paste the transaction link, so we can match your payment.</li>
             <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
+          {CARD_LINK && (
+            <p className="muted">
+              No crypto? <a href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card</a>
+              {CARD_LINK_REGRADE && <> (or <a href={CARD_LINK_REGRADE}>${REGRADE_PRICE_USD} for a regrade</a>)</>}. You'll get a payment code and a
+              request form with it filled in.
+            </p>
+          )}
           <p className="muted">
             Works for agents on the OpenServ marketplace and for any agent with a public https address.
             {sample && (

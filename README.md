@@ -118,6 +118,20 @@ transaction filled in, and the workflow above takes over. The GitHub Pages copy 
 It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token for this repository with
 "Issues: read and write". Without it, the endpoint answers 503 before asking for payment.
 
+### Pay by card (Stripe)
+
+Ready to switch on, for buyers without crypto:
+1. In Stripe, create two Payment Links: $10 "Agent Report Card grade" and $5 "Agent Report Card regrade". For each,
+   under "After payment" choose "Don't show confirmation page" and redirect to
+   `https://grader.designimp.com/paid/?session={CHECKOUT_SESSION_ID}`.
+2. Add the repository secret `STRIPE_SECRET_KEY` (a restricted key with "Checkout Sessions: read" is enough).
+3. Add repository variables `CARD_PAYMENT_LINK` and `CARD_PAYMENT_LINK_REGRADE` (the two link URLs), and the same
+   two as environment variables in the Vercel project, so both copies of the site show the card option.
+
+After paying, the buyer sees a payment code (the Stripe checkout id) and a request form with it filled in. The bot
+checks with Stripe that it was paid, in US dollars, for at least the price, within 14 days, and not used before.
+Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
+
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
 ## Public site
