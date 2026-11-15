@@ -6,3 +6,6 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 public/badge/
+
+# Generated on Vercel by scripts/prepare-server.ts
+src/app/api/grade/route.ts

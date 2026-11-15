@@ -1,7 +1,7 @@
 /**
  * On Vercel the site also runs a small server, for the pay-by-API endpoint
- * (src/app/api/grade/route.server.ts). Files ending in .server.ts are only
- * picked up there, so the GitHub Pages build stays plain static files.
+ * (src/server/grade.ts, whose route file scripts/prepare-server.ts writes only
+ * there), so the GitHub Pages build stays plain static files.
  */
 const onVercel = Boolean(process.env.VERCEL);
 
@@ -13,7 +13,6 @@ const onVercel = Boolean(process.env.VERCEL);
  */
 const nextConfig = {
   ...(onVercel ? {} : { output: "export" }),
-  pageExtensions: onVercel ? ["tsx", "ts", "server.ts"] : ["tsx", "ts"],
   trailingSlash: true,
   basePath: process.env.BASE_PATH || "",
   env: {

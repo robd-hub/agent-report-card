@@ -10,7 +10,7 @@
     "grade": "NODE_USE_ENV_PROXY=1 tsx scripts/grade.ts",
     "auto-grade": "tsx scripts/auto-grade.ts",
     "typecheck": "tsc --noEmit",
-    "prebuild": "tsx scripts/badges.ts"
+    "prebuild": "tsx scripts/prepare-server.ts && tsx scripts/badges.ts"
   },
   "dependencies": {
     "@openserv-labs/client": "^2.5.3",

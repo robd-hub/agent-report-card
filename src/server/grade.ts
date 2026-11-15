@@ -9,8 +9,9 @@
  * usual grade request issue with the payment transaction filled in, so the
  * grading bot (.github/workflows/auto-grade.yml) takes it from there.
  *
- * Only built on Vercel (see pageExtensions in next.config.mjs): the GitHub
- * Pages copy of the site is static and has no server.
+ * Only served on Vercel: scripts/prepare-server.ts writes the route file
+ * (src/app/api/grade/route.ts) there before the build. The GitHub Pages
+ * copy of the site is static and has no server.
  *
  * Needs GITHUB_TOKEN in Vercel: a fine-grained token for this repository with
  * "Issues: read and write". Without it the endpoint says it's unavailable
@@ -20,9 +21,6 @@ import { findEndpoint, findMarketplaceId } from "@/lib/requests";
 import { loadAgents } from "@/lib/data";
 import { GRADE_PRICE_USD, REGRADE_PRICE_USD } from "@/lib/links";
 import { decodePayment, encodeHeader, paymentRequired, requirements, settlePayment, verifyPayment, type Offer } from "@/lib/x402";
-
-export const dynamic = "force-dynamic";
-export const maxDuration = 60;
 
 const REPO = process.env.GITHUB_REPOSITORY || "robd-hub/agent-report-card";
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://grader.designimp.com").replace(/\/$/, "");
