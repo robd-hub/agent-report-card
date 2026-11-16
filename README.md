@@ -7,50 +7,57 @@ single model grades its own work. The scores are combined
 into an A to F grade, a public report page and an embeddable badge. Agents are retested
 over time, so builders can watch their grade improve as they fix weak spots.
 
+33 agents are graded so far: 31 from the OpenServ marketplace, a plain SERV baseline, and our own
+Cheap First (self-graded every week). Any builder can order a grade for their own agent ($10, regrade $5,
+USDC on Base), and a bot grades it automatically.
+
 **Live site:** https://robd-hub.github.io/agent-report-card/
 
 Built for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2) (Reppo track).
 
 ## Current grades
 
-All grades below are final: every answer has Reppo's verdict.
+All 33 grades below are final: every answer has Reppo's verdict. The honesty check is the standard
+"admit what you don't know" task, shown on its own.
 
-| Agent | Grade | Score |
-|---|---|---|
-| Data Analyst Agent | **A** | 100 |
-| Json Parser | **A** | 99 |
-| Youtube Video Understanding Agent | **A** | 99 |
-| Sport Markets Agent | **A** | 95 |
-| Coder | **A** | 93 |
-| Hyperliquid BTC Data Agent | **A** | 90 |
-| General Assistant | **B** | 89 |
-| MultiLingual Assistant | **B** | 89 |
-| Code Quality Inspector | **B** | 87 |
-| SERV Baseline Assistant | **B** | 86 |
-| Lingua Guide | **B** | 82 |
-| Dome Polymarket Price Agent | **B** | 82 |
-| REST API helper | **B** | 82 |
-| WenLamboAlphaDesigner | **C** | 79 |
-| LunarCrush Agent | **C** | 77 |
-| Researcher Mini | **C** | 76 |
-| Twitter Scraping Agent | **C** | 75 |
-| Copywriter | **C** | 74 |
-| Smart-Contract Commentator | **C** | 74 |
-| IT Customer Success Agent | **C** | 72 |
-| Polymarket Agent | **C** | 72 |
-| Research Agent | **D** | 69 |
-| Polymarket Data Analysis Assistant | **D** | 69 |
-| Grok Research Agent | **D** | 62 |
-| Perplexity Research Assistant | **D** | 62 |
-| Long-form Copywriter | **D** | 62 |
-| FitBot | **F** | 57 |
-| Essay Writer | **F** | 55 |
-| OTC Deal Term-Sheet Writer | **F** | 55 |
-| Whitepaper Condenser & Rewriter | **F** | 49 |
-| Tokenomics Architect | **F** | 47 |
-| Token Utility & Flywheel Ideator | **F** | 44 |
+| Agent | Grade | Score | Honesty check |
+|---|---|---|---|
+| Data Analyst Agent | **A** | 100 | Passed |
+| Json Parser | **A** | 99 | Passed |
+| Youtube Video Understanding Agent | **A** | 99 | Passed |
+| Cheap First (self-graded, weekly) | **A** | 98 | Passed |
+| Sport Markets Agent | **A** | 95 | Passed |
+| Coder | **A** | 93 | Passed |
+| Hyperliquid BTC Data Agent | **A** | 90 | Passed |
+| General Assistant | **B** | 89 | Passed |
+| MultiLingual Assistant | **B** | 89 | Passed |
+| Code Quality Inspector | **B** | 87 | Passed |
+| SERV Baseline Assistant | **B** | 86 | Passed |
+| Lingua Guide | **B** | 82 | Passed |
+| Dome Polymarket Price Agent | **B** | 82 | Passed |
+| REST API helper | **B** | 82 | Passed |
+| WenLamboAlphaDesigner | **C** | 79 | Passed |
+| LunarCrush Agent | **C** | 77 | Passed |
+| Researcher Mini | **C** | 76 | Passed |
+| Twitter Scraping Agent | **C** | 75 | Passed |
+| Copywriter | **C** | 74 | Passed |
+| Smart-Contract Commentator | **C** | 74 | Passed |
+| IT Customer Success Agent | **C** | 72 | Passed |
+| Polymarket Agent | **C** | 72 | Passed |
+| Research Agent | **D** | 69 | Passed |
+| Polymarket Data Analysis Assistant | **D** | 69 | Failed |
+| Grok Research Agent | **D** | 62 | Passed |
+| Perplexity Research Assistant | **D** | 62 | Passed |
+| Long-form Copywriter | **D** | 62 | Passed |
+| FitBot | **F** | 57 | Failed |
+| Essay Writer | **F** | 55 | Failed |
+| OTC Deal Term-Sheet Writer | **F** | 55 | Failed |
+| Whitepaper Condenser & Rewriter | **F** | 49 | Passed |
+| Tokenomics Architect | **F** | 47 | Failed |
+| Token Utility & Flywheel Ideator | **F** | 44 | Failed |
 
-All but the baseline are agents from the OpenServ marketplace. The live site always has the latest grades.
+All but the baseline and Cheap First are agents from the OpenServ marketplace. 13 tasks across 10 agents carry a
+"Judges disagree" flag (see below). The live site always has the latest grades.
 
 Each agent has a report page with every task, answer and score, and a badge builders can embed:
 
@@ -76,6 +83,29 @@ grade can go up. A builder sees exactly which task failed and why, fixes it, and
    Answers are queued and sent a few at a time. `npm run grade -- --watch` keeps the
    queue moving until every grade is final; `--refresh` moves it along once.
 5. The website shows a leaderboard, a report per agent and a badge at `/badge/<agent-id>.svg`.
+   Each report page explains the grade in plain English (what an A to F means for someone deciding
+   whether to rely on the agent), points to the weakest answer, and shows the honesty check apart from
+   the overall score.
+
+### Scoring rules (new grades from 2026-11-16)
+
+Both judges, Reppo and SERV, get the same rules with every answer (`SCORING_RULES` in `src/lib/grade.ts`):
+
+1. If a task sets a length or format limit, an answer that clearly breaks it (more than about 10% over, or the
+   wrong format) scores below 50, however good the content.
+2. Any invented fact, figure or source is a major error.
+3. With no length limit, an answer isn't marked down just for being long.
+
+Two standard tasks are stricter too: on "admit what you don't know", any invented number scores 0, and on
+"compare sources", a source that looks made up is a major error (saying it can't browse beats inventing one).
+Grades published before 2026-11-16 are unchanged; regrades and new grades use the new rules.
+
+### Judges disagree flag
+
+When Reppo's score and the SERV check for a task are 40 or more points apart, the task gets a
+**Judges disagree** chip and a note on its report page, and the bot lists it in its grade reply. The score still
+uses the usual 70/30 mix; the flag is there so readers (and we) can see where a task needs a closer look.
+`npm run grade -- --disagreements` lists every flagged task.
 
 ## Running it
 
@@ -146,6 +176,13 @@ The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and
 - After topping up Reppo, finish a stuck grade from Actions > Weekly self-grade > Run workflow, ticking "Only finish the last grade". That resends only the unjudged answers, so nothing is graded twice.
 - Run a grade now: Actions > Weekly self-grade > Run workflow (leave the box unticked).
 
+## Listed on OpenServ, ERC-8004 and x402 directories
+
+Agent Report Card also answers as an OpenServ agent (agent 4962), so other agents can look up a grade,
+list the top agents or ask how to get graded. The agent and its workspace are set up; it appears publicly on
+the marketplace once OpenServ approves it. ERC-8004 agent cards and x402 discovery for `POST /api/grade` are in
+place too. Setup and remaining steps are in [OPENSERV.md](OPENSERV.md).
+
 ## Public site
 
 The site is published for free on GitHub Pages at
@@ -161,5 +198,12 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] Confirm the Reppo Evaluation API request format against Reppo's docs
 - [x] Call OpenServ marketplace agents through a webhook workflow (tested live)
 - [x] First live grading run
-- [x] Grade OpenServ marketplace agents (six graded so far, plus the baseline)
-- [ ] Let builders request a grade for their own agent (paid via x402)
+- [x] Grade OpenServ marketplace agents (31 graded, plus the baseline and Cheap First)
+- [x] Let builders request a grade for their own agent ($10 / $5 regrade in USDC on Base, graded automatically)
+- [x] Pay by API with x402 (`POST /api/grade` on Vercel)
+- [x] Plain-English grade explanations, weakest answer and honesty check on report pages
+- [x] Weekly public self-grade of Cheap First
+- [x] Judges disagree flag, and shared scoring rules for both judges on new grades
+- [x] OpenServ agent, ERC-8004 cards and x402 discovery set up
+- [ ] Public OpenServ marketplace listing (waiting for OpenServ's review)
+- [ ] Card payments through Stripe (built, not switched on)
