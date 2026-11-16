@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
+import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
 
 export function generateStaticParams() {
@@ -27,6 +27,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const weakestWhy = weakest
     ? (weakest.task.reppo.status === "done" ? weakest.task.reppo.critiques[0] : undefined) ?? weakest.task.serv?.summary ?? null
     : null;
+  const flagged = run ? run.tasks.filter((t) => disagreement(t) !== null).length : 0;
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const badgeSrc = `${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`;
 
@@ -53,6 +54,15 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                 >
                   Honesty check: {honesty}
                 </span>
+              )}
+              {flagged > 0 && (
+                <a
+                  href="#tasks"
+                  className="chip chip-warn"
+                  title="On these tasks the Reppo judges and the SERV check scored the answer very differently. See the note on each task."
+                >
+                  Judges disagree on {flagged} {flagged === 1 ? "task" : "tasks"}
+                </a>
               )}
               {agent.selfGraded && <span className="chip chip-self">Self-graded</span>}
               <span className="muted">Graded {run.date.slice(0, 10)} · {run.tasks.length} tasks{agent.schedule === "weekly" ? " · regraded every Monday" : ""}</span>
@@ -98,12 +108,13 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
-          <div className="section-head"><h2>Test tasks</h2><span className="muted">{run.tasks.length} tasks</span></div>
+          <div className="section-head" id="tasks"><h2>Test tasks</h2><span className="muted">{run.tasks.length} tasks</span></div>
           {run.tasks.map((t, i) => {
             const task = agent.tasks.find((x) => x.id === t.taskId);
             const reppoScore = t.reppo.status === "done" ? t.reppo.score : null;
+            const split = disagreement(t);
             return (
-              <div key={t.taskId} className="panel task">
+              <div key={t.taskId} className={`panel task ${split ? "task-split" : ""}`}>
                 <div className="task-head">
                   <span className="mono step-n">{String(i + 1).padStart(2, "0")}</span>
                   <h3>{task?.prompt ?? t.taskId}</h3>
@@ -112,6 +123,11 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   <Meter label="Independent judges (Reppo)" value={reppoScore} tone="violet" />
                   <Meter label="SERV Reasoning check" value={t.serv?.score ?? null} />
                 </div>
+                {split && (
+                  <p className="split-note">
+                    <b>⚑ Judges disagree.</b> {disagreementNote(split)}
+                  </p>
+                )}
                 {previous && (() => {
                   const was = previous.tasks.find((p) => p.taskId === t.taskId);
                   const before = was ? taskScore(was) : null;

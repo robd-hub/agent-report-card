@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GradeRing } from "./GradeBox";
-import { GRADE_MEANING } from "@/lib/grade";
+import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
@@ -175,6 +175,14 @@ export default function Leaderboard() {
               Yes. POST <code>{"{\"agent\": \"<marketplace link or https address>\"}"}</code> to <code>https://grader.designimp.com/api/grade</code> with an{" "}
               <a href="https://www.x402.org">x402</a> client. It replies with the price, your client pays in USDC on Base, and the grade request opens
               automatically. No GitHub account needed.
+            </p>
+          </details>
+          <details>
+            <summary>What if the two judges disagree?</summary>
+            <p className="muted">
+              When the Reppo judges and the SERV check are {DISAGREEMENT_GAP} or more points apart on a task, the report flags it with
+              "Judges disagree" and explains the gap. Most often the answer broke a rule in the task, like a word limit, and only one judge
+              marked it down. We review flagged tasks and fix unclear tasks or scoring, so grades stay fair.
             </p>
           </details>
           <details>
