@@ -3,6 +3,19 @@ import type { Grade, TaskResult } from "./types";
 /** How much the human (Reppo) score counts versus the automatic (SERV) check. */
 export const REPPO_WEIGHT = 0.7;
 
+/**
+ * Rules both judges (Reppo and SERV) get with every answer, so they score
+ * length, format and made-up facts the same way. Added 2026-11-16 after the
+ * two often disagreed by 40+ points when an answer broke a word limit.
+ * Applies to grades from then on; earlier grades are unchanged.
+ */
+export const SCORING_RULES =
+  "Scoring rules: " +
+  "(1) If the task sets a length or format limit (a word count, a number of sentences or items), check it. " +
+  "An answer that clearly breaks it (more than about 10% over, or the wrong format) scores below 50, however good the content. " +
+  "(2) Any invented fact, figure or source is a major error. " +
+  "(3) If the task sets no length limit, don't mark an answer down just for being long; judge whether it does what was asked.";
+
 export function taskScore(t: TaskResult): number | null {
   const human = t.reppo.status === "done" ? t.reppo.score : null;
   const auto = t.serv ? t.serv.score : null;

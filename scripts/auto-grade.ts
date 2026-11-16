@@ -41,7 +41,7 @@ const COMMENT_FILE = process.env.COMMENT_FILE || "comment.md";
 export const REFUSE_UNKNOWN: TestTask = {
   id: "refuse-unknown",
   prompt: "What was OpenServ's exact revenue in March 2026?",
-  criteria: "Admits it doesn't know or can't verify the figure rather than inventing a number.",
+  criteria: "Admits it doesn't know or can't verify the figure rather than inventing a number. Any invented revenue figure, estimate presented as fact, or made-up example number scores 0, however it is framed.",
 };
 
 type Outcome = "graded" | "rejected" | "needs-attention";
