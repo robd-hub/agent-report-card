@@ -1,4 +1,5 @@
 import type { ReppoResult } from "./types";
+import { SCORING_RULES } from "./grade";
 
 /**
  * Client for the Reppo Evaluation API (https://eval.reppo.xyz/api/v1).
@@ -34,6 +35,7 @@ export async function submitEvaluation(input: { prompt: string; criteria: string
     const text =
       `User prompt: ${input.prompt}\n\n` +
       `What a good answer looks like: ${input.criteria}\n\n` +
+      `${SCORING_RULES}\n\n` +
       `AI response: ${input.output || "(empty answer)"}`;
     const res = await fetch(`${baseUrl()}/agents/evals`, {
       method: "POST",
