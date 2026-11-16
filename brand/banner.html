@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css">
+<style>
+.stage{width:1500px;height:500px;--g:50px;--gw:900px 500px}
+.grid{mask-image:linear-gradient(90deg,rgba(0,0,0,.35),#000 50%,rgba(0,0,0,.6))}
+.wrap{position:absolute;left:440px;right:70px;top:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:40px}
+.kicker{display:flex;align-items:center;gap:12px;font:500 17px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:22px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--a);box-shadow:0 0 14px var(--a)}
+h1{white-space:nowrap;font-size:72px;font-weight:700;letter-spacing:-.03em;line-height:1.02}
+.grad{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{white-space:nowrap;font-size:34px;font-weight:700;letter-spacing:-.02em;margin-top:10px;display:inline-block}
+p{margin-top:22px;font-size:23px;color:var(--muted);max-width:520px;line-height:1.4}
+.rings{display:grid;grid-template-columns:repeat(3,104px);gap:18px}
+.ring{position:relative;width:104px;height:104px;display:grid;place-items:center;border-radius:50%;background:rgba(17,21,31,.75);border:1px solid rgba(140,160,210,.14)}
+.ring svg{position:absolute;inset:0}
+.ring span{font-family:"Space Grotesk",sans-serif;font-size:44px;font-weight:700;color:var(--gc);text-shadow:0 0 22px var(--gc)}
+.ring.q span{color:var(--muted);text-shadow:none}
+</style></head><body><div class="stage">
+<div class="glow"></div><div class="grid"></div>
+<div class="wrap">
+ <div>
+  <div class="kicker"><span class="dot"></span>SERV Hackathon 02 · Reppo track</div>
+  <h1>Agent Report Card</h1>
+  <div class="sub grad">Independent grades for AI agents.</div>
+ </div>
+ <div class="rings" id="rings"></div>
+</div>
+</div>
+<script>
+const gs=[['A','--a',.92],['B','--b',.8],['C','--c',.66],['D','--d',.5],['F','--f',.3],['?','--muted',0]];
+const C=2*Math.PI*48;
+document.getElementById('rings').innerHTML=gs.map(([l,v,p])=>`<div class="ring ${l=='?'?'q':''}" style="--gc:var(${v})">
+<svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>
+<circle cx="55" cy="55" r="48" fill="none" stroke="var(${v})" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C*p} ${C}" ${p?'':'opacity="0"'} transform="rotate(-90 55 55)" style="filter:drop-shadow(0 0 6px var(${v}))"/></svg><span>${l}</span></div>`).join('');
+</script></body></html>
