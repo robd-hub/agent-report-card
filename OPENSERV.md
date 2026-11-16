@@ -58,9 +58,10 @@ version 2 `PAYMENT-REQUIRED` header carrying the "bazaar" discovery extension
 either `X-PAYMENT` (v1) or `PAYMENT-SIGNATURE` (v2). `/.well-known/x402` lists
 the endpoint.
 
-- **x402scan** (x402scan.com): lists only v2 endpoints. Add
-  `https://agent-report-card.vercel.app/api/grade/` with "Register This URL
-  Only", or add the site and let it read `/.well-known/x402`.
+- **x402scan** (x402scan.com): lists only v2 endpoints, and now finds them
+  through `/openapi.json` (an OpenAPI document with the price in
+  `x-payment-info`, from `src/server/openapi.ts`), not `/.well-known/x402`.
+  Add `agent-report-card.vercel.app`.
 - **PayAI and other facilitator catalogues**: built from the bazaar extension
   when a payment settles through the facilitator, so the endpoint appears
   after its first paid grade.

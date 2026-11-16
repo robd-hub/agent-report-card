@@ -12,3 +12,4 @@ src/app/api/grade/route.ts
 src/app/openserv/
 .openserv.json
 src/app/.well-known/
+src/app/openapi.json/

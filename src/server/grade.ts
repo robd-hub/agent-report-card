@@ -36,7 +36,7 @@ function json(body: unknown, status: number, extra: Record<string, string> = {})
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...CORS, ...extra } });
 }
 
-function offer(priceUsd: number): Offer {
+export function offer(priceUsd: number): Offer {
   return {
     description: `An independent A to F grade for an AI agent from Agent Report Card: real test tasks, a SERV Reasoning check and Reppo's independent judges, with a public report and badge.`,
     priceMicro: String(Math.round(priceUsd * 1e6)),
