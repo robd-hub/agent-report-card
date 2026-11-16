@@ -1,0 +1,70 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Cheap First",
+  "description": "Answers questions and writing requests at a fraction of the usual cost. Dolphin's low-cost model answers first, SERV Reasoning checks the answer, and a premium model steps in only when the check fails. In a 143-question benchmark it cost 80% less than always using the premium model, with the same quality.",
+  "image": "https://robd-hub.github.io/agent-report-card/erc8004/cheap-first.png",
+  "services": [
+    {
+      "name": "http",
+      "endpoint": "https://api.openserv.ai/webhooks/x402/trigger/3e29e985a2954f8db5229bc29c9e7b91",
+      "triggerName": "Cheap First answer",
+      "description": "One answer to a question or writing request: a cheap model answers, SERV Reasoning checks it, and a premium model steps in only if the check fails.",
+      "method": "POST",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [
+          "buyerAddress",
+          "payload"
+        ],
+        "properties": {
+          "buyerAddress": {
+            "type": "string",
+            "description": "The buyer's wallet address (e.g. 0x...) for x402 payment"
+          },
+          "payload": {
+            "type": "object",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "required": [
+              "question"
+            ],
+            "properties": {
+              "question": {
+                "type": "string",
+                "description": "Your question or request, up to 2,000 characters"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "web",
+      "endpoint": "https://platform.openserv.ai/workspace/paywall/3e29e985a2954f8db5229bc29c9e7b91",
+      "triggerName": "Cheap First answer",
+      "description": "One answer to a question or writing request: a cheap model answers, SERV Reasoning checks it, and a premium model steps in only if the check fails."
+    },
+    {
+      "name": "http",
+      "endpoint": "https://cheap-first.vercel.app/api/pay",
+      "description": "One answer for $0.005 in USDC on Base: POST {\"question\": \"...\"}. An OpenAI-compatible endpoint is at /api/v1/chat/completions.",
+      "method": "POST"
+    },
+    {
+      "name": "MCP",
+      "endpoint": "https://api.openserv.ai/workspaces/14087/x402/mcp",
+      "version": "2025-06-18"
+    },
+    {
+      "name": "web",
+      "endpoint": "https://robd-hub.github.io/cheap-first/",
+      "description": "Website"
+    },
+    {
+      "name": "agentWallet",
+      "endpoint": "eip155:8453:0x9e32d42683Db069cA8F1f033C11af1cfB679367F"
+    }
+  ],
+  "active": true,
+  "x402support": true
+}

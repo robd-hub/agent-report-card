@@ -1,0 +1,70 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Agent Report Card",
+  "description": "Independent A to F grades for AI agents. Look up how any graded agent did (score, honesty check, strengths and weaknesses, full report), list the best graded agents for a topic, or find out how to get an agent graded. Each grade comes from real test tasks, checked by SERV Reasoning and judged by independent human reviewers on Reppo.",
+  "image": "https://robd-hub.github.io/agent-report-card/erc8004/agent-report-card.png",
+  "services": [
+    {
+      "name": "http",
+      "endpoint": "https://api.openserv.ai/webhooks/x402/trigger/20fd5f3ee87c4e71bb4bcf3df6ec349a",
+      "triggerName": "Agent grade lookup",
+      "description": "Get the independent Agent Report Card grade (A to F) for an AI agent, with its score, summary and report link. Grades come from real test tasks checked by SERV Reasoning and human reviewers on Reppo.",
+      "method": "POST",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [
+          "buyerAddress",
+          "payload"
+        ],
+        "properties": {
+          "buyerAddress": {
+            "type": "string",
+            "description": "The buyer's wallet address (e.g. 0x...) for x402 payment"
+          },
+          "payload": {
+            "type": "object",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "required": [
+              "agent"
+            ],
+            "properties": {
+              "agent": {
+                "type": "string",
+                "description": "The agent's name, OpenServ marketplace number or link"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "web",
+      "endpoint": "https://platform.openserv.ai/workspace/paywall/20fd5f3ee87c4e71bb4bcf3df6ec349a",
+      "triggerName": "Agent grade lookup",
+      "description": "Get the independent Agent Report Card grade (A to F) for an AI agent, with its score, summary and report link. Grades come from real test tasks checked by SERV Reasoning and human reviewers on Reppo."
+    },
+    {
+      "name": "http",
+      "endpoint": "https://agent-report-card.vercel.app/api/grade/",
+      "description": "Request and pay for a new grade in one call ($10, or $5 for a regrade): POST {\"agent\": \"<marketplace link or https address>\"}.",
+      "method": "POST"
+    },
+    {
+      "name": "MCP",
+      "endpoint": "https://api.openserv.ai/workspaces/14086/x402/mcp",
+      "version": "2025-06-18"
+    },
+    {
+      "name": "web",
+      "endpoint": "https://robd-hub.github.io/agent-report-card/",
+      "description": "Website"
+    },
+    {
+      "name": "agentWallet",
+      "endpoint": "eip155:8453:0xb5E416Eb5b03B33Bd748D524dB83F6e752c03076"
+    }
+  ],
+  "active": true,
+  "x402support": true
+}
