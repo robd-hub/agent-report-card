@@ -107,6 +107,8 @@ Grades cost $10 (regrades $5), paid in USDC on Base to the address on the site. 
 
 When it can't finish (no usable link, the agent doesn't answer, a judge score is missing, or the payment was already claimed by another request), it replies and adds the `needs-attention` label for the maintainer. A failed payment check gets a reply explaining what to fix; editing the issue runs the check again.
 
+**Free grades.** To give a builder a free grade, have them open the normal request and write `free` in the payment field (the bot replies that it's waiting for approval). Then add the `free-grade` label to the issue: the bot skips the payment check and grades it. Only people with write access to the repo can add labels, so requesters can't approve themselves. Free grades are logged in `data/payments.json` with an amount of 0.
+
 ### Pay by API (x402)
 
 On Vercel (grader.designimp.com) the site also serves `POST /api/grade`, so an AI agent or script can order and pay

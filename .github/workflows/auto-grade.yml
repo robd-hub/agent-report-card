@@ -46,6 +46,9 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          # Set when the maintainer adds the "free-grade" label (only people with
+          # write access can add labels), so the payment check is skipped.
+          FREE_GRADE: ${{ contains(github.event.issue.labels.*.name, 'free-grade') }}
           COMMENT_FILE: ${{ runner.temp }}/comment.md
           SERV_API_KEY: ${{ secrets.SERV_API_KEY }}
           REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}
