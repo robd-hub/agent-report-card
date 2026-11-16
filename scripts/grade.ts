@@ -11,7 +11,7 @@
  * Reppo scores each answer in about 30-90 seconds. Answers are queued and
  * sent a few at a time, so a big batch doesn't reserve all our credits at once.
  */
-import { prepareAgent, runAgent } from "../src/lib/adapters";
+import { prepareAgent, runAgent, type AgentReply } from "../src/lib/adapters";
 import { isProvisional, letterGrade, runScore } from "../src/lib/grade";
 import { loadAgents, loadReport, saveReport } from "../src/lib/data";
 import { fetchEvaluation, reppoConfigured, submitEvaluation } from "../src/lib/reppo";
@@ -19,7 +19,7 @@ import { servCheck, servChat, servConfigured } from "../src/lib/serv";
 import type { AgentConfig, GradingRun, TaskResult } from "../src/lib/types";
 
 /** Runs one task, trying once more if the agent errors or times out. */
-async function runWithRetry(agent: AgentConfig, prompt: string): Promise<string> {
+async function runWithRetry(agent: AgentConfig, prompt: string): Promise<AgentReply> {
   try {
     return await runAgent(agent, prompt);
   } catch (e) {
@@ -38,8 +38,9 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
   const tasks: TaskResult[] = await Promise.all(
     agent.tasks.map(async (task) => {
       let output = "";
+      let meta: TaskResult["meta"];
       try {
-        output = await runWithRetry(agent, task.prompt);
+        ({ answer: output, meta } = await runWithRetry(agent, task.prompt));
       } catch (e) {
         console.log(`  ${task.id}: could not run (${(e as Error).message})`);
         failed = true;
@@ -48,7 +49,7 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
       const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
       const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
       console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
-      return { taskId: task.id, output, serv, reppo };
+      return { taskId: task.id, output, serv, reppo, ...(meta ? { meta } : {}) };
     }),
   );
   // A grade with a missing task wouldn't be fair, so don't save a partial run.
@@ -168,9 +169,10 @@ async function main() {
   }
   if (!refresh && !watch) for (const agent of agents) await gradeAgent(agent);
   if (!reppoConfigured()) return;
-  // Reppo's one-pending-evaluation limit is per account, so the queue always
-  // covers every agent, even when only one agent was graded this time.
-  const allAgents = loadAgents();
+  // With agent ids given (as the weekly self-grade does), only move those
+  // agents' answers through Reppo, so a scheduled run never spends credits on
+  // anything else. With no ids, the queue covers every agent.
+  const allAgents = only.length ? agents : loadAgents();
   let waiting = await stepReppoQueue(allAgents);
   console.log(`${waiting} answer(s) still waiting on Reppo.`);
   while (watch && waiting > 0) {

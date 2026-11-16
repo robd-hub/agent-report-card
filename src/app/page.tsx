@@ -62,6 +62,7 @@ export default function Leaderboard() {
                   ) : (
                     <span className="chip">Not graded</span>
                   )}
+                  {agent.selfGraded && <span className="chip chip-self" title="Our own agent, graded the same way as every other">Self-graded · weekly</span>}
                 </div>
                 <div className="muted entry-desc">{agent.description}</div>
                 <div className="entry-bar"><div className={`g-${run?.grade ?? "none"}`} style={{ width: `${run?.score ?? 0}%` }} /></div>

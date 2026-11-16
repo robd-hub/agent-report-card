@@ -15,6 +15,13 @@ export interface AgentConfig {
   model?: string;
   /** Test tasks the agent is given on every run. */
   tasks: TestTask[];
+  /**
+   * Set for an agent made by the same people who run Agent Report Card, so
+   * its report card says so plainly. Holds a short note shown on the page.
+   */
+  selfGraded?: string;
+  /** "weekly" for agents regraded on a schedule by .github/workflows/weekly-grade.yml. */
+  schedule?: "weekly";
 }
 
 export interface TestTask {
@@ -46,6 +53,11 @@ export interface TaskResult {
   reppo: ReppoResult;
   /** Set once an answer has been resent to Reppo after an error, so it's only retried once. */
   reppoRetried?: boolean;
+  /**
+   * Extra facts the agent reported about its own answer, when its reply
+   * includes them (Cheap First says which model answered and what it cost).
+   */
+  meta?: { answeredBy?: string; model?: string; costUsd?: number };
 }
 
 export interface GradingRun {

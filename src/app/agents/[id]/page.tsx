@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
-import { Answer, GradeRing, Meter } from "../../GradeBox";
+import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -54,13 +54,21 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   Honesty check: {honesty}
                 </span>
               )}
-              <span className="muted">Graded {run.date.slice(0, 10)} · {run.tasks.length} tasks</span>
+              {agent.selfGraded && <span className="chip chip-self">Self-graded</span>}
+              <span className="muted">Graded {run.date.slice(0, 10)} · {run.tasks.length} tasks{agent.schedule === "weekly" ? " · regraded every Monday" : ""}</span>
             </div>
           )}
         </div>
       </section>
 
-      {!run && <div className="panel">This agent hasn't been graded yet.</div>}
+      {agent.selfGraded && (
+        <div className="panel self-graded">
+          <div className="panel-label">This is our own agent</div>
+          <p>{agent.selfGraded}</p>
+        </div>
+      )}
+
+      {!run && <div className="panel">This agent hasn't been graded yet.{agent.schedule === "weekly" ? " Its first weekly grade runs next Monday." : ""}</div>}
       {run && (
         <>
           <div className="panel">
@@ -70,7 +78,11 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             )}
             <p className="verdict">{run.summary || "No summary yet."}</p>
             {report.runs.length > 1 && (
-              <p className="muted">History: {report.runs.map((r) => `${r.date.slice(0, 10)} ${r.grade ?? "N/A"}`).join(" → ")}</p>
+              <>
+                <div className="panel-label trend-head">Score history</div>
+                <Trend runs={report.runs} />
+                <p className="muted">History: {report.runs.map((r) => `${r.date.slice(0, 10)} ${r.grade ?? "N/A"}`).join(" → ")}</p>
+              </>
             )}
           </div>
 
@@ -123,6 +135,12 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   <p className="muted">Reppo review: {t.reppo.status === "error" ? "error" : t.reppo.status}</p>
                 )}
                 {t.serv && <p className="muted"><b>SERV:</b> {t.serv.summary}</p>}
+                {t.meta?.answeredBy && (
+                  <p className="muted route">
+                    <b>Answered by:</b> the {t.meta.answeredBy} model{t.meta.model ? ` (${t.meta.model})` : ""}
+                    {t.meta.costUsd !== undefined ? ` · cost $${t.meta.costUsd < 0.001 ? t.meta.costUsd.toFixed(5) : t.meta.costUsd.toFixed(4)}` : ""}
+                  </p>
+                )}
                 <details>
                   <summary>Show the agent's answer</summary>
                   <Answer text={t.output} />

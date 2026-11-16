@@ -1,0 +1,93 @@
+# Regrades our own agent (Cheap First) every Monday, so it has a public
+# report card with a week-by-week history and any drop in quality shows up.
+# Which agents: those with "schedule": "weekly" in data/agents.json.
+#
+# Cost: one Reppo evaluation (440 credits) per task. Cheap First has 3 tasks,
+# so about 1,320 Reppo credits a week, plus a few cents of SERV.
+#
+# If the agent can't be reached, Reppo doesn't finish (usually: out of
+# credits) or the grade goes down, an issue labelled "weekly-grade" is opened.
+#
+# Uses the same repository secrets as the paid grading bot.
+name: Weekly self-grade
+
+on:
+  schedule:
+    # Mondays 01:00 UTC (9 AM in Manila).
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      finish_only:
+        description: "Only finish the last grade at Reppo (after topping up credits), don't grade again"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+# Shares the paid bot's queue: both commit to main and spend Reppo credits.
+concurrency:
+  group: auto-grade
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - id: grade
+        name: Grade and check for a drop
+        run: npx tsx scripts/weekly-grade.ts $([ "$FINISH_ONLY" = "true" ] && echo --finish)
+        env:
+          FINISH_ONLY: ${{ inputs.finish_only }}
+          ALERT_FILE: ${{ runner.temp }}/alert.md
+          SERV_API_KEY: ${{ secrets.SERV_API_KEY }}
+          REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}
+          OPENSERV_USER_API_KEY: ${{ secrets.OPENSERV_USER_API_KEY }}
+
+      - name: Save results
+        id: save
+        if: always()
+        run: |
+          git config user.name "agent-report-card-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No data changes to save."
+          else
+            git commit -m "Weekly self-grade $(date -u +%Y-%m-%d)"
+            git pull --rebase origin main
+            git push origin HEAD:main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open an issue if it needs a look
+        if: always() && (steps.grade.outputs.alert == 'true' || steps.grade.outcome == 'failure')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALERT_FILE: ${{ runner.temp }}/alert.md
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -f "$ALERT_FILE" ] || echo "The weekly self-grade failed before it could check the result." > "$ALERT_FILE"
+          printf '\n[Workflow run](%s)\n' "$RUN_URL" >> "$ALERT_FILE"
+          gh label create weekly-grade --repo "$GITHUB_REPOSITORY" --color 5319E7 --description "Weekly self-grade needs a look" 2>/dev/null || true
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "Weekly self-grade needs a look ($(date -u +%Y-%m-%d))" --label weekly-grade --body-file "$ALERT_FILE"
+
+      # A push made with the workflow's own token doesn't start other
+      # workflows, so start the site build directly.
+      - name: Republish the site
+        if: always() && steps.save.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
