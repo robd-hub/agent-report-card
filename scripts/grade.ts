@@ -7,12 +7,13 @@
  *   npm run grade -- --refresh    # move the Reppo queue along once and stop
  *   npm run grade -- --watch      # keep moving the Reppo queue until every grade is final
  *   npm run grade -- --rebuild    # recompute the latest grade and summary from saved results
+ *   npm run grade -- --disagreements  # list tasks where Reppo and SERV are far apart (no API calls)
  *
  * Reppo scores each answer in about 30-90 seconds. Answers are queued and
  * sent a few at a time, so a big batch doesn't reserve all our credits at once.
  */
 import { prepareAgent, runAgent, type AgentReply } from "../src/lib/adapters";
-import { isProvisional, letterGrade, runScore } from "../src/lib/grade";
+import { DISAGREEMENT_GAP, disagreement, isProvisional, letterGrade, runScore } from "../src/lib/grade";
 import { loadAgents, loadReport, saveReport } from "../src/lib/data";
 import { fetchEvaluation, reppoConfigured, submitEvaluation } from "../src/lib/reppo";
 import { servCheck, servChat, servConfigured } from "../src/lib/serv";
@@ -91,6 +92,8 @@ async function stepReppoQueue(agents: AgentConfig[]): Promise<number> {
     if (item.t.reppo.status === "pending") inFlight++;
     else {
       console.log(`  ${item.agent.name} / ${item.t.taskId}: Reppo ${item.t.reppo.status === "done" ? item.t.reppo.score + "/100" : item.t.reppo.status}`);
+      const split = disagreement(item.t);
+      if (split) console.log(`    ⚑ judges disagree: Reppo ${split.reppo} vs SERV ${split.serv} (${split.gap} points apart)`);
       await finish(item);
     }
   }
@@ -147,11 +150,27 @@ async function writeSummary(agent: AgentConfig, tasks: TaskResult[]): Promise<st
   );
 }
 
+/** Prints every task in the latest grades where the two judges are far apart, biggest gap first. */
+function listDisagreements() {
+  const rows: { agent: string; task: string; reppo: number; serv: number; gap: number; why: string }[] = [];
+  for (const agent of loadAgents()) {
+    const run = loadReport(agent.id).runs.at(-1);
+    for (const t of run?.tasks ?? []) {
+      const g = disagreement(t);
+      if (g) rows.push({ agent: agent.id, task: t.taskId, reppo: g.reppo, serv: g.serv, gap: g.gap, why: t.serv?.summary ?? "" });
+    }
+  }
+  rows.sort((a, b) => b.gap - a.gap);
+  console.log(`${rows.length} task(s) where Reppo and SERV are ${DISAGREEMENT_GAP}+ points apart:\n`);
+  for (const r of rows) console.log(`${r.agent} / ${r.task}: Reppo ${r.reppo}, SERV ${r.serv} (${r.gap} apart)\n  SERV: ${r.why}\n`);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const refresh = args.includes("--refresh");
   const watch = args.includes("--watch");
   const rebuild = args.includes("--rebuild");
+  if (args.includes("--disagreements")) return listDisagreements();
   const only = args.filter((a) => !a.startsWith("--"));
   const agents = loadAgents().filter((a) => only.length === 0 || only.includes(a.id));
   if (!servConfigured()) console.log("Note: SERV_API_KEY is not set, so agents on SERV can't run and SERV checks are skipped.");

@@ -188,3 +188,8 @@ pre { white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,.35);
 .trend-dot.hollow { fill: var(--bg); }
 .route { font-size: 13px; }
 .trend-head { margin-top: 18px; }
+
+.task-split { border-color: rgba(255, 216, 74, .4); }
+.split-note { font-size: 14px; margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 216, 74, .35); background: rgba(255, 216, 74, .08); }
+.split-note b { color: var(--c); }
+a.chip { text-decoration: none; }

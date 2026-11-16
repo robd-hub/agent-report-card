@@ -28,7 +28,7 @@ import { loadAgents, loadReport } from "../src/lib/data";
 import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
 export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
-import { taskScore } from "../src/lib/grade";
+import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
 import { checkPayment, findTxHash, savePayment } from "../src/lib/payment";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
@@ -340,6 +340,10 @@ async function main() {
     const change = previous ? ` ${before === null ? "new" : now === null ? "–" : `${Math.round(before)} → ${Math.round(now)}`} |` : "";
     return `| ${task?.prompt.replace(/\|/g, "/").replace(/\s+/g, " ").slice(0, 90) ?? t.taskId} | ${t.serv ? `${t.serv.score}/100` : "skipped"} | ${reppo} |${change}`;
   });
+  const splits = run.tasks
+    .map((t) => ({ t, g: disagreement(t) }))
+    .filter((x): x is { t: typeof x.t; g: NonNullable<typeof x.g> } => x.g !== null)
+    .map(({ t, g }) => `- **${t.taskId}:** ${disagreementNote(g)}`);
   const gradeLine = run.grade ? `**${run.grade}** (${run.score}/100)` : "not available yet";
   const wasLine = previous?.grade ? ` Last time: ${previous.grade} (${previous.score}/100).` : "";
   const comment = [
@@ -351,6 +355,7 @@ async function main() {
     "",
     run.summary ? `**Verdict:** ${run.summary}` : "",
     "",
+    ...(splits.length ? ["⚑ **Judges disagree** on these tasks, so we'll review them:", ...splits, ""] : []),
     `Full report: ${page}`,
     `Badge for your README: \`![Agent Report Card](${SITE}/badge/${agent.id}.svg)\``,
     "",

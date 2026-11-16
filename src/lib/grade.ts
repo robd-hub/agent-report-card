@@ -10,6 +10,46 @@ export function taskScore(t: TaskResult): number | null {
   return human ?? auto;
 }
 
+/**
+ * Points apart the Reppo judges and the SERV check must be before a task is
+ * flagged as a judge disagreement. A gap this big usually means one judge
+ * missed something (most often a word limit or format rule in the task), so
+ * the task or its scoring needs a look.
+ */
+export const DISAGREEMENT_GAP = 40;
+
+export interface JudgeGap {
+  reppo: number;
+  serv: number;
+  /** Absolute difference in points. */
+  gap: number;
+  /** Which side scored the answer higher. */
+  higher: "reppo" | "serv";
+}
+
+/** The two judges' scores for a task and the gap between them, or null unless both are in. */
+export function judgeGap(t: TaskResult): JudgeGap | null {
+  if (t.reppo.status !== "done" || !t.serv) return null;
+  const reppo = t.reppo.score;
+  const serv = t.serv.score;
+  return { reppo, serv, gap: Math.abs(reppo - serv), higher: reppo >= serv ? "reppo" : "serv" };
+}
+
+/** The gap for a task if it's big enough to flag, otherwise null. */
+export function disagreement(t: TaskResult): JudgeGap | null {
+  const g = judgeGap(t);
+  return g && g.gap >= DISAGREEMENT_GAP ? g : null;
+}
+
+/** Plain-English explanation of a flagged task, for report pages and grade replies. */
+export function disagreementNote(g: JudgeGap): string {
+  const who =
+    g.higher === "reppo"
+      ? "The independent judges on Reppo liked the answer, but the SERV check marked it down. That usually means the answer broke a rule in the task, such as a word limit or format, that the judges let pass."
+      : "The SERV check liked the answer, but the independent judges on Reppo marked it down. That usually means the judges spotted a problem the automatic check missed.";
+  return `The two scores are ${g.gap} points apart (Reppo ${g.reppo}, SERV ${g.serv}). ${who} We review flagged tasks to keep grades fair. The task score still uses the usual mix: ${Math.round(REPPO_WEIGHT * 100)}% Reppo, ${Math.round((1 - REPPO_WEIGHT) * 100)}% SERV.`;
+}
+
 export function runScore(tasks: TaskResult[]): number | null {
   const scores = tasks.map(taskScore).filter((s): s is number => s !== null);
   if (scores.length === 0) return null;
