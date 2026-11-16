@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GradeRing } from "./GradeBox";
+import { GRADE_MEANING } from "@/lib/grade";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
@@ -38,6 +39,14 @@ export default function Leaderboard() {
           <h2>Leaderboard</h2>
           <span className="muted">Ranked by latest score</span>
         </div>
+        <details className="legend">
+          <summary>What do the grades mean?</summary>
+          <ul>
+            {(Object.keys(GRADE_MEANING) as (keyof typeof GRADE_MEANING)[]).map((g) => (
+              <li key={g}><b className={`g-text-${g}`}>{g}</b> {GRADE_MEANING[g]}</li>
+            ))}
+          </ul>
+        </details>
         <div className="board">
           {rows.map(({ agent, run }, i) => (
             <Link key={agent.id} href={`/agents/${agent.id}`} className="entry">

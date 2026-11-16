@@ -168,3 +168,11 @@ pre { white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,.35);
 .faq details { border: 1px solid rgba(255, 255, 255, .08); border-radius: 12px; padding: 14px 16px; background: rgba(255, 255, 255, .02); }
 .faq summary { cursor: pointer; font-weight: 600; }
 .faq p { margin: 10px 0 0; }
+.meaning { margin: 0 0 10px; font-size: 1rem; }
+.example .answer { max-height: none; }
+.example-bad { border-color: rgba(255, 77, 109, .35); }
+.legend { margin: 0 0 12px; color: var(--muted); }
+.legend summary { cursor: pointer; }
+.legend ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.legend li { margin: 4px 0; }
+.legend b { display: inline-block; width: 1.4em; font-family: var(--mono); color: var(--text, #fff); }

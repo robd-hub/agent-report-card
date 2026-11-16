@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { honestyCheck, taskScore } from "@/lib/grade";
+import { excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter } from "../../GradeBox";
 
 export function generateStaticParams() {
@@ -22,6 +22,11 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const report = loadReport(agent.id);
   const run = latestRun(report);
   const honesty = run ? honestyCheck(run.tasks) : null;
+  const weakest = run ? weakestTask(run.tasks) : null;
+  const weakestPrompt = weakest ? agent.tasks.find((x) => x.id === weakest.task.taskId)?.prompt ?? weakest.task.taskId : null;
+  const weakestWhy = weakest
+    ? (weakest.task.reppo.status === "done" ? weakest.task.reppo.critiques[0] : undefined) ?? weakest.task.serv?.summary ?? null
+    : null;
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const badgeSrc = `${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`;
 
@@ -60,11 +65,26 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
         <>
           <div className="panel">
             <div className="panel-label">Verdict</div>
+            {run.grade && (
+              <p className="meaning"><b>What {run.grade === "A" || run.grade === "F" ? "an" : "a"} {run.grade} means:</b> {GRADE_MEANING[run.grade]}</p>
+            )}
             <p className="verdict">{run.summary || "No summary yet."}</p>
             {report.runs.length > 1 && (
               <p className="muted">History: {report.runs.map((r) => `${r.date.slice(0, 10)} ${r.grade ?? "N/A"}`).join(" → ")}</p>
             )}
           </div>
+
+          {weakest && (
+            <div className={`panel example ${weakest.score < 70 ? "example-bad" : ""}`}>
+              <div className="panel-label">{weakest.score < 70 ? "Where it fell short" : "Its weakest answer"}</div>
+              <p><b>Task:</b> {weakestPrompt}</p>
+              <Answer text={excerpt(weakest.task.output || "(no answer)")} />
+              <p className="muted">
+                <b>Task score {Math.round(weakest.score)}/100</b> (judges and SERV check combined).
+                {weakestWhy && <><br /><b>Why:</b> {weakestWhy}</>}
+              </p>
+            </div>
+          )}
 
           <div className="section-head"><h2>Test tasks</h2><span className="muted">{run.tasks.length} tasks</span></div>
           {run.tasks.map((t, i) => {
