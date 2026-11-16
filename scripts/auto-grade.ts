@@ -199,8 +199,18 @@ async function main() {
     );
   }
 
-  const tx = findTxHash(paymentText);
-  if (!tx) {
+  // A free grade is one the maintainer approved by adding the "free-grade"
+  // label. Only people with write access can label issues, so a requester
+  // can't grant it to themselves.
+  const free = process.env.FREE_GRADE === "true";
+  const tx = free ? null : findTxHash(paymentText);
+  if (!free && !tx && /\bfree\b/i.test(paymentText)) {
+    return finish(
+      "rejected",
+      "Thanks! Free grades are approved by hand. Once the maintainer approves this one, the grader starts on its own and replies here.",
+    );
+  }
+  if (!free && !tx) {
     return finish(
       "rejected",
       `We couldn't find a payment in your request. Send ${GRADE_PRICE_USD} USDC on Base to \`${PAY_ADDRESS}\` (${REGRADE_PRICE_USD} USDC for a regrade), then edit this request and paste the Basescan link` +
@@ -215,19 +225,24 @@ async function main() {
   const isRegrade = Boolean(agent);
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
-  const payment = await checkPayment(tx, price);
-  if (!payment.ok && payment.needsMaintainer) return finish("needs-attention", payment.reason);
-  if (!payment.ok && payment.alreadyUsed) {
-    // Transactions are public, so someone could paste another buyer's payment.
-    // Don't just turn the second claimant away: let the maintainer decide.
-    return finish(
-      "needs-attention",
-      `${payment.reason} If you made this payment yourself and didn't open that request, reply here and the maintainer will sort it out.`,
-    );
+  let payment = { amountUsd: 0, from: "" };
+  if (!free) {
+    const check = await checkPayment(tx!, price);
+    if (!check.ok && check.needsMaintainer) return finish("needs-attention", check.reason);
+    if (!check.ok && check.alreadyUsed) {
+      // Transactions are public, so someone could paste another buyer's payment.
+      // Don't just turn the second claimant away: let the maintainer decide.
+      return finish(
+        "needs-attention",
+        `${check.reason} If you made this payment yourself and didn't open that request, reply here and the maintainer will sort it out.`,
+      );
+    }
+    if (!check.ok) {
+      return finish("rejected", `We couldn't confirm the payment for this request: ${check.reason}\n\nOnce that's fixed, edit this request and the grader will check again.`);
+    }
+    payment = check;
   }
-  if (!payment.ok) {
-    return finish("rejected", `We couldn't confirm the payment for this request: ${payment.reason}\n\nOnce that's fixed, edit this request and the grader will check again.`);
-  }
+  const received = free ? "Your free grade is approved, thank you." : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
 
   if (!agent && endpoint) {
     // Off the marketplace, the requester's own form is all we know about the agent.
@@ -239,7 +254,7 @@ async function main() {
     } catch (e) {
       return finish(
         "needs-attention",
-        `Your payment of ${payment.amountUsd} USDC arrived, thank you. We couldn't prepare test tasks for ${name} automatically (${(e as Error).message}), so the maintainer will finish this one by hand and reply here.`,
+        `${received} We couldn't prepare test tasks for ${name} automatically (${(e as Error).message}), so the maintainer will finish this one by hand and reply here.`,
       );
     }
     let id = slugify(name);
@@ -262,7 +277,7 @@ async function main() {
     if (!market) {
       return finish(
         "needs-attention",
-        `Your payment of ${payment.amountUsd} USDC arrived, thank you. But we couldn't find agent number ${marketplaceId} on the OpenServ marketplace. ` +
+        `${received} But we couldn't find agent number ${marketplaceId} on the OpenServ marketplace. ` +
           "The maintainer will check and reply here. If the number is wrong, edit this request with the right marketplace link.",
       );
     }
@@ -272,7 +287,7 @@ async function main() {
     } catch (e) {
       return finish(
         "needs-attention",
-        `Your payment of ${payment.amountUsd} USDC arrived, thank you. We couldn't prepare test tasks for ${market.name} automatically (${(e as Error).message}), so the maintainer will finish this one by hand and reply here.`,
+        `${received} We couldn't prepare test tasks for ${market.name} automatically (${(e as Error).message}), so the maintainer will finish this one by hand and reply here.`,
       );
     }
     let id = slugify(market.name);
@@ -285,8 +300,9 @@ async function main() {
   if (!agent) return finish("needs-attention", "Something went wrong while setting up this request. The maintainer has been notified and will reply here.");
 
   // Record the payment before grading, so the same transaction can't be used twice.
+  // Free grades are recorded too, with no transaction, so they're counted.
   savePayment({
-    tx,
+    tx: free ? `free-grade-issue-${issue}` : tx!,
     issue,
     agentId: agent.id,
     amountUsd: payment.amountUsd,
@@ -309,7 +325,7 @@ async function main() {
   if (!run) {
     return finish(
       "needs-attention",
-      `Your payment of ${payment.amountUsd} USDC arrived, thank you. We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : `at ${agent.endpoint}`} (each was tried twice). ` +
+      `${received} We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : `at ${agent.endpoint}`} (each was tried twice). ` +
         "The maintainer will look into it and reply here, and will retry or refund.",
     );
   }
