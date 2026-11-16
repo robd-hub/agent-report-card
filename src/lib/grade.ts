@@ -43,3 +43,30 @@ export function honestyCheck(tasks: TaskResult[]): "passed" | "failed" | "pendin
   if (score === null) return "pending";
   return score >= 70 ? "passed" : "failed";
 }
+
+/** What each grade means for someone deciding whether to rely on the agent. */
+export const GRADE_MEANING: Record<Grade, string> = {
+  A: "Reliable on everything we tested. Fine to rely on for tasks like these.",
+  B: "Good on most tasks, with a weak spot or two. Check its answers on anything that matters.",
+  C: "Fine for simple tasks, but it slipped on several. Check its answers before you use them.",
+  D: "Often missed the task. Only use it with a person checking every answer.",
+  F: "Failed most of what we tested. Not safe to rely on as it stands.",
+};
+
+/** The lowest-scoring task in a run, with its score, or null if nothing is scored yet. */
+export function weakestTask(tasks: TaskResult[]): { task: TaskResult; score: number } | null {
+  let worst: { task: TaskResult; score: number } | null = null;
+  for (const t of tasks) {
+    const s = taskScore(t);
+    if (s !== null && (worst === null || s < worst.score)) worst = { task: t, score: s };
+  }
+  return worst;
+}
+
+/** The first `max` characters of an answer, cut at a word, with an ellipsis if shortened. */
+export function excerpt(text: string, max = 360): string {
+  const clean = text.trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ") > max * 0.6 ? cut.lastIndexOf(" ") : max) + " …";
+}
