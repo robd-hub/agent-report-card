@@ -64,7 +64,8 @@ const LISTINGS: Record<"arc" | "cf", Listing> = {
   cf: {
     agentName: "Cheap First",
     workflowName: "cheap-first",
-    endpointUrl: "https://cheap-first.vercel.app/openserv",
+    // OpenServ adds a trailing slash, which only /api/openserv handles.
+    endpointUrl: "https://cheap-first.vercel.app/api/openserv",
     description:
       "Answers questions and writing requests at a fraction of the usual cost. Dolphin's low-cost model answers first, SERV Reasoning checks the answer, and a premium model steps in only when the check fails. In a 143-question benchmark it cost 80% less than always using the premium model, with the same quality.",
     trigger: {
