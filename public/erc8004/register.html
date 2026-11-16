@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register agents on ERC-8004</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --bg: #f7f7f5; --card: #fff; --text: #1d1d1b; --muted: #5f5f5a; --line: #deddd8; --accent: #2d5bd7; --ok: #1f7a3f; --bad: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #151514; --card: #1f1f1d; --text: #ececea; --muted: #a3a39d; --line: #34342f; --accent: #7d9cff; --ok: #5cc483; --bad: #ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.5rem; margin: 0 0 8px; }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--muted); font-size: .92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 16px 0; }
+  .card h2 { font-size: 1.1rem; margin: 0 0 4px; }
+  button { font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: default; }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; overflow-wrap: anywhere; }
+  .status { margin-top: 10px; font-size: .95rem; overflow-wrap: anywhere; }
+  .status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
+  ol { padding-left: 20px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Register our agents on ERC-8004</h1>
+  <p>This gives Agent Report Card and Cheap First an on-chain identity on Base, so agent directories such as <a href="https://www.8004scan.io/" target="_blank" rel="noopener">8004scan</a> can find them. Each registration is one MetaMask transaction and costs a few cents of ETH on Base for gas. Nothing else is paid.</p>
+  <ol class="muted">
+    <li>Click <b>Connect MetaMask</b> and approve.</li>
+    <li>Click <b>Register</b> on each agent and confirm in MetaMask. Click each one only once.</li>
+    <li>Copy the result line that appears and send it back in the project thread.</li>
+  </ol>
+
+  <p><button id="connect">Connect MetaMask</button></p>
+  <p id="account" class="muted"></p>
+
+  <div id="agents"></div>
+  <p class="muted">The registry is the official ERC-8004 Identity Registry on Base, <code>0x8004A169FB4a3325136EB29fA0ceB6D2e539a432</code>. Your wallet becomes the owner of each agent identity.</p>
+</main>
+<script>
+const REGISTRY = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
+const BASE = "0x2105"; // chain 8453
+const TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+const REGISTER_SELECTOR = "f2c298be"; // register(string)
+const AGENTS = [
+  { key: "arc", name: "Agent Report Card", uri: "https://robd-hub.github.io/agent-report-card/erc8004/agent-report-card.json" },
+  { key: "cf", name: "Cheap First", uri: "https://robd-hub.github.io/agent-report-card/erc8004/cheap-first.json" },
+];
+let account = null;
+
+function word(n) { return n.toString(16).padStart(64, "0"); }
+function encodeRegister(uri) {
+  const bytes = new TextEncoder().encode(uri);
+  let hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  hex = hex.padEnd(Math.ceil(hex.length / 64) * 64, "0");
+  return "0x" + REGISTER_SELECTOR + word(32) + word(bytes.length) + hex;
+}
+function setStatus(el, text, cls) { el.textContent = text; el.className = "status" + (cls ? " " + cls : ""); }
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function toBase() {
+  try {
+    await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE }] });
+  } catch (e) {
+    if (e && e.code === 4902) {
+      await ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: BASE, chainName: "Base", nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 }, rpcUrls: ["https://mainnet.base.org"], blockExplorerUrls: ["https://basescan.org"] }] });
+    } else throw e;
+  }
+}
+
+async function register(agent, btn, status) {
+  btn.disabled = true;
+  try {
+    await toBase();
+    setStatus(status, "Confirm the transaction in MetaMask...");
+    const hash = await ethereum.request({ method: "eth_sendTransaction", params: [{ from: account, to: REGISTRY, data: encodeRegister(agent.uri) }] });
+    try { localStorage.setItem("erc8004-" + agent.key, hash); } catch {}
+    setStatus(status, "Sent. Waiting for Base to confirm it (usually a few seconds)...");
+    let receipt = null;
+    for (let i = 0; i < 90 && !receipt; i++) {
+      await sleep(2000);
+      receipt = await ethereum.request({ method: "eth_getTransactionReceipt", params: [hash] });
+    }
+    if (!receipt) { setStatus(status, `Still waiting. Send this back in the thread instead: ${agent.key} ${hash}`, "bad"); return; }
+    if (receipt.status !== "0x1") { setStatus(status, `The transaction failed on Base: ${hash}`, "bad"); btn.disabled = false; return; }
+    const mint = receipt.logs.find((l) => l.address.toLowerCase() === REGISTRY.toLowerCase() && l.topics[0] === TRANSFER && BigInt(l.topics[1]) === 0n);
+    const id = mint ? BigInt(mint.topics[3]).toString() : "?";
+    setStatus(status, `Done. Send this line back in the thread: ${agent.key} ${hash} ${id}`, "ok");
+    const a = document.createElement("a");
+    a.href = `https://www.8004scan.io/agents/base/${id}`; a.target = "_blank"; a.rel = "noopener"; a.textContent = " View on 8004scan";
+    status.appendChild(a);
+  } catch (e) {
+    setStatus(status, (e && e.message) || String(e), "bad");
+    btn.disabled = false;
+  }
+}
+
+function render() {
+  const box = document.getElementById("agents");
+  for (const agent of AGENTS) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2></h2><p class="muted mono"></p>`;
+    card.querySelector("h2").textContent = agent.name;
+    card.querySelector("p").textContent = agent.uri;
+    const btn = document.createElement("button");
+    btn.textContent = "Register";
+    btn.disabled = true;
+    btn.dataset.agent = agent.key;
+    const status = document.createElement("div");
+    status.className = "status";
+    let sent = null;
+    try { sent = localStorage.getItem("erc8004-" + agent.key); } catch {}
+    if (sent) setStatus(status, `Already sent from this browser: ${sent}. Only register again if that transaction failed.`);
+    btn.onclick = () => register(agent, btn, status);
+    card.append(btn, status);
+    box.appendChild(card);
+  }
+}
+
+document.getElementById("connect").onclick = async () => {
+  const out = document.getElementById("account");
+  if (!window.ethereum) { out.textContent = "MetaMask wasn't found. Open this page in the browser where MetaMask is installed."; return; }
+  try {
+    [account] = await ethereum.request({ method: "eth_requestAccounts" });
+    await toBase();
+    out.textContent = `Connected: ${account} on Base`;
+    document.querySelectorAll("button[data-agent]").forEach((b) => (b.disabled = false));
+  } catch (e) {
+    out.textContent = (e && e.message) || String(e);
+  }
+};
+render();
+</script>
+</body>
+</html>

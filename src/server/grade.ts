@@ -20,7 +20,7 @@
 import { findEndpoint, findMarketplaceId } from "@/lib/requests";
 import { loadAgents } from "@/lib/data";
 import { GRADE_PRICE_USD, REGRADE_PRICE_USD } from "@/lib/links";
-import { decodePayment, encodeHeader, paymentRequired, requirements, settlePayment, verifyPayment, type Offer } from "@/lib/x402";
+import { decodePayment, encodeHeader, paymentFrom, paymentRequired, paymentRequiredV2, requirements, settlePayment, settlePaymentV2, verifyPayment, verifyPaymentV2, type Offer, type PaymentRequirements } from "@/lib/x402";
 
 const REPO = process.env.GITHUB_REPOSITORY || "robd-hub/agent-report-card";
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://grader.designimp.com").replace(/\/$/, "");
@@ -28,8 +28,8 @@ const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://grader.designimp.com"
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, X-PAYMENT",
-  "Access-Control-Expose-Headers": "X-PAYMENT-RESPONSE",
+  "Access-Control-Allow-Headers": "Content-Type, X-PAYMENT, PAYMENT-SIGNATURE",
+  "Access-Control-Expose-Headers": "X-PAYMENT-RESPONSE, PAYMENT-REQUIRED, PAYMENT-RESPONSE",
 };
 
 function json(body: unknown, status: number, extra: Record<string, string> = {}): Response {
@@ -40,6 +40,10 @@ function offer(priceUsd: number): Offer {
   return {
     description: `An independent A to F grade for an AI agent from Agent Report Card: real test tasks, a SERV Reasoning check and Reppo's independent judges, with a public report and badge.`,
     priceMicro: String(Math.round(priceUsd * 1e6)),
+    example: {
+      body: { agent: "https://platform.openserv.ai/agents/123", task: "Summarise this week's AI agent news in 5 bullet points", contact: "@yourhandle" },
+      output: { status: "accepted", request: "https://github.com/robd-hub/agent-report-card/issues/42", report: null, transaction: "0x...", priceUsd: 10 },
+    },
     outputSchema: {
       input: {
         type: "http",
@@ -67,6 +71,11 @@ export function issueBody(fields: Record<string, string>): string {
     .join("\n\n");
 }
 
+/** A 402 in both x402 versions: a v1 JSON body, and the v2 offer in the PAYMENT-REQUIRED header. */
+function challenge(resource: string, error: string, o: Offer, req: PaymentRequirements, extra: Record<string, string> = {}): Response {
+  return json(paymentRequired(resource, error, o), 402, { "PAYMENT-REQUIRED": encodeHeader(paymentRequiredV2(resource, error, o, req)), ...extra });
+}
+
 export function OPTIONS(): Response {
   return new Response(null, { status: 204, headers: CORS });
 }
@@ -79,17 +88,26 @@ export function GET(): Response {
 export async function POST(request: Request): Promise<Response> {
   if (!process.env.GITHUB_TOKEN) return json({ error: "Paying by API isn't switched on yet. Request a grade on the website instead." }, 503);
 
-  let body: Record<string, unknown>;
+  const payment = paymentFrom(request);
+  let body: Record<string, unknown> = {};
   try {
     body = (await request.json()) as Record<string, unknown>;
   } catch {
-    return json({ error: 'Send JSON like {"agent": "https://platform.openserv.ai/agents/123"}.' }, 400);
+    if (payment) return json({ error: 'Send JSON like {"agent": "https://platform.openserv.ai/agents/123"}.' }, 400);
   }
+  const resource = new URL(request.url).toString();
   const agentLink = clean(body.agent, 500);
   const model = clean(body.model, 100);
   const whatItDoes = clean(body.whatItDoes, 2000);
   const marketplaceId = findMarketplaceId(agentLink);
   const endpoint = marketplaceId ? null : findEndpoint(agentLink, model);
+
+  // No payment yet: quote the price before checking the request, so a bare
+  // probe (as x402 directories send) gets the 402 instead of a 400.
+  if (!payment && !marketplaceId && !endpoint) {
+    const o = offer(GRADE_PRICE_USD);
+    return challenge(resource, `Payment required: $${GRADE_PRICE_USD} in USDC on Base per grade ($${REGRADE_PRICE_USD} for an agent already graded). Send {"agent": "<marketplace link or https address>"}.`, o, requirements(resource, o));
+  }
   if (!marketplaceId && !endpoint) {
     return json({ error: "`agent` must be an OpenServ marketplace link or number, or a public https address (OpenAI-style /chat/completions addresses also need `model`)." }, 400);
   }
@@ -98,16 +116,16 @@ export async function POST(request: Request): Promise<Response> {
   const known = loadAgents().find((a) => (marketplaceId ? a.marketplaceId === marketplaceId : a.endpoint === endpoint!.endpoint));
   const price = known ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
   const o = offer(price);
-  const resource = new URL(request.url).toString();
   const req = requirements(resource, o);
 
-  const header = request.headers.get("x-payment");
-  if (!header) return json(paymentRequired(resource, `Payment required: $${price} in USDC on Base${known ? " (regrade)" : ""}.`, o), 402);
-  const payload = decodePayment(header);
-  if (!payload) return json(paymentRequired(resource, "The X-PAYMENT header couldn't be read.", o), 402);
+  if (!payment) return challenge(resource, `Payment required: $${price} in USDC on Base${known ? " (regrade)" : ""}.`, o, req);
+  const v2 = payment.version === 2;
+  const receiptHeader = v2 ? "PAYMENT-RESPONSE" : "X-PAYMENT-RESPONSE";
+  const payload = decodePayment(payment.header);
+  if (!payload) return challenge(resource, `The ${v2 ? "PAYMENT-SIGNATURE" : "X-PAYMENT"} header couldn't be read.`, o, req);
   try {
-    const check = await verifyPayment(payload, req);
-    if (!check.isValid) return json(paymentRequired(resource, `Payment not accepted: ${check.invalidReason ?? "invalid payment"}.`, o), 402);
+    const check = await (v2 ? verifyPaymentV2 : verifyPayment)(payload, req);
+    if (!check.isValid) return challenge(resource, `Payment not accepted: ${check.invalidReason ?? "invalid payment"}.`, o, req);
   } catch (e) {
     console.error(e);
     return json({ error: "Couldn't check the payment right now. You haven't been charged. Please try again." }, 503);
@@ -115,16 +133,16 @@ export async function POST(request: Request): Promise<Response> {
 
   let settled: Awaited<ReturnType<typeof settlePayment>>;
   try {
-    settled = await settlePayment(payload, req);
+    settled = await (v2 ? settlePaymentV2 : settlePayment)(payload, req);
   } catch (e) {
     console.error(e);
-    return json(paymentRequired(resource, "The payment couldn't be settled. You haven't been charged.", o), 402);
+    return challenge(resource, "The payment couldn't be settled. You haven't been charged.", o, req);
   }
   if (!settled.success || !settled.transaction) {
-    return json(paymentRequired(resource, `Payment couldn't be settled: ${settled.errorReason ?? "unknown reason"}. You haven't been charged.`, o), 402);
+    return challenge(resource, `Payment couldn't be settled: ${settled.errorReason ?? "unknown reason"}. You haven't been charged.`, o, req, { [receiptHeader]: encodeHeader(settled) });
   }
   const tx = settled.transaction;
-  const paidHeader = { "X-PAYMENT-RESPONSE": encodeHeader(settled) };
+  const paidHeader = { [receiptHeader]: encodeHeader(settled) };
 
   const name = clean(body.name, 80) || known?.name || (marketplaceId ? `Marketplace agent ${marketplaceId}` : new URL(endpoint!.endpoint).hostname);
   const issue = {
