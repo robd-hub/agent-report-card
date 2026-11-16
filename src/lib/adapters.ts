@@ -1,15 +1,41 @@
 import { prepareMarketplaceAgent, runMarketplaceAgent } from "./openserv";
-import type { AgentConfig } from "./types";
+import type { AgentConfig, TaskResult } from "./types";
+
+export interface AgentReply {
+  answer: string;
+  meta?: TaskResult["meta"];
+}
 
 /** Send a task to the agent under test and return its answer. */
-export async function runAgent(agent: AgentConfig, prompt: string): Promise<string> {
+export async function runAgent(agent: AgentConfig, prompt: string): Promise<AgentReply> {
   switch (agent.adapter) {
     case "openai-compatible":
-      return runOpenAICompatible(agent, prompt);
+      return { answer: await runOpenAICompatible(agent, prompt) };
     case "openserv-marketplace":
-      return runMarketplaceAgent(agent, prompt);
+      return { answer: await runMarketplaceAgent(agent, prompt) };
     case "http-json":
       return runHttpJson(agent, prompt);
+  }
+}
+
+/**
+ * Facts an agent reports about its own answer, if its JSON reply has them:
+ * which model answered ("answeredBy", "model") and what it cost ("costUsd").
+ * Only short strings and finite numbers are kept.
+ */
+export function metaFrom(text: string): TaskResult["meta"] {
+  try {
+    const b = JSON.parse(text) as Record<string, unknown>;
+    if (!b || typeof b !== "object") return undefined;
+    const str = (v: unknown) => (typeof v === "string" && v.length <= 80 ? v : undefined);
+    const meta = {
+      answeredBy: str(b.answeredBy),
+      model: str(b.model),
+      costUsd: typeof b.costUsd === "number" && Number.isFinite(b.costUsd) && b.costUsd >= 0 ? b.costUsd : undefined,
+    };
+    return Object.values(meta).some((v) => v !== undefined) ? meta : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -67,7 +93,7 @@ export function answerFrom(text: string): string {
 }
 
 /** An agent on its own server: POST {"prompt": "..."} and read the answer from the reply. */
-async function runHttpJson(agent: AgentConfig, prompt: string): Promise<string> {
+async function runHttpJson(agent: AgentConfig, prompt: string): Promise<AgentReply> {
   if (!agent.endpoint || !isPublicHttpsUrl(agent.endpoint)) throw new Error(`Agent ${agent.id} needs a public https endpoint`);
   const res = await fetch(agent.endpoint, {
     method: "POST",
@@ -77,9 +103,10 @@ async function runHttpJson(agent: AgentConfig, prompt: string): Promise<string> 
     redirect: "error",
   });
   if (!res.ok) throw new Error(`Agent ${agent.id} returned ${res.status}`);
-  const answer = answerFrom((await res.text()).slice(0, 200_000));
+  const text = (await res.text()).slice(0, 200_000);
+  const answer = answerFrom(text);
   if (!answer.trim()) throw new Error(`Agent ${agent.id} returned no answer we could read`);
-  return answer;
+  return { answer, meta: metaFrom(text) };
 }
 
 async function runOpenAICompatible(agent: AgentConfig, prompt: string): Promise<string> {

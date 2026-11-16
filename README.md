@@ -136,6 +136,16 @@ Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
+## Weekly self-grade (Cheap First)
+
+[Cheap First](https://github.com/robd-hub/cheap-first) is our own agent, so it gets a public report card like any other, marked "Self-graded" on the site with a note saying so. The `Weekly self-grade` workflow regrades it every Monday at 01:00 UTC (9 AM Manila) through its free demo endpoint, and the report page shows a score-history chart and which model (cheap or premium) answered each task.
+
+- Which agents: any with `"schedule": "weekly"` in `data/agents.json` (`scripts/weekly-grade.ts`).
+- Cost: one Reppo evaluation (440 credits) per task. Cheap First has 3 tasks, so about 1,320 credits a week (about 5,700 a month), plus a few cents of SERV.
+- Alerts: if the agent can't be reached, Reppo doesn't finish (usually out of credits), or the grade drops a letter or 5+ points, the workflow opens an issue labelled `weekly-grade`.
+- After topping up Reppo, finish a stuck grade from Actions > Weekly self-grade > Run workflow, ticking "Only finish the last grade". That resends only the unjudged answers, so nothing is graded twice.
+- Run a grade now: Actions > Weekly self-grade > Run workflow (leave the box unticked).
+
 ## Public site
 
 The site is published for free on GitHub Pages at

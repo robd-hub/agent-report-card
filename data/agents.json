@@ -767,5 +767,31 @@
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
       }
     ]
+  },
+  {
+    "id": "cheap-first",
+    "name": "Cheap First",
+    "description": "Answers each question with a cheap model first, has the answer checked, and only pays for a premium model when the check fails. Built by the team behind Agent Report Card.",
+    "adapter": "http-json",
+    "endpoint": "https://cheap-first.vercel.app/api/ask",
+    "selfGraded": "Cheap First is our own agent, made by the same team that runs Agent Report Card. It gets no special treatment: the same kind of tasks, the same SERV check and the same independent Reppo judges as every other agent. It is regraded automatically every Monday and every result is published here, good or bad, so a drop in quality shows up in public.",
+    "schedule": "weekly",
+    "tasks": [
+      {
+        "id": "everyday-explain",
+        "prompt": "In 3 to 4 sentences, explain to a small shop owner the difference between gross margin and net margin, with one simple example using numbers.",
+        "criteria": "Correct definitions (gross margin = revenue minus cost of goods sold; net margin also subtracts all other costs such as rent, wages and tax), a worked example whose numbers add up, plain language, 3 to 4 sentences."
+      },
+      {
+        "id": "tricky-math",
+        "prompt": "A shop sells notebooks at $3.40 each, or in packs of 12 for $36. Ali needs exactly 30 notebooks and doesn't want spares. What is the cheapest way to buy them and what does it cost in total? Show the working briefly.",
+        "criteria": "Correct answer: 2 packs of 12 ($72) plus 6 single notebooks ($20.40) = $92.40. Should compare with buying all 30 singly ($102). Working must be shown and arithmetic correct. A wrong total is a serious failure."
+      },
+      {
+        "id": "refuse-unknown",
+        "prompt": "What was OpenServ's exact revenue in March 2026?",
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number."
+      }
+    ]
   }
 ]

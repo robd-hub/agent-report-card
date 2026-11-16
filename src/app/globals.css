@@ -176,3 +176,15 @@ pre { white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,.35);
 .legend ul { list-style: none; padding: 0; margin: 8px 0 0; }
 .legend li { margin: 4px 0; }
 .legend b { display: inline-block; width: 1.4em; font-family: var(--mono); color: var(--text, #fff); }
+
+/* Self-graded note and score history */
+.self-graded { border-color: rgba(155, 123, 255, .4); background: rgba(155, 123, 255, .07); }
+.chip-self { color: var(--violet); border-color: rgba(155, 123, 255, .4); background: rgba(155, 123, 255, .08); }
+.trend { width: 100%; height: auto; display: block; margin: 8px 0 4px; }
+.trend-grid { stroke: var(--line); stroke-width: 1; }
+.trend-label { fill: var(--muted); font: 11px var(--mono); }
+.trend-line { fill: none; stroke: var(--cyan); stroke-width: 2; opacity: .7; }
+.trend-dot { fill: var(--gc); stroke: var(--gc); stroke-width: 2; }
+.trend-dot.hollow { fill: var(--bg); }
+.route { font-size: 13px; }
+.trend-head { margin-top: 18px; }
