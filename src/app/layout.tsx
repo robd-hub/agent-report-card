@@ -3,6 +3,10 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Absolute links for the share pictures X and others show for a report link.
+  // Origin only: Next adds the base path itself.
+  metadataBase: new URL(new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io").origin),
+  twitter: { card: "summary_large_image", site: "@agentreportcard" },
   title: "Agent Report Card",
   description: "Independent grades for AI agents, checked by SERV Reasoning and judged independently on Reppo.",
 };

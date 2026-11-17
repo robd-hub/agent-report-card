@@ -231,3 +231,5 @@ a.chip { text-decoration: none; }
 .grade-table td:nth-child(2) { white-space: nowrap; width: 110px; }
 .calc { margin: 12px 0; padding: 10px 14px; border-radius: 10px; background: rgba(79, 227, 255, .06); border: 1px solid rgba(79, 227, 255, .2); }
 @media (max-width: 640px) { .steps.two { grid-template-columns: 1fr; } .grade-table td:nth-child(2) { width: auto; } }
+.badge-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.og-preview { display: block; width: 100%; max-width: 600px; height: auto; margin-top: 8px; border-radius: 12px; border: 1px solid var(--line); }
