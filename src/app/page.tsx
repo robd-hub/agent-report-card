@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Board, boardRows, CategoryTabs } from "./Board";
 import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
@@ -48,7 +49,7 @@ export default function Leaderboard() {
       </section>
 
       <section id="how">
-        <div className="section-head"><h2>How grading works</h2></div>
+        <div className="section-head"><h2>How grading works</h2><Link href="/how-grading-works" className="muted">The full method, with a real example →</Link></div>
         <div className="steps">
           <div className="step">
             <span className="mono step-n">01</span>
