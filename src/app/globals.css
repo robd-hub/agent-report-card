@@ -210,3 +210,11 @@ a.chip { text-decoration: none; }
 .badge-preview img { max-width: 100%; height: auto; }
 .badge-picker pre { width: 100%; margin: 0; }
 .small { font-size: .85rem; margin: 0; }
+
+/* Leaderboard by category */
+.cat-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.cat-tabs a { padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); font-size: .88rem; text-decoration: none; }
+.cat-tabs a span { opacity: .6; margin-left: 4px; font-size: .78rem; }
+.cat-tabs a:hover { border-color: var(--line-strong); color: inherit; }
+.cat-tabs a.on { border-color: var(--cyan); color: var(--cyan); background: rgba(79, 227, 255, .06); }
+.cat-hero { margin: 12px 0 24px; }

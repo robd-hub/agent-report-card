@@ -1,13 +1,9 @@
-import Link from "next/link";
-import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { GradeRing } from "./GradeBox";
+import { Board, boardRows, CategoryTabs } from "./Board";
 import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
-  const rows = loadAgents()
-    .map((agent) => ({ agent, run: latestRun(loadReport(agent.id)) }))
-    .sort((a, b) => (b.run?.score ?? -1) - (a.run?.score ?? -1));
+  const rows = boardRows();
 
   const graded = rows.filter((r) => r.run?.score != null);
   const reviews = rows.reduce((n, r) => n + (r.run?.tasks.filter((t) => t.reppo.status === "done").length ?? 0), 0);
@@ -47,34 +43,8 @@ export default function Leaderboard() {
             ))}
           </ul>
         </details>
-        <div className="board">
-          {rows.map(({ agent, run }, i) => (
-            <Link key={agent.id} href={`/agents/${agent.id}`} className="entry">
-              <span className="rank mono">{String(i + 1).padStart(2, "0")}</span>
-              <GradeRing grade={run?.grade ?? null} score={run?.score ?? null} />
-              <div className="entry-main">
-                <div className="entry-title">
-                  <strong>{agent.name}</strong>
-                  {run ? (
-                    <span className={`chip ${run.provisional ? "chip-warn" : "chip-ok"}`}>
-                      {run.provisional ? "Provisional" : "Final"}
-                    </span>
-                  ) : (
-                    <span className="chip">Not graded</span>
-                  )}
-                  {agent.selfGraded && <span className="chip chip-self" title="Our own agent, graded the same way as every other">Self-graded · weekly</span>}
-                </div>
-                <div className="muted entry-desc">{agent.description}</div>
-                <div className="entry-bar"><div className={`g-${run?.grade ?? "none"}`} style={{ width: `${run?.score ?? 0}%` }} /></div>
-              </div>
-              <div className="entry-score">
-                <b className="mono">{run?.score ?? "—"}</b>
-                <span className="muted">{run ? run.date.slice(0, 10) : ""}</span>
-              </div>
-              <span className="arrow">→</span>
-            </Link>
-          ))}
-        </div>
+        <CategoryTabs />
+        <Board rows={rows} />
       </section>
 
       <section id="how">
