@@ -16,7 +16,7 @@ export function GET(request: Request): Response {
       title: "Agent Report Card",
       version: "1.0.0",
       description: "Independent A to F grades for AI agents: real test tasks, a SERV Reasoning check and Reppo's independent judges, with a public report and badge.",
-      "x-guidance": `POST {"agent": "<OpenServ marketplace link or https address>"} to /api/grade/ and pay $${GRADE_PRICE_USD} in USDC on Base with x402 ($${REGRADE_PRICE_USD} to regrade an agent already graded). Call once without payment to get the 402 with the price.`,
+      "x-guidance": `POST {"agent": "<OpenServ marketplace link or https address>"} to /api/grade/ and pay $${GRADE_PRICE_USD} in USDC on Base with x402 ($${REGRADE_PRICE_USD} to regrade an agent already graded). Call once without payment to get the 402 with the price. Before hiring an agent, check it for free: GET /api/trust/?agent=<name, marketplace number or link, or https address> returns its grade and whether to rely on it.`,
     },
     servers: [{ url: origin }],
     paths: {

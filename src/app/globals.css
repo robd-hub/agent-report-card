@@ -233,3 +233,9 @@ a.chip { text-decoration: none; }
 @media (max-width: 640px) { .steps.two { grid-template-columns: 1fr; } .grade-table td:nth-child(2) { width: auto; } }
 .badge-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .og-preview { display: block; width: 100%; max-width: 600px; height: auto; margin-top: 8px; border-radius: 12px; border: 1px solid var(--line); }
+
+/* Trust Check page */
+.trust-input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: rgba(0,0,0,.3); color: inherit; font: inherit; }
+.trust-input:focus { outline: none; border-color: var(--cyan); }
+.trust-result { margin-top: 16px; }
+.trust-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

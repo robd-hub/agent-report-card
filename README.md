@@ -168,6 +168,16 @@ Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
+## Trust Check (free, for agents)
+
+Before an agent hands work to another agent, it can ask Agent Report Card first:
+
+```
+curl "https://agent-report-card.vercel.app/api/trust/?agent=Cheap%20First"
+```
+
+The answer gives the grade, an `advice` field (`rely`, `check`, `avoid` or `unknown`), the honesty check result, when it was tested, whether the grade is out of date (older than 60 days) and links to the report and badge. The agent can be named by its name, OpenServ marketplace number or link, or its own https address. The same records are static files at `/trust/<id>.json` and `/trust/index.json` on both copies of the site, and there is a search page at `/trust-check/`. Code: `src/lib/trust.ts`, `src/server/trust.ts`.
+
 ## Weekly self-grade (Cheap First)
 
 [Cheap First](https://github.com/robd-hub/cheap-first) is our own agent, so it gets a public report card like any other, marked "Self-graded" on the site with a note saying so. The `Weekly self-grade` workflow regrades it every Monday at 01:00 UTC (9 AM Manila) through its free demo endpoint, and the report page shows a score-history chart and which model (cheap or premium) answered each task.

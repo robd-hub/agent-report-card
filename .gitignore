@@ -13,3 +13,5 @@ src/app/openserv/
 .openserv.json
 src/app/.well-known/
 src/app/openapi.json/
+public/trust/
+src/app/api/trust/
