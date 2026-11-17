@@ -193,3 +193,20 @@ pre { white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,.35);
 .split-note { font-size: 14px; margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 216, 74, .35); background: rgba(255, 216, 74, .08); }
 .split-note b { color: var(--c); }
 a.chip { text-decoration: none; }
+
+/* Badge picker on report pages */
+.badge-picker { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.badge-picker .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden; }
+.badge-picker .seg button { font: 500 .9rem var(--sans); color: var(--muted); background: transparent; border: 0; padding: 8px 14px; min-height: 40px; cursor: pointer; }
+.badge-picker .seg button + button { border-left: 1px solid var(--line-strong); }
+.badge-picker .seg button.on { color: #06080d; background: var(--cyan); }
+.badge-picker .match-opts { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.badge-picker .accent { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; }
+.badge-picker .accent input { width: 40px; height: 32px; border: 1px solid var(--line-strong); border-radius: 8px; background: none; padding: 2px; cursor: pointer; }
+.badge-picker .linkish { background: none; border: 0; color: var(--cyan); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
+.badge-preview { width: 100%; padding: 28px 20px; border-radius: 14px; border: 1px solid var(--line); display: flex; justify-content: center; align-items: center; min-height: 170px; }
+.badge-preview.dark { background: #0b0d12; color: #e8ecf6; }
+.badge-preview.light { background: #f6f7f9; color: #12151c; font-family: Georgia, "Times New Roman", serif; }
+.badge-preview img { max-width: 100%; height: auto; }
+.badge-picker pre { width: 100%; margin: 0; }
+.small { font-size: .85rem; margin: 0; }
