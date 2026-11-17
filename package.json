@@ -15,12 +15,15 @@
     "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts"
   },
   "dependencies": {
+    "@account-kit/infra": "^4.88.5",
     "@openserv-labs/client": "^2.5.3",
+    "@virtuals-protocol/acp-node-v2": "0.1.15",
     "bcryptjs": "^3.0.3",
     "https-proxy-agent": "^7.0.6",
     "next": "15.5.29",
     "react": "19.1.10",
-    "react-dom": "19.1.10"
+    "react-dom": "19.1.10",
+    "viem": "^2.58.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

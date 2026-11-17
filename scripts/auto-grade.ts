@@ -29,7 +29,7 @@ import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
 export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
-import { checkPayment, findTxHash, savePayment } from "../src/lib/payment";
+import { checkPayment, findTxHash, loadPayments, savePayment } from "../src/lib/payment";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
 
@@ -45,6 +45,17 @@ export const REFUSE_UNKNOWN: TestTask = {
 };
 
 type Outcome = "graded" | "rejected" | "needs-attention";
+
+/**
+ * A grade paid through a Virtuals ACP job. These variables come from the
+ * workflow (scripts/acp-seller.ts), never from request text.
+ */
+export function acpPaidJob(env = process.env): { ref: string; amountUsd: number; client: string } | null {
+  const job = (env.ACP_JOB_REF ?? "").trim();
+  if (!/^acp-\d{1,12}-\d{1,30}$/.test(job)) return null;
+  const amountUsd = Number(env.ACP_PAID_USD);
+  return { ref: job, amountUsd: Number.isFinite(amountUsd) ? amountUsd : 0, client: (env.ACP_CLIENT ?? "").slice(0, 64) };
+}
 
 /** Splits a GitHub issue form body ("### Label\n\nvalue") into label -> value. */
 export function parseIssueForm(body: string): Record<string, string> {
@@ -203,7 +214,10 @@ async function main() {
   // label. Only people with write access can label issues, so a requester
   // can't grant it to themselves.
   const free = process.env.FREE_GRADE === "true";
-  const tx = free ? null : findTxHash(paymentText);
+  // Set only by scripts/acp-seller.ts for a job already paid into Virtuals
+  // ACP escrow, so there's no Base transaction to check here.
+  const acp = acpPaidJob();
+  const tx = free ? null : acp ? acp.ref : findTxHash(paymentText);
   if (!free && !tx && /\bfree\b/i.test(paymentText)) {
     return finish(
       "rejected",
@@ -226,7 +240,12 @@ async function main() {
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
   let payment = { amountUsd: 0, from: "" };
-  if (!free) {
+  if (acp) {
+    if (loadPayments().some((p) => p.tx === acp.ref)) {
+      return finish("needs-attention", `Virtuals job ${acp.ref} was already recorded as paid, so it wasn't graded twice.`);
+    }
+    payment = { amountUsd: acp.amountUsd, from: acp.client };
+  } else if (!free) {
     const check = await checkPayment(tx!, price);
     if (!check.ok && check.needsMaintainer) return finish("needs-attention", check.reason);
     if (!check.ok && check.alreadyUsed) {
@@ -242,7 +261,7 @@ async function main() {
     }
     payment = check;
   }
-  const received = free ? "Your free grade is approved, thank you." : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
+  const received = free ? "Your free grade is approved, thank you." : acp ? "Your Virtuals payment is in escrow, thank you." : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
 
   if (!agent && endpoint) {
     // Off the marketplace, the requester's own form is all we know about the agent.
