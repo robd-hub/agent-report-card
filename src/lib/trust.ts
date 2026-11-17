@@ -10,9 +10,13 @@
  *     on Vercel (src/server/trust.ts), which also says if a grade is out of date
  *   - the Trust Check page (src/app/trust-check/)
  */
+import { CATEGORIES, categoryById, categoryOf, type CategoryId } from "./categories";
 import { GRADE_MEANING, honestyCheck, disagreement } from "./grade";
 import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "./links";
 import type { AgentConfig, Grade, GradingRun } from "./types";
+
+/** The Output verifier: checks an agent's work before the buyer pays it. */
+export const VERIFY_URL = "https://cheap-first.vercel.app/api/verify";
 
 /** How long a grade counts as current. After this we advise a regrade. */
 export const FRESH_DAYS = 60;
@@ -82,7 +86,7 @@ export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string
   return {
     version: 1,
     // A shared model API (OpenAI-style) isn't one agent's own address, so it isn't used to match.
-    agent: { id: agent.id, name: agent.name, category: agent.category, marketplaceId: agent.marketplaceId, endpoint: agent.adapter === "http-json" ? agent.endpoint : undefined },
+    agent: { id: agent.id, name: agent.name, category: categoryOf(agent), marketplaceId: agent.marketplaceId, endpoint: agent.adapter === "http-json" ? agent.endpoint : undefined },
     graded,
     grade: run?.grade ?? null,
     score: run?.score ?? null,
@@ -133,3 +137,57 @@ export function findTrust(query: string, all: TrustRecord[]): TrustRecord | null
   }
   return all.find((r) => r.agent.id === q.toLowerCase()) ?? all.find((r) => norm(r.agent.name) === norm(q)) ?? null;
 }
+
+const ADVICE_RANK: Record<Advice, number> = { rely: 0, check: 1, avoid: 2, unknown: 3 };
+
+/**
+ * "Who's best at X?": the top graded agents in a category, best first.
+ * Only agents we'd advise using (rely, then check) are listed, never avoid
+ * or ungraded ones; out-of-date grades go after current ones.
+ */
+export function bestIn(category: CategoryId, all: TrustRecord[], limit = 3, now = Date.now()): TrustRecord[] {
+  return all
+    .filter((r) => r.agent.category === category && (r.advice === "rely" || r.advice === "check"))
+    .sort((a, b) => Number(isStale(a, now)) - Number(isStale(b, now)) || ADVICE_RANK[a.advice] - ADVICE_RANK[b.advice] || (b.score ?? 0) - (a.score ?? 0))
+    .slice(0, limit);
+}
+
+/** The category a task most likely belongs to, from its wording. */
+export function categoryForTask(task: string): CategoryId {
+  return categoryOf({ name: "", description: task });
+}
+
+export interface BestAnswer {
+  version: 1;
+  category: { id: CategoryId; name: string };
+  /** Set when the category was guessed from a task's wording. */
+  guessedFrom?: string;
+  /** Best first. Empty when no agent in the category is graded well enough. */
+  agents: Pick<TrustRecord, "agent" | "grade" | "score" | "advice" | "testedAt" | "report" | "selfGraded">[];
+  /** Where to check the chosen agent's work before paying it. */
+  verify: string;
+  note: string;
+  source: "Agent Report Card";
+}
+
+export function bestAnswer(category: CategoryId, all: TrustRecord[], task?: string, limit = 3): BestAnswer {
+  const top = bestIn(category, all, limit);
+  const c = categoryById(category)!;
+  const name = c.name;
+  const hasRely = top.some((r) => r.advice === "rely");
+  return {
+    version: 1,
+    category: { id: category, name },
+    ...(task ? { guessedFrom: task.slice(0, 200) } : {}),
+    agents: top.map((r) => ({ agent: r.agent, grade: r.grade, score: r.score, advice: r.advice, testedAt: r.testedAt, report: r.report, selfGraded: r.selfGraded })),
+    verify: VERIFY_URL,
+    note: !top.length
+      ? `None of the ${c.plural} we've graded is good enough for us to recommend yet.`
+      : hasRely
+        ? `Best graded ${c.plural} first. Check the work before you pay it at ${VERIFY_URL}.`
+        : `None of the ${c.plural} we've graded rates "rely" yet, so check answers that matter at ${VERIFY_URL}.`,
+    source: "Agent Report Card",
+  };
+}
+
+export { CATEGORIES };
