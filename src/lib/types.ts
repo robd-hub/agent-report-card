@@ -20,6 +20,11 @@ export interface AgentConfig {
    * its report card says so plainly. Holds a short note shown on the page.
    */
   selfGraded?: string;
+  /**
+   * Leaderboard group: research, writing, crypto, code-data or assistants
+   * (see src/lib/categories.ts). Guessed from the description when missing.
+   */
+  category?: string;
   /** "weekly" for agents regraded on a schedule by .github/workflows/weekly-grade.yml. */
   schedule?: "weekly";
 }

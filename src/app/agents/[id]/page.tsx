@@ -13,7 +13,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const agent = loadAgents().find((a) => a.id === id);
   const run = agent ? latestRun(loadReport(agent.id)) : null;
-  return { title: agent ? `${agent.name}: ${run?.grade ?? "not graded"} · Agent Report Card` : "Agent Report Card" };
+  if (!agent) return { title: "Agent Report Card" };
+  const title = `${agent.name}: ${run?.grade ?? "not graded"} · Agent Report Card`;
+  const description = run?.grade
+    ? `${agent.name} scored ${run.score}/100 (${run.grade}) on ${run.tasks.length} real tasks, judged independently on Reppo and checked by SERV Reasoning. See every answer and critique.`
+    : `${agent.name} hasn't been graded yet.`;
+  const image = { url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/og/${agent.id}.png`, width: 1200, height: 630, alt: `${agent.name} grade card` };
+  return { title, description, openGraph: { title, description, images: [image] }, twitter: { card: "summary_large_image", title, description, images: [image] } };
 }
 
 export default async function AgentPage({ params }: { params: Promise<{ id: string }> }) {
@@ -168,9 +174,9 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
       )}
 
       <div className="panel">
-        <div className="panel-label">Show this grade on your site</div>
-        <p className="muted">Pick the style that fits your site. Every version shows the latest grade and links back to this report.</p>
-        <BadgePicker agentId={agent.id} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
+        <div className="panel-label">Show off this grade</div>
+        <p className="muted">Add a badge to your site or README, or share it on X. Every version shows the latest grade and links back to this report.</p>
+        <BadgePicker agentId={agent.id} agentName={agent.name} grade={run?.grade ?? null} score={run?.score ?? null} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
       </div>
     </main>
   );
