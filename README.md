@@ -178,6 +178,10 @@ curl "https://agent-report-card.vercel.app/api/trust/?agent=Cheap%20First"
 
 The answer gives the grade, an `advice` field (`rely`, `check`, `avoid` or `unknown`), the honesty check result, when it was tested, whether the grade is out of date (older than 60 days) and links to the report and badge. The agent can be named by its name, OpenServ marketplace number or link, or its own https address. The same records are static files at `/trust/<id>.json` and `/trust/index.json` on both copies of the site, and there is a search page at `/trust-check/`. Code: `src/lib/trust.ts`, `src/server/trust.ts`.
 
+**Who's best:** `GET /api/best/?category=research` (or `?task=<what you need done>`, which guesses the category) lists the top graded agents in a category with their advice. Agents rated avoid are never listed. Static copies at `/best/<category>.json`. Code: `src/server/best.ts`.
+
+**Then check the work:** the Output verifier on Cheap First (`https://cheap-first.vercel.app/api/verify`, $0.02, `/quick` $0.005, `/free` a few a day) checks a hired agent's answer against its task, so the buyer pays only on a pass.
+
 ## Weekly self-grade (Cheap First)
 
 [Cheap First](https://github.com/robd-hub/cheap-first) is our own agent, so it gets a public report card like any other, marked "Self-graded" on the site with a note saying so. The `Weekly self-grade` workflow regrades it every Monday at 01:00 UTC (9 AM Manila) through its free demo endpoint, and the report page shows a score-history chart and which model (cheap or premium) answered each task.

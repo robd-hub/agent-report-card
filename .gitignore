@@ -15,3 +15,5 @@ src/app/.well-known/
 src/app/openapi.json/
 public/trust/
 src/app/api/trust/
+public/best/
+src/app/api/best/
