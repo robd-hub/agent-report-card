@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
+import { BadgePicker } from "./BadgePicker";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -29,7 +30,6 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
     : null;
   const flagged = run ? run.tasks.filter((t) => disagreement(t) !== null).length : 0;
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
-  const badgeSrc = `${process.env.NEXT_PUBLIC_BASE_PATH}/badge/${agent.id}.svg`;
 
   return (
     <main>
@@ -169,8 +169,8 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
 
       <div className="panel">
         <div className="panel-label">Show this grade on your site</div>
-        <p><img src={badgeSrc} alt="Agent Report Card grade" /></p>
-        <pre>{`<img src="${process.env.NEXT_PUBLIC_SITE_URL}/badge/${agent.id}.svg" alt="Agent Report Card grade" />`}</pre>
+        <p className="muted">Pick the style that fits your site. Every version shows the latest grade and links back to this report.</p>
+        <BadgePicker agentId={agent.id} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
       </div>
     </main>
   );
