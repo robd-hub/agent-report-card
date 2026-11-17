@@ -31,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <nav>
             <Link href="/#leaderboard">Leaderboard</Link>
+            <Link href="/trust-check">Trust Check</Link>
             <Link href="/how-grading-works">How grading works</Link>
             <a href="https://github.com/robd-hub/agent-report-card">GitHub</a>
             <Link href="/#get-graded" className="nav-cta">Get graded</Link>

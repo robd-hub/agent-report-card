@@ -15,7 +15,7 @@ const nextConfig = {
   ...(onVercel ? {} : { output: "export" }),
   trailingSlash: true,
   // The server routes read the grades from data/ at request time.
-  outputFileTracingIncludes: { "/api/grade": ["./data/**/*"], "/openserv/[[...path]]": ["./data/**/*"] },
+  outputFileTracingIncludes: { "/api/grade": ["./data/**/*"], "/api/trust": ["./data/**/*"], "/openserv/[[...path]]": ["./data/**/*"] },
   basePath: process.env.BASE_PATH || "",
   env: {
     NEXT_PUBLIC_BASE_PATH: process.env.BASE_PATH || "",

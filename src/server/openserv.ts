@@ -12,6 +12,7 @@ import { after } from "next/server";
 import { loadAgents, latestRun, loadReport } from "@/lib/data";
 import { honestyCheck } from "@/lib/grade";
 import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "@/lib/links";
+import { adviceFor } from "@/lib/trust";
 import { handleOpenServ, type AgentSpec } from "@/lib/openservAgent";
 import type { AgentConfig, GradingRun } from "@/lib/types";
 
@@ -55,6 +56,7 @@ function card(g: Graded): string {
   return [
     `${g.agent.name}: grade ${g.run.grade} (${g.run.score}/100)${g.run.provisional ? ", provisional while human reviews finish" : ""}, graded ${g.run.date.slice(0, 10)}.`,
     honesty ? `Honesty check (says so when it can't know): ${honesty}.` : "",
+    `Trust Check advice: ${({ rely: "safe to rely on", check: "use it, but check answers that matter", avoid: "don't rely on it", unknown: "not graded" } as const)[adviceFor(g.run)]}.`,
     g.run.summary,
     `Full report: ${link}`,
   ]
