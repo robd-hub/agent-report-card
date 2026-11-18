@@ -242,3 +242,14 @@ a.chip { text-decoration: none; }
 .best-list { margin: 0; padding-left: 20px; }
 .best-list li { margin: 6px 0; }
 .best-list .chip { margin-left: 6px; }
+
+/* Drift Watch */
+.drift-input { min-height: 160px; font: .85rem/1.5 var(--mono); resize: vertical; }
+.drift-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }
+.drift-actions .btn { cursor: pointer; font: 600 .95rem var(--sans); }
+.drift-actions .btn:disabled { opacity: .5; cursor: default; }
+.drift-result { margin-top: 18px; }
+.drift-task { border-top: 1px solid var(--line); padding: 14px 0 4px; margin-top: 12px; }
+.drift-task-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+.drift-row { overflow-wrap: anywhere; }
+.drift-alert { color: var(--f); margin: 8px 0 0; }
