@@ -27,6 +27,11 @@ export interface AgentConfig {
   category?: string;
   /** "weekly" for agents regraded on a schedule by .github/workflows/weekly-grade.yml. */
   schedule?: "weekly";
+  /**
+   * The agent's own Concordium Agent Registry badge (base58 CIS-2 token
+   * address), when it has one. Its grade is written on-chain against it.
+   */
+  concordiumBadge?: string;
 }
 
 export interface TestTask {

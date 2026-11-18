@@ -6,6 +6,8 @@
 #
 # Needs three repository secrets (Settings > Secrets and variables > Actions):
 #   SERV_API_KEY, REPPO_API_KEY, OPENSERV_USER_API_KEY
+# and, for Concordium (switched on by the variable CONCORDIUM_ENABLED=1),
+#   CONCORDIUM_TESTNET_KEY
 name: Auto-grade paid requests
 
 on:
@@ -56,6 +58,19 @@ jobs:
           # Optional, for card payments through Stripe.
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           CARD_PAYMENTS: ${{ vars.CARD_PAYMENT_LINK }}
+          # Optional: accept CCD payments on the Concordium test network.
+          CONCORDIUM_ENABLED: ${{ vars.CONCORDIUM_ENABLED }}
+
+      # Writes each new final grade on the Concordium test network. Does
+      # nothing until the repository variable CONCORDIUM_ENABLED is 1, and
+      # never fails the run: a grade that couldn't be written is retried next time.
+      - name: Write final grades on Concordium
+        if: always() && vars.CONCORDIUM_ENABLED == '1'
+        continue-on-error: true
+        run: npx tsx scripts/concordium.ts anchor --all
+        env:
+          CONCORDIUM_ENABLED: ${{ vars.CONCORDIUM_ENABLED }}
+          CONCORDIUM_TESTNET_KEY: ${{ secrets.CONCORDIUM_TESTNET_KEY }}
 
       - name: Save results
         run: |

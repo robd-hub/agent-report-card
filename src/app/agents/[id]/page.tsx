@@ -4,6 +4,7 @@ import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
 import { BadgePicker } from "./BadgePicker";
+import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -36,6 +37,9 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
     : null;
   const flagged = run ? run.tasks.filter((t) => disagreement(t) !== null).length : 0;
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
+  const ccd = loadCcd();
+  const onChain = anchorFor(agent.id, run, ccd);
+  const registry = agent.concordiumBadge ? ccd.badges[agent.id] ?? null : null;
 
   return (
     <main>
@@ -71,6 +75,16 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                 </a>
               )}
               {agent.selfGraded && <span className="chip chip-self">Self-graded</span>}
+              {onChain && (
+                <a href={explorerTx(onChain.tx)} className="chip chip-ok" title="This grade and a fingerprint of the full report are recorded on the Concordium test network.">
+                  Recorded on Concordium ↗
+                </a>
+              )}
+              {agent.concordiumBadge && (
+                <a href={badgeCheckUrl(agent.concordiumBadge)} className="chip" title="This agent is in Concordium's Agent Registry. The check shows who owns it and whether its badge is valid.">
+                  Concordium registry{registry?.tokenId !== undefined ? `: agent ${registry.tokenId}` : ""} ↗
+                </a>
+              )}
               <span className="muted">Graded {run.date.slice(0, 10)} · {run.tasks.length} tasks{agent.schedule === "weekly" ? " · regraded every Monday" : ""}</span>
             </div>
           )}
@@ -101,6 +115,21 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
               </>
             )}
           </div>
+
+          {onChain && (
+            <div className="panel">
+              <div className="panel-label">Checked on Concordium</div>
+              <p>
+                This grade ({onChain.grade}, {onChain.score}/100) was written on the Concordium test network on {onChain.anchoredAt.slice(0, 10)},
+                {onChain.badge ? " against this agent's own Concordium registry entry," : ""} with a fingerprint of the full report, so it can't be quietly changed later.{" "}
+                <a href={explorerTx(onChain.tx)}>See it on CCDExplorer</a>.
+              </p>
+              <p className="muted small">
+                Fingerprint (SHA-256 of this run in the <a href={`https://github.com/robd-hub/agent-report-card/blob/main/data/results/${agent.id}.json`}>public results file</a>):{" "}
+                <span className="mono">{onChain.reportHash}</span>
+              </p>
+            </div>
+          )}
 
           {weakest && (
             <div className={`panel example ${weakest.score < 70 ? "example-bad" : ""}`}>

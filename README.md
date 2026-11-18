@@ -199,6 +199,27 @@ list the top agents or ask how to get graded. The agent and its workspace are se
 the marketplace once OpenServ approves it. ERC-8004 agent cards and x402 discovery for `POST /api/grade` are in
 place too. Setup and remaining steps are in [OPENSERV.md](OPENSERV.md).
 
+## Concordium: verified identity plus a checkable grade
+
+Concordium tells you **who** is behind an agent. Agent Report Card tells you **how well** it works. On the Concordium test network:
+
+- **Registered in the Agent Registry.** Agent Report Card is CIS-8004 agent [1255](https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9YFFRjzw8JSc2qS8ai) (badge `JyP9YFFRjzw8JSc2qS8ai`), owned by our identity-verified account `3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68`. Its A2A Agent Card with the Concordium badge is [public/concordium/agent-card.json](public/concordium/agent-card.json), and the card's SHA-256 is pinned on-chain. Our own agent Cheap First is agent 1256.
+- **Every final grade is written on-chain.** A data transaction carries the agent, grade, score, date, a SHA-256 fingerprint of the full report (`JSON.stringify` of the run in `data/results/<agent>.json`) and, if the agent is in the registry, its badge. All 33 current grades are on-chain; the list with transaction links is [data/concordium.json](data/concordium.json). Each report page shows "Recorded on Concordium" with a CCDExplorer link. Check one yourself: `npx tsx scripts/concordium.ts verify coder`.
+- **Pay for a grade in CCD.** Send 10 CCD (5 for a regrade) to the account above and paste the CCDExplorer link in the request. The bot checks the transfer on-chain (finalized, right account, enough CCD, under 14 days old, not used before) before it grades, the same way it checks USDC on Base.
+- **Grade tied to the agent's registry entry.** The request form takes an optional Concordium badge. The bot looks it up in the registry and writes the grade against it.
+
+Transactions go through the public wallet proxy (`wallet-proxy.testnet.concordium.com`), and registry calls through Concordium's [Agent Registry service](https://agent-registry-mcp.concordium.com/openapi.json). Costs on testnet: a grade record is about 4.9 CCD, a registry update about 17.8 CCD.
+
+**Switch.** It's all off until the repository variable `CONCORDIUM_ENABLED` is `1` (Settings > Secrets and variables > Actions > Variables). That turns on CCD payments and on-chain grades in the bot, and the "pay in CCD" option on the site. Records already in `data/concordium.json` always show. The signing key is the repository secret `CONCORDIUM_TESTNET_KEY` (the Browser Wallet's account export); it is never printed. On Vercel, set `NEXT_PUBLIC_CONCORDIUM=1` too.
+
+```bash
+npx tsx scripts/concordium.ts status                 # balance and badge check
+CONCORDIUM_ENABLED=1 npx tsx scripts/concordium.ts anchor --all   # write any new final grades
+npx tsx scripts/concordium.ts verify <agentId>      # compare a grade with the chain
+```
+
+**Path to production.** Move the same contracts and flow to Concordium mainnet once paid grades sell: register on the mainnet registry, point `WALLET_PROXY` and the explorer links at mainnet, and price grades in CCD or a stablecoin.
+
 ## Public site
 
 The site is published for free on GitHub Pages at

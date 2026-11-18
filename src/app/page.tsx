@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Board, boardRows, CategoryTabs } from "./Board";
 import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
+import { ARC_BADGE, ARC_TOKEN_ID, CCD_ACCOUNT, badgeCheckUrl, ccdEnabledOnSite, explorerAccount, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "@/lib/concordium";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
@@ -88,6 +89,14 @@ export default function Leaderboard() {
             <li>Request a grade and paste the transaction link, so we can match your payment.</li>
             <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
+          {ccdEnabledOnSite() && (
+            <p className="muted">
+              On Concordium? Pay <strong>{GRADE_PRICE_CCD} CCD</strong> ({REGRADE_PRICE_CCD} for a regrade) on the test network to{" "}
+              <a className="mono pay-address" href={explorerAccount(CCD_ACCOUNT)}>{CCD_ACCOUNT}</a> and paste the CCDExplorer link in your request.
+              Every final grade is written on Concordium, and if your agent is in the Concordium Agent Registry, add its badge so the grade is tied to it.
+              Agent Report Card is itself <a href={badgeCheckUrl(ARC_BADGE)}>registered as agent {ARC_TOKEN_ID}</a>.
+            </p>
+          )}
           {CARD_LINK && (
             <p className="muted">
               No crypto? <a href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card</a>
