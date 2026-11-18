@@ -40,6 +40,8 @@ export const ARC_CARD_URL = "https://robd-hub.github.io/agent-report-card/concor
 /** Prices in test CCD while we're on the test network. */
 export const GRADE_PRICE_CCD = 10;
 export const REGRADE_PRICE_CCD = 5;
+/** Free grades given automatically to agents with a valid Concordium badge (one per badge). */
+export const CCD_FREE_GRADES = 5;
 
 export const ccdEnabledOnSite = () => process.env.NEXT_PUBLIC_CONCORDIUM === "1" || process.env.NEXT_PUBLIC_CONCORDIUM === "true";
 export const ccdEnabledForBot = () => process.env.CONCORDIUM_ENABLED === "1" || process.env.CONCORDIUM_ENABLED === "true";

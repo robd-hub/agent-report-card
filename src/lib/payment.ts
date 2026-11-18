@@ -31,6 +31,8 @@ export interface PaymentRecord {
   /** Set for payments in CCD on Concordium (amountUsd is then 0). */
   currency?: "CCD";
   amountCcd?: number;
+  /** The agent's Concordium badge, when the request gave one. */
+  badge?: string;
 }
 
 export function loadPayments(): PaymentRecord[] {

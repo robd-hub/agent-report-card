@@ -32,7 +32,7 @@ export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
 import { checkPayment, findTxHash, loadPayments, MAX_PAYMENT_AGE_DAYS, savePayment } from "../src/lib/payment";
-import { CCD_ACCOUNT, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
+import { badgeCheckUrl, CCD_ACCOUNT, CCD_FREE_GRADES, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
 
@@ -205,12 +205,48 @@ async function main() {
   // A free grade is one the maintainer approved by adding the "free-grade"
   // label. Only people with write access can label issues, so a requester
   // can't grant it to themselves.
-  const free = process.env.FREE_GRADE === "true";
+  const labelFree = process.env.FREE_GRADE === "true";
   const ccdOn = ccdEnabledForBot();
-  const baseTx = free ? null : findTxHash(paymentText);
-  const ccdTx = free || baseTx || !ccdOn ? null : findCcdTxHash(paymentText);
+  const baseTx = labelFree ? null : findTxHash(paymentText);
+  const ccdTx = labelFree || baseTx || !ccdOn ? null : findCcdTxHash(paymentText);
   const tx = baseTx ?? ccdTx;
   const badge = ccdOn ? findBadge(form["Concordium Agent Registry badge (optional)"] ?? "") : null;
+
+  // Concordium offer: the first CCD_FREE_GRADES agents that ask for a free
+  // grade and have a valid "Verified by Concordium" badge are approved with
+  // no one involved. One per badge; our own agents don't count.
+  let ccdFree = false;
+  if (!labelFree && !tx && ccdOn && badge && /\bfree\b/i.test(paymentText)) {
+    const given = loadPayments().filter((p) => p.tx.startsWith("free-concordium-"));
+    if (given.some((p) => p.badge === badge)) {
+      return finish("rejected", "This Concordium badge has already had its free grade. A regrade costs 5 CCD or 5 USDC; see the Get graded section on the site.");
+    }
+    if (given.length >= CCD_FREE_GRADES) {
+      return finish("rejected", `Thanks! All ${CCD_FREE_GRADES} free grades for Concordium agents have been given out. The maintainer may still approve this one by hand, or you can pay ${GRADE_PRICE_CCD} CCD on the test network.`);
+    }
+    const { checkBadge } = await import("../src/lib/concordiumChain");
+    let status: Awaited<ReturnType<typeof checkBadge>> | null = null;
+    try {
+      status = await checkBadge(badge);
+    } catch {
+      return finish("needs-attention", "Thanks! We couldn't reach Concordium's Agent Registry to check your badge just now. The maintainer will look and reply here.");
+    }
+    if (status.tokenId === undefined) {
+      return finish("rejected", `We couldn't find the badge \`${badge}\` in the Concordium Agent Registry on the test network. Check it and edit this request.`);
+    }
+    if (status.owner === CCD_ACCOUNT) {
+      return finish("rejected", "That badge belongs to Agent Report Card's own account, so it can't use the free offer.");
+    }
+    if (!status.verified) {
+      return finish(
+        "rejected",
+        `Your badge \`${badge}\` is in the registry, but it doesn't pass Concordium's badge check yet (the agent card must be online and match the hash pinned on-chain). ` +
+          `See ${badgeCheckUrl(badge)}, fix it, then edit this request and the grader will check again.`,
+      );
+    }
+    ccdFree = true;
+  }
+  const free = labelFree || ccdFree;
   if (!free && !tx && /\bfree\b/i.test(paymentText)) {
     return finish(
       "rejected",
@@ -268,7 +304,9 @@ async function main() {
     payment = check;
   }
   const received = free
-    ? "Your free grade is approved, thank you."
+    ? ccdFree
+      ? "Your agent's Verified by Concordium badge checks out, so this grade is free, as part of our offer for Concordium agents."
+      : "Your free grade is approved, thank you."
     : paidCcd !== null
       ? `Your payment of ${paidCcd} CCD arrived on Concordium, thank you.`
       : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
@@ -338,7 +376,8 @@ async function main() {
   // Record the payment before grading, so the same transaction can't be used twice.
   // Free grades are recorded too, with no transaction, so they're counted.
   savePayment({
-    tx: free ? `free-grade-issue-${issue}` : tx!,
+    tx: ccdFree ? `free-concordium-issue-${issue}` : free ? `free-grade-issue-${issue}` : tx!,
+    ...(badge ? { badge } : {}),
     issue,
     agentId: agent.id,
     amountUsd: payment.amountUsd,
