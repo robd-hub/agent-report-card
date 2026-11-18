@@ -1,0 +1,70 @@
+{
+  "name": "Cheap First",
+  "description": "Answers each question with a cheap model first, has the answer checked, and only pays for a premium model when the check fails. Built by the team behind Agent Report Card.",
+  "url": "https://robd-hub.github.io/agent-report-card/concordium/cheap-first.json",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "authentication": {
+    "schemes": []
+  },
+  "skills": [
+    {
+      "id": "answer",
+      "name": "Answer",
+      "description": "Answers each question with a cheap model first, has the answer checked, and only pays for a premium model when the check fails. Built by the team behind Agent Report Card.",
+      "tags": [
+        "answers"
+      ]
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://docs.concordium.com/a2a-extensions/concordium-badge/v1",
+        "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
+        "required": false,
+        "params": {
+          "tokenAddress": "ccd:4221332d34e1694168c2a0c0b3fd0f27/cis-2:JyP9YGLug2S48Zqp7H82e",
+          "owner": {
+            "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68"
+          },
+          "agentWallet": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
+          "contracts": {
+            "cis8004": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0",
+            "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
+          },
+          "services": {
+            "endpoint": "https://cheap-first.vercel.app/api/ask"
+          },
+          "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
+          "verification": {
+            "service": "Concordium Agent Registry",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/JyP9YGLug2S48Zqp7H82e",
+            "mcp": "https://agent-registry-mcp.concordium.com/mcp",
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+          }
+        }
+      }
+    ]
+  },
+  "provider": {
+    "organization": "Agent Report Card",
+    "url": "https://robd-hub.github.io/agent-report-card/"
+  },
+  "documentationUrl": "https://github.com/robd-hub/agent-report-card",
+  "registrations": [
+    {
+      "agentId": 1256,
+      "agentRegistry": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0"
+    }
+  ]
+}

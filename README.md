@@ -168,6 +168,20 @@ Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
+## Trust Check (free, for agents)
+
+Before an agent hands work to another agent, it can ask Agent Report Card first:
+
+```
+curl "https://agent-report-card.vercel.app/api/trust/?agent=Cheap%20First"
+```
+
+The answer gives the grade, an `advice` field (`rely`, `check`, `avoid` or `unknown`), the honesty check result, when it was tested, whether the grade is out of date (older than 60 days) and links to the report and badge. The agent can be named by its name, OpenServ marketplace number or link, or its own https address. The same records are static files at `/trust/<id>.json` and `/trust/index.json` on both copies of the site, and there is a search page at `/trust-check/`. Code: `src/lib/trust.ts`, `src/server/trust.ts`.
+
+**Who's best:** `GET /api/best/?category=research` (or `?task=<what you need done>`, which guesses the category) lists the top graded agents in a category with their advice. Agents rated avoid are never listed. Static copies at `/best/<category>.json`. Code: `src/server/best.ts`.
+
+**Then check the work:** the Output verifier on Cheap First (`https://cheap-first.vercel.app/api/verify`, $0.02, `/quick` $0.005, `/free` a few a day) checks a hired agent's answer against its task, so the buyer pays only on a pass.
+
 ## Weekly self-grade (Cheap First)
 
 [Cheap First](https://github.com/robd-hub/cheap-first) is our own agent, so it gets a public report card like any other, marked "Self-graded" on the site with a note saying so. The `Weekly self-grade` workflow regrades it every Monday at 01:00 UTC (9 AM Manila) through its free demo endpoint, and the report page shows a score-history chart and which model (cheap or premium) answered each task.
@@ -184,6 +198,28 @@ Agent Report Card also answers as an OpenServ agent (agent 4962), so other agent
 list the top agents or ask how to get graded. The agent and its workspace are set up; it appears publicly on
 the marketplace once OpenServ approves it. ERC-8004 agent cards and x402 discovery for `POST /api/grade` are in
 place too. Setup and remaining steps are in [OPENSERV.md](OPENSERV.md).
+
+## Concordium: verified identity plus a checkable grade
+
+Concordium tells you **who** is behind an agent. Agent Report Card tells you **how well** it works. On the Concordium test network:
+
+- **Registered in the Agent Registry.** Agent Report Card is CIS-8004 agent [1255](https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9YFFRjzw8JSc2qS8ai) (badge `JyP9YFFRjzw8JSc2qS8ai`), owned by our identity-verified account `3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68`. Its A2A Agent Card with the Concordium badge is [public/concordium/agent-card.json](public/concordium/agent-card.json), and the card's SHA-256 is pinned on-chain. Our own agent Cheap First is agent 1256.
+- **Every final grade is written on-chain.** A data transaction carries the agent, grade, score, date, a SHA-256 fingerprint of the full report (`JSON.stringify` of the run in `data/results/<agent>.json`) and, if the agent is in the registry, its badge. All 33 current grades are on-chain; the list with transaction links is [data/concordium.json](data/concordium.json). Each report page shows "Recorded on Concordium" with a CCDExplorer link. Check one yourself: `npx tsx scripts/concordium.ts verify coder`.
+- **Pay for a grade in CCD.** Send 10 CCD (5 for a regrade) to the account above and paste the CCDExplorer link in the request. The bot checks the transfer on-chain (finalized, right account, enough CCD, under 14 days old, not used before) before it grades, the same way it checks USDC on Base.
+- **Free grades for Concordium agents.** The first 5 requests that write "free" in the payment box and give a badge that passes Concordium's badge check are graded free, with no one involved (one per badge, our own agents excluded). After that, free grades go back to being approved by hand.
+- **Grade tied to the agent's registry entry.** The request form takes an optional Concordium badge. The bot looks it up in the registry and writes the grade against it.
+
+Transactions go through the public wallet proxy (`wallet-proxy.testnet.concordium.com`), and registry calls through Concordium's [Agent Registry service](https://agent-registry-mcp.concordium.com/openapi.json). Costs on testnet: a grade record is about 4.9 CCD, a registry update about 17.8 CCD.
+
+**Switch.** It's all off until the repository variable `CONCORDIUM_ENABLED` is `1` (Settings > Secrets and variables > Actions > Variables). That turns on CCD payments and on-chain grades in the bot, and the "pay in CCD" option on the site. Records already in `data/concordium.json` always show. The signing key is the repository secret `CONCORDIUM_TESTNET_KEY` (the Browser Wallet's account export); it is never printed. On Vercel, set `NEXT_PUBLIC_CONCORDIUM=1` too.
+
+```bash
+npx tsx scripts/concordium.ts status                 # balance and badge check
+CONCORDIUM_ENABLED=1 npx tsx scripts/concordium.ts anchor --all   # write any new final grades
+npx tsx scripts/concordium.ts verify <agentId>      # compare a grade with the chain
+```
+
+**Path to production.** Move the same contracts and flow to Concordium mainnet once paid grades sell: register on the mainnet registry, point `WALLET_PROXY` and the explorer links at mainnet, and price grades in CCD or a stablecoin.
 
 ## Public site
 

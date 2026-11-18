@@ -56,6 +56,17 @@ jobs:
           REPPO_API_KEY: ${{ secrets.REPPO_API_KEY }}
           OPENSERV_USER_API_KEY: ${{ secrets.OPENSERV_USER_API_KEY }}
 
+      # Writes each new final grade on the Concordium test network. Does
+      # nothing until the repository variable CONCORDIUM_ENABLED is 1, and
+      # never fails the run: a grade that couldn't be written is retried next time.
+      - name: Write final grades on Concordium
+        if: always() && vars.CONCORDIUM_ENABLED == '1'
+        continue-on-error: true
+        run: npx tsx scripts/concordium.ts anchor --all
+        env:
+          CONCORDIUM_ENABLED: ${{ vars.CONCORDIUM_ENABLED }}
+          CONCORDIUM_TESTNET_KEY: ${{ secrets.CONCORDIUM_TESTNET_KEY }}
+
       - name: Save results
         id: save
         if: always()

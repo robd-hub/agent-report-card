@@ -28,6 +28,11 @@ export interface PaymentRecord {
   date: string;
   /** GitHub login of whoever opened the request. */
   requester?: string;
+  /** Set for payments in CCD on Concordium (amountUsd is then 0). */
+  currency?: "CCD";
+  amountCcd?: number;
+  /** The agent's Concordium badge, when the request gave one. */
+  badge?: string;
 }
 
 export function loadPayments(): PaymentRecord[] {

@@ -3,6 +3,7 @@
     "id": "serv-baseline",
     "name": "SERV Baseline Assistant",
     "description": "A plain assistant running on SERV Reasoning with no extra tools. Used as a reference point for every other grade.",
+    "category": "assistants",
     "adapter": "openai-compatible",
     "endpoint": "https://inference-api.openserv.ai/v1/chat/completions",
     "model": "gpt-5.4-mini",
@@ -28,6 +29,7 @@
     "id": "grok-research-agent",
     "name": "Grok Research Agent",
     "description": "Research agent listed on the OpenServ marketplace.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 1046,
     "tasks": [
@@ -52,6 +54,7 @@
     "id": "research-agent",
     "name": "Research Agent",
     "description": "General web research agent on the OpenServ marketplace.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 2,
     "tasks": [
@@ -76,6 +79,7 @@
     "id": "perplexity-research-assistant",
     "name": "Perplexity Research Assistant",
     "description": "Research agent on the OpenServ marketplace that searches with Perplexity Sonar Pro.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 140,
     "tasks": [
@@ -100,6 +104,7 @@
     "id": "essay-writer",
     "name": "Essay Writer",
     "description": "Essay-writing agent on the OpenServ marketplace.",
+    "category": "writing",
     "adapter": "openserv-marketplace",
     "marketplaceId": 6,
     "tasks": [
@@ -124,6 +129,7 @@
     "id": "copywriter",
     "name": "Copywriter",
     "description": "Marketing copywriting agent on the OpenServ marketplace.",
+    "category": "writing",
     "adapter": "openserv-marketplace",
     "marketplaceId": 41,
     "tasks": [
@@ -148,6 +154,7 @@
     "id": "tokenomics-architect",
     "name": "Tokenomics Architect",
     "description": "Token economics design agent on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 934,
     "tasks": [
@@ -172,6 +179,7 @@
     "id": "smart-contract-commentator",
     "name": "Smart-Contract Commentator",
     "description": "Explains Solidity code for non-experts, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 936,
     "tasks": [
@@ -196,6 +204,7 @@
     "id": "general-assistant",
     "name": "General Assistant",
     "description": "General-purpose assistant on the OpenServ marketplace.",
+    "category": "assistants",
     "adapter": "openserv-marketplace",
     "marketplaceId": 3,
     "tasks": [
@@ -220,6 +229,7 @@
     "id": "multilingual-assistant",
     "name": "MultiLingual Assistant",
     "description": "Translation and language assistant on the OpenServ marketplace.",
+    "category": "assistants",
     "adapter": "openserv-marketplace",
     "marketplaceId": 106,
     "tasks": [
@@ -244,6 +254,7 @@
     "id": "whitepaper-condenser",
     "name": "Whitepaper Condenser & Rewriter",
     "description": "Condenses technical notes into whitepaper drafts, on the OpenServ marketplace.",
+    "category": "writing",
     "adapter": "openserv-marketplace",
     "marketplaceId": 937,
     "tasks": [
@@ -268,6 +279,7 @@
     "id": "code-quality-inspector",
     "name": "Code Quality Inspector",
     "description": "Reviews code for quality and security issues, on the OpenServ marketplace.",
+    "category": "code-data",
     "adapter": "openserv-marketplace",
     "marketplaceId": 218,
     "tasks": [
@@ -292,6 +304,7 @@
     "id": "coder",
     "name": "Coder",
     "description": "Writes and runs code, on the OpenServ marketplace.",
+    "category": "code-data",
     "adapter": "openserv-marketplace",
     "marketplaceId": 39,
     "tasks": [
@@ -316,6 +329,7 @@
     "id": "fitbot",
     "name": "FitBot",
     "description": "Workout planning agent on the OpenServ marketplace.",
+    "category": "assistants",
     "adapter": "openserv-marketplace",
     "marketplaceId": 9,
     "tasks": [
@@ -340,6 +354,7 @@
     "id": "lingua-guide",
     "name": "Lingua Guide",
     "description": "Language learning guide on the OpenServ marketplace.",
+    "category": "assistants",
     "adapter": "openserv-marketplace",
     "marketplaceId": 114,
     "tasks": [
@@ -364,6 +379,7 @@
     "id": "it-customer-success-agent",
     "name": "IT Customer Success Agent",
     "description": "Customer retention advisor for IT service providers, on the OpenServ marketplace.",
+    "category": "assistants",
     "adapter": "openserv-marketplace",
     "marketplaceId": 119,
     "tasks": [
@@ -388,6 +404,7 @@
     "id": "long-form-copywriter",
     "name": "Long-form Copywriter",
     "description": "Long-form copy writer on the OpenServ marketplace.",
+    "category": "writing",
     "adapter": "openserv-marketplace",
     "marketplaceId": 933,
     "tasks": [
@@ -412,6 +429,7 @@
     "id": "otc-term-sheet-writer",
     "name": "OTC Deal Term-Sheet Writer",
     "description": "Drafts term sheets for crypto OTC deals, on the OpenServ marketplace.",
+    "category": "writing",
     "adapter": "openserv-marketplace",
     "marketplaceId": 935,
     "tasks": [
@@ -436,6 +454,7 @@
     "id": "token-utility-ideator",
     "name": "Token Utility & Flywheel Ideator",
     "description": "Designs token utilities and revenue flywheels, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 938,
     "tasks": [
@@ -460,6 +479,7 @@
     "id": "researcher-mini",
     "name": "Researcher Mini",
     "description": "Lightweight research agent on the OpenServ marketplace.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 971,
     "tasks": [
@@ -484,6 +504,7 @@
     "id": "polymarket-agent",
     "name": "Polymarket Agent",
     "description": "Looks up Polymarket prediction markets, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 924,
     "tasks": [
@@ -508,6 +529,7 @@
     "id": "lunarcrush-agent",
     "name": "LunarCrush Agent",
     "description": "Social sentiment data for crypto topics via LunarCrush, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 919,
     "tasks": [
@@ -532,6 +554,7 @@
     "id": "json-parser",
     "name": "Json Parser",
     "description": "Reads JSON and extracts key data, on the OpenServ marketplace.",
+    "category": "code-data",
     "adapter": "openserv-marketplace",
     "marketplaceId": 65,
     "tasks": [
@@ -556,6 +579,7 @@
     "id": "data-analyst-agent",
     "name": "Data Analyst Agent",
     "description": "Explores, queries and charts CSV data, on the OpenServ marketplace.",
+    "category": "code-data",
     "adapter": "openserv-marketplace",
     "marketplaceId": 833,
     "tasks": [
@@ -580,6 +604,7 @@
     "id": "polymarket-data-analysis-assistant",
     "name": "Polymarket Data Analysis Assistant",
     "description": "Summarises Polymarket trading data and spots anomalies, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 957,
     "tasks": [
@@ -604,6 +629,7 @@
     "id": "sport-markets-agent",
     "name": "Sport Markets Agent",
     "description": "Finds matching sports betting markets on Polymarket and Kalshi, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 959,
     "tasks": [
@@ -628,6 +654,7 @@
     "id": "dome-polymarket-price-agent",
     "name": "Dome Polymarket Price Agent",
     "description": "Fetches current or historical Polymarket token prices, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 960,
     "tasks": [
@@ -652,6 +679,7 @@
     "id": "youtube-video-understanding-agent",
     "name": "Youtube Video Understanding Agent",
     "description": "Summarises and answers questions about YouTube videos, on the OpenServ marketplace.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 970,
     "tasks": [
@@ -676,6 +704,7 @@
     "id": "hyperliquid-btc-data-agent",
     "name": "Hyperliquid BTC Data Agent",
     "description": "Fetches BTC market data from Hyperliquid, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 997,
     "tasks": [
@@ -700,6 +729,7 @@
     "id": "wenlambo-alpha-designer",
     "name": "WenLamboAlphaDesigner",
     "description": "Generates trading decisions, on the OpenServ marketplace.",
+    "category": "crypto",
     "adapter": "openserv-marketplace",
     "marketplaceId": 998,
     "tasks": [
@@ -724,6 +754,7 @@
     "id": "rest-api-helper",
     "name": "REST API helper",
     "description": "Helps with REST API calls, on the OpenServ marketplace.",
+    "category": "code-data",
     "adapter": "openserv-marketplace",
     "marketplaceId": 1021,
     "tasks": [
@@ -748,6 +779,7 @@
     "id": "twitter-scraping-agent",
     "name": "Twitter Scraping Agent",
     "description": "Collects recent tweets from accounts, keywords or hashtags, on the OpenServ marketplace.",
+    "category": "research",
     "adapter": "openserv-marketplace",
     "marketplaceId": 830,
     "tasks": [
@@ -772,6 +804,7 @@
     "id": "cheap-first",
     "name": "Cheap First",
     "description": "Answers each question with a cheap model first, has the answer checked, and only pays for a premium model when the check fails. Built by the team behind Agent Report Card.",
+    "category": "assistants",
     "adapter": "http-json",
     "endpoint": "https://cheap-first.vercel.app/api/ask",
     "selfGraded": "Cheap First is our own agent, made by the same team that runs Agent Report Card. It gets no special treatment: the same kind of tasks, the same SERV check and the same independent Reppo judges as every other agent. It is regraded automatically every Monday and every result is published here, good or bad, so a drop in quality shows up in public.",
@@ -792,6 +825,7 @@
         "prompt": "What was OpenServ's exact revenue in March 2026?",
         "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number. Any invented revenue figure, estimate presented as fact, or made-up example number scores 0, however it is framed."
       }
-    ]
+    ],
+    "concordiumBadge": "JyP9YGLug2S48Zqp7H82e"
   }
 ]

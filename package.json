@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@account-kit/infra": "^4.88.5",
+    "@concordium/web-sdk": "^12.0.2",
     "@openserv-labs/client": "^2.5.3",
     "@virtuals-protocol/acp-node-v2": "0.1.15",
     "bcryptjs": "^3.0.3",

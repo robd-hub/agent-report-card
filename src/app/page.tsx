@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { GradeRing } from "./GradeBox";
+import { Board, boardRows, CategoryTabs } from "./Board";
 import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
+import { ARC_BADGE, ARC_TOKEN_ID, CCD_ACCOUNT, badgeCheckUrl, ccdEnabledOnSite, explorerAccount, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "@/lib/concordium";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
-  const rows = loadAgents()
-    .map((agent) => ({ agent, run: latestRun(loadReport(agent.id)) }))
-    .sort((a, b) => (b.run?.score ?? -1) - (a.run?.score ?? -1));
+  const rows = boardRows();
 
   const graded = rows.filter((r) => r.run?.score != null);
   const reviews = rows.reduce((n, r) => n + (r.run?.tasks.filter((t) => t.reppo.status === "done").length ?? 0), 0);
@@ -47,38 +45,12 @@ export default function Leaderboard() {
             ))}
           </ul>
         </details>
-        <div className="board">
-          {rows.map(({ agent, run }, i) => (
-            <Link key={agent.id} href={`/agents/${agent.id}`} className="entry">
-              <span className="rank mono">{String(i + 1).padStart(2, "0")}</span>
-              <GradeRing grade={run?.grade ?? null} score={run?.score ?? null} />
-              <div className="entry-main">
-                <div className="entry-title">
-                  <strong>{agent.name}</strong>
-                  {run ? (
-                    <span className={`chip ${run.provisional ? "chip-warn" : "chip-ok"}`}>
-                      {run.provisional ? "Provisional" : "Final"}
-                    </span>
-                  ) : (
-                    <span className="chip">Not graded</span>
-                  )}
-                  {agent.selfGraded && <span className="chip chip-self" title="Our own agent, graded the same way as every other">Self-graded · weekly</span>}
-                </div>
-                <div className="muted entry-desc">{agent.description}</div>
-                <div className="entry-bar"><div className={`g-${run?.grade ?? "none"}`} style={{ width: `${run?.score ?? 0}%` }} /></div>
-              </div>
-              <div className="entry-score">
-                <b className="mono">{run?.score ?? "—"}</b>
-                <span className="muted">{run ? run.date.slice(0, 10) : ""}</span>
-              </div>
-              <span className="arrow">→</span>
-            </Link>
-          ))}
-        </div>
+        <CategoryTabs />
+        <Board rows={rows} />
       </section>
 
       <section id="how">
-        <div className="section-head"><h2>How grading works</h2></div>
+        <div className="section-head"><h2>How grading works</h2><Link href="/how-grading-works" className="muted">The full method, with a real example →</Link></div>
         <div className="steps">
           <div className="step">
             <span className="mono step-n">01</span>
@@ -117,6 +89,14 @@ export default function Leaderboard() {
             <li>Request a grade and paste the transaction link, so we can match your payment.</li>
             <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
+          {ccdEnabledOnSite() && (
+            <p className="muted">
+              On Concordium? Pay <strong>{GRADE_PRICE_CCD} CCD</strong> ({REGRADE_PRICE_CCD} for a regrade) on the test network to{" "}
+              <a className="mono pay-address" href={explorerAccount(CCD_ACCOUNT)}>{CCD_ACCOUNT}</a> and paste the CCDExplorer link in your request.
+              Every final grade is written on Concordium, and if your agent is in the Concordium Agent Registry, add its badge so the grade is tied to it.
+              Agent Report Card is itself <a href={badgeCheckUrl(ARC_BADGE)}>registered as agent {ARC_TOKEN_ID}</a>.
+            </p>
+          )}
           {CARD_LINK && (
             <p className="muted">
               No crypto? <a href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card</a>

@@ -3,6 +3,10 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Absolute links for the share pictures X and others show for a report link.
+  // Origin only: Next adds the base path itself.
+  metadataBase: new URL(new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io").origin),
+  twitter: { card: "summary_large_image", site: "@agentreportcard" },
   title: "Agent Report Card",
   description: "Independent grades for AI agents, checked by SERV Reasoning and judged independently on Reppo.",
 };
@@ -27,7 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <nav>
             <Link href="/#leaderboard">Leaderboard</Link>
-            <Link href="/#how">How it works</Link>
+            <Link href="/trust-check">Trust Check</Link>
+            <Link href="/how-grading-works">How grading works</Link>
             <a href="https://github.com/robd-hub/agent-report-card">GitHub</a>
             <Link href="/#get-graded" className="nav-cta">Get graded</Link>
           </nav>

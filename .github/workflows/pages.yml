@@ -33,6 +33,8 @@ jobs:
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
           CARD_PAYMENT_LINK: ${{ vars.CARD_PAYMENT_LINK }}
           CARD_PAYMENT_LINK_REGRADE: ${{ vars.CARD_PAYMENT_LINK_REGRADE }}
+          # Shows the "pay in CCD" option once Concordium is switched on.
+          NEXT_PUBLIC_CONCORDIUM: ${{ vars.CONCORDIUM_ENABLED }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

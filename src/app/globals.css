@@ -210,3 +210,35 @@ a.chip { text-decoration: none; }
 .badge-preview img { max-width: 100%; height: auto; }
 .badge-picker pre { width: 100%; margin: 0; }
 .small { font-size: .85rem; margin: 0; }
+
+/* Leaderboard by category */
+.cat-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.cat-tabs a { padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); font-size: .88rem; text-decoration: none; }
+.cat-tabs a span { opacity: .6; margin-left: 4px; font-size: .78rem; }
+.cat-tabs a:hover { border-color: var(--line-strong); color: inherit; }
+.cat-tabs a.on { border-color: var(--cyan); color: var(--cyan); background: rgba(79, 227, 255, .06); }
+.cat-hero { margin: 12px 0 24px; }
+
+/* How grading works page */
+.prose-page { max-width: 860px; }
+.prose-page section { margin: 36px 0; }
+.prose-page h2 { margin-bottom: 10px; }
+.prose-page blockquote { margin: 10px 0; padding: 12px 16px; border-left: 3px solid var(--cyan); background: rgba(255,255,255,.02); border-radius: 8px; }
+.steps.two { grid-template-columns: repeat(2, 1fr); margin: 12px 0; }
+.grade-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.grade-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.grade-table td:first-child { width: 36px; font-size: 1.2rem; }
+.grade-table td:nth-child(2) { white-space: nowrap; width: 110px; }
+.calc { margin: 12px 0; padding: 10px 14px; border-radius: 10px; background: rgba(79, 227, 255, .06); border: 1px solid rgba(79, 227, 255, .2); }
+@media (max-width: 640px) { .steps.two { grid-template-columns: 1fr; } .grade-table td:nth-child(2) { width: auto; } }
+.badge-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.og-preview { display: block; width: 100%; max-width: 600px; height: auto; margin-top: 8px; border-radius: 12px; border: 1px solid var(--line); }
+
+/* Trust Check page */
+.trust-input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: rgba(0,0,0,.3); color: inherit; font: inherit; }
+.trust-input:focus { outline: none; border-color: var(--cyan); }
+.trust-result { margin-top: 16px; }
+.trust-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.best-list { margin: 0; padding-left: 20px; }
+.best-list li { margin: 6px 0; }
+.best-list .chip { margin-left: 6px; }

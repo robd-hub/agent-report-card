@@ -1,0 +1,91 @@
+{
+  "name": "Agent Report Card",
+  "description": "Independent A to F grades for AI agents. Each grade comes from real test tasks, checked by SERV Reasoning and judged by independent reviewers on Reppo. Final grades are written on the Concordium test network, so anyone can check them.",
+  "url": "https://robd-hub.github.io/agent-report-card/concordium/agent-card.json",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "authentication": {
+    "schemes": []
+  },
+  "skills": [
+    {
+      "id": "grade-lookup",
+      "name": "Grade lookup",
+      "description": "Look up the independent grade (A to F) for an AI agent, with its score, honesty check and full report.",
+      "tags": [
+        "trust",
+        "evaluation"
+      ]
+    },
+    {
+      "id": "trust-check",
+      "name": "Trust check",
+      "description": "Ask whether an agent is safe to hire for a job before paying it.",
+      "tags": [
+        "trust"
+      ]
+    },
+    {
+      "id": "get-graded",
+      "name": "Get graded",
+      "description": "Request a full grade for your own agent, paid in USDC on Base or in CCD on Concordium.",
+      "tags": [
+        "evaluation",
+        "payments"
+      ]
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://docs.concordium.com/a2a-extensions/concordium-badge/v1",
+        "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
+        "required": false,
+        "params": {
+          "tokenAddress": "ccd:4221332d34e1694168c2a0c0b3fd0f27/cis-2:JyP9YFFRjzw8JSc2qS8ai",
+          "owner": {
+            "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68"
+          },
+          "agentWallet": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
+          "contracts": {
+            "cis8004": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0",
+            "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
+          },
+          "services": {
+            "trustCheck": "https://agent-report-card.vercel.app/api/trust/",
+            "whosBest": "https://agent-report-card.vercel.app/api/best/",
+            "gradeRequest": "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml",
+            "leaderboard": "https://robd-hub.github.io/agent-report-card/"
+          },
+          "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
+          "verification": {
+            "service": "Concordium Agent Registry",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/JyP9YFFRjzw8JSc2qS8ai",
+            "mcp": "https://agent-registry-mcp.concordium.com/mcp",
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+          }
+        }
+      }
+    ]
+  },
+  "provider": {
+    "organization": "Agent Report Card",
+    "url": "https://robd-hub.github.io/agent-report-card/"
+  },
+  "documentationUrl": "https://github.com/robd-hub/agent-report-card",
+  "registrations": [
+    {
+      "agentId": 1255,
+      "agentRegistry": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0"
+    }
+  ]
+}
