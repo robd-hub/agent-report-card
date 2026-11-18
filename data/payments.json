@@ -1,0 +1,14 @@
+[
+  {
+    "tx": "ad2eb45e1327f0e7d61072876edb8c7ef2a9f8372a4b3efe498b8912c9e24af2",
+    "badge": "JyP9YGLug2S48Zqp7H82e",
+    "issue": 35,
+    "agentId": "cheap-first",
+    "amountUsd": 0,
+    "from": "3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
+    "currency": "CCD",
+    "amountCcd": 10,
+    "date": "2026-11-18T12:35:10.977Z",
+    "requester": "robd-hub"
+  }
+]

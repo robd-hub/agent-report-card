@@ -9,6 +9,15 @@
         "badge": "JyP9YGLug2S48Zqp7H82e",
         "tx": "125351556e9bb84482722ff8e8099b8a56b9ba6d192523453c9c8f9b4d08d365",
         "anchoredAt": "2026-11-18T08:42:08.576Z"
+      },
+      {
+        "runDate": "2026-11-18T12:35:18.458Z",
+        "grade": "A",
+        "score": 98,
+        "reportHash": "097a75b6461b79a3e5f1cce387042301911a896119ed4bd138ae5c2eed1a7062",
+        "badge": "JyP9YGLug2S48Zqp7H82e",
+        "tx": "925816a4cbf595bcf5cf2d5a815649af299bffec3ec90d80ae5550fa6b7c14bf",
+        "anchoredAt": "2026-11-18T12:38:51.072Z"
       }
     ],
     "serv-baseline": [
@@ -336,9 +345,9 @@
     "cheap-first": {
       "badge": "JyP9YGLug2S48Zqp7H82e",
       "tokenId": 1256,
-      "verified": false,
+      "verified": true,
       "owner": "3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
-      "checkedAt": "2026-11-18T08:41:57.243Z"
+      "checkedAt": "2026-11-18T12:38:39.888Z"
     }
   }
 }
