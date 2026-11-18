@@ -26,6 +26,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadAgents, loadReport } from "../src/lib/data";
 import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
+import { ACP_WRITTEN_TASKS, closeAcp, fetchAcpAgent, findAcpWallet, MAX_TASK_USD, pickOffering } from "../src/lib/acp";
 export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
@@ -109,8 +110,7 @@ export function firstSuggestedTask(text: string): string {
  * description. If the requester suggested a real request, SERV may turn it
  * into one of the tasks, but always writes the success criteria itself.
  */
-export async function writeTasks(agent: MarketplaceAgent, suggested = ""): Promise<{ description: string; tasks: TestTask[] }> {
-  const n = WRITTEN_TASKS;
+export async function writeTasks(agent: MarketplaceAgent, suggested = "", n = WRITTEN_TASKS): Promise<{ description: string; tasks: TestTask[] }> {
   const system =
     `You design fair test tasks for grading AI agents. Write exactly ${n} different tasks that test the agent's core job as described, from easy to hard. ` +
     "Each task must be self-contained text that the agent can answer in text alone: no files, images, wallets, payments, " +
@@ -201,7 +201,10 @@ async function main() {
   const marketplaceId = findMarketplaceId(link);
   const modelName = form["Model name (OpenAI-style endpoints only)"] ?? "";
   const endpoint = marketplaceId ? null : findEndpoint(link, modelName);
-  if (!marketplaceId && !endpoint) {
+  // Agents on Virtuals are named by their wallet address (only on paid Virtuals jobs,
+  // since grading them means paying them for test jobs).
+  const acpWallet = !marketplaceId && !endpoint && acpPaidJob() ? findAcpWallet(link) : null;
+  if (!marketplaceId && !endpoint && !acpWallet) {
     return finish(
       "needs-attention",
       "Thanks for your request! The automatic grader can reach agents on the OpenServ marketplace, or agents with a public https address that answers a POST request " +
@@ -235,7 +238,9 @@ async function main() {
   const agents = loadAgents();
   let agent = marketplaceId
     ? agents.find((a) => a.adapter === "openserv-marketplace" && a.marketplaceId === marketplaceId)
-    : agents.find((a) => a.endpoint === endpoint!.endpoint);
+    : acpWallet
+      ? agents.find((a) => a.adapter === "virtuals-acp" && a.acpWallet?.toLowerCase() === acpWallet.toLowerCase())
+      : agents.find((a) => a.endpoint === endpoint!.endpoint);
   const isRegrade = Boolean(agent);
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
@@ -285,6 +290,48 @@ async function main() {
       adapter: endpoint.adapter,
       endpoint: endpoint.endpoint,
       ...(endpoint.model ? { model: endpoint.model } : {}),
+      tasks: written.tasks,
+    };
+    agents.push(agent);
+    saveAgents(agents);
+  }
+
+  if (!agent && acpWallet) {
+    let detail: Awaited<ReturnType<typeof fetchAcpAgent>> = null;
+    try {
+      detail = await fetchAcpAgent(acpWallet);
+    } catch (e) {
+      console.error(e);
+    }
+    if (!detail) {
+      return finish("needs-attention", `${received} But we couldn't look up the Virtuals agent at ${acpWallet}. The maintainer will check.`);
+    }
+    const offering = pickOffering(detail);
+    if (!offering) {
+      return finish("needs-attention", `${received} But ${detail.name} has no public fixed-price offering at ${MAX_TASK_USD} USDC or less for us to test it through. The maintainer will check.`);
+    }
+    const name = detail.name.replace(/[\r\n]+/g, " ").trim().slice(0, 80) || acpWallet;
+    const about: MarketplaceAgent = {
+      id: 0,
+      name,
+      capabilities_description: `${detail.description ?? ""}\n\nOffering "${offering.name}": ${offering.description ?? ""}`.slice(0, 4000),
+      expected_output: typeof offering.deliverable === "string" ? offering.deliverable.slice(0, 800) : JSON.stringify(offering.deliverable ?? "").slice(0, 800),
+    };
+    let written: Awaited<ReturnType<typeof writeTasks>>;
+    try {
+      written = await writeTasks(about, suggested, ACP_WRITTEN_TASKS);
+    } catch (e) {
+      return finish("needs-attention", `${received} We couldn't prepare test tasks for ${name} automatically (${(e as Error).message}). The maintainer will finish this one by hand.`);
+    }
+    let id = slugify(name) || "virtuals-agent";
+    for (let k = 2; agents.some((a) => a.id === id); k++) id = `${slugify(name) || "virtuals-agent"}-${k}`;
+    agent = {
+      id,
+      name,
+      description: written.description.replace(/, on the OpenServ marketplace\.$/, ", on Virtuals."),
+      adapter: "virtuals-acp",
+      acpWallet,
+      acpOffering: offering.name,
       tasks: written.tasks,
     };
     agents.push(agent);
@@ -344,7 +391,7 @@ async function main() {
   if (!run) {
     return finish(
       "needs-attention",
-      `${received} We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : `at ${agent.endpoint}`} (each was tried twice). ` +
+      `${received} We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : agent.adapter === "virtuals-acp" ? "through Virtuals" : `at ${agent.endpoint}`} (each was tried twice). ` +
         "The maintainer will look into it and reply here, and will retry or refund.",
     );
   }
@@ -384,8 +431,11 @@ async function main() {
 }
 
 if (process.argv[1]?.endsWith("auto-grade.ts")) {
-  main().catch((e) => {
-    console.error(e);
-    finish("needs-attention", "Something went wrong while handling this request. The maintainer has been notified and will reply here.");
-  });
+  main()
+    .catch((e) => {
+      console.error(e);
+      finish("needs-attention", "Something went wrong while handling this request. The maintainer has been notified and will reply here.");
+    })
+    // A Virtuals lookup leaves an event stream open; close it so the run ends.
+    .finally(() => closeAcp());
 }

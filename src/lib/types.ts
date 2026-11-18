@@ -4,7 +4,7 @@ export interface AgentConfig {
   name: string;
   description: string;
   /** Where the agent lives, used to pick the adapter that calls it. */
-  adapter: "openserv-marketplace" | "openai-compatible" | "http-json";
+  adapter: "openserv-marketplace" | "openai-compatible" | "http-json" | "virtuals-acp";
   /** OpenServ marketplace id, for adapter "openserv-marketplace". */
   marketplaceId?: number;
   /**
@@ -13,6 +13,12 @@ export interface AgentConfig {
    */
   endpoint?: string;
   model?: string;
+  /**
+   * For adapter "virtuals-acp": the agent's wallet on Virtuals, and the
+   * offering we hire it through (each task is one paid job).
+   */
+  acpWallet?: string;
+  acpOffering?: string;
   /** Test tasks the agent is given on every run. */
   tasks: TestTask[];
   /**

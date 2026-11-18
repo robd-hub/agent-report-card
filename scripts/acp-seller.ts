@@ -4,7 +4,9 @@
  * Run on a schedule by .github/workflows/acp-seller.yml. Each run connects as
  * the Agent Report Card agent, catches up on its open jobs, and stops:
  *
- *   1. A new job whose request names an agent we can reach gets a budget of
+ *   1. A new job whose request names an agent we can reach (OpenServ, a public
+ *      endpoint, or a Virtuals agent with an offering we can afford to hire
+ *      for test tasks) gets a budget of
  *      ACP_PRICE_USD (the offering's price). A request we can't use gets a
  *      message saying why, and no budget, so the buyer never pays.
  *   2. A funded job (the buyer's USDC is now held in escrow) is graded with
@@ -28,9 +30,9 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { AcpAgent, AssetToken, PrivyAlchemyEvmProviderAdapter } from "@virtuals-protocol/acp-node-v2";
-import type { JobSession } from "@virtuals-protocol/acp-node-v2";
-import { base } from "@account-kit/infra";
+import { AssetToken } from "@virtuals-protocol/acp-node-v2";
+import type { AcpAgent, JobSession } from "@virtuals-protocol/acp-node-v2";
+import { closeAcp, connectAcp, findAcpWallet, MAX_TASK_USD, pickOffering } from "../src/lib/acp";
 import { loadReport } from "../src/lib/data";
 import { GRADE_PRICE_USD } from "../src/lib/links";
 import { loadPayments } from "../src/lib/payment";
@@ -102,7 +104,30 @@ export function parseRequirement(content: string): GradeRequest {
 
 /** True when the grader can reach the agent the request names. */
 export function canGrade(req: GradeRequest): boolean {
-  return Boolean(findMarketplaceId(req.link) || findEndpoint(req.link, req.model));
+  return Boolean(findMarketplaceId(req.link) || findEndpoint(req.link, req.model) || findAcpWallet(req.link));
+}
+
+/**
+ * Why we can't take the request, or "" if we can. A Virtuals agent also needs
+ * an offering cheap enough to hire it for the test tasks.
+ */
+async function whyNot(agent: AcpAgent, req: GradeRequest | null): Promise<string> {
+  if (!req || !canGrade(req)) {
+    return (
+      "Sorry, the grader can't reach that agent. Send a Virtuals agent's wallet address, a link to an OpenServ marketplace agent, or a public https address that answers " +
+      'a POST of {"prompt": "..."} (or an OpenAI-style /chat/completions address plus its model name).'
+    );
+  }
+  const wallet = findMarketplaceId(req.link) || findEndpoint(req.link, req.model) ? null : findAcpWallet(req.link);
+  if (!wallet) return "";
+  const me = await agent.getAddress();
+  if (wallet.toLowerCase() === me.toLowerCase()) return "Sorry, Agent Report Card can't grade itself.";
+  const detail = await agent.getAgentByWalletAddress(wallet).catch(() => null);
+  if (!detail) return `Sorry, we couldn't find a Virtuals agent at ${wallet}.`;
+  if (!pickOffering(detail)) {
+    return `Sorry, we test a Virtuals agent by hiring it a few times, and ${detail.name} has no public fixed-price offering at ${MAX_TASK_USD} USDC or less.`;
+  }
+  return "";
 }
 
 /** The request as the GitHub issue form text that auto-grade.ts reads. */
@@ -137,26 +162,6 @@ function clientOf(session: JobSession): string {
   return "";
 }
 
-async function connect(): Promise<AcpAgent> {
-  const { ACP_WALLET_ADDRESS, ACP_WALLET_ID, ACP_SIGNER_PRIVATE_KEY, ACP_BUILDER_CODE } = process.env;
-  if (!ACP_WALLET_ADDRESS || !ACP_WALLET_ID || !ACP_SIGNER_PRIVATE_KEY) {
-    throw new Error("ACP_WALLET_ADDRESS, ACP_WALLET_ID and ACP_SIGNER_PRIVATE_KEY must be set");
-  }
-  const agent = await AcpAgent.create({
-    evmProvider: await PrivyAlchemyEvmProviderAdapter.create({
-      walletAddress: ACP_WALLET_ADDRESS as `0x${string}`,
-      walletId: ACP_WALLET_ID,
-      signerPrivateKey: ACP_SIGNER_PRIVATE_KEY,
-      chains: [base],
-      ...(ACP_BUILDER_CODE ? { builderCode: ACP_BUILDER_CODE } : {}),
-    }),
-  });
-  // Sessions are read after start() has caught up, not handled live.
-  agent.on("entry", () => {});
-  await agent.start();
-  return agent;
-}
-
 const providerJobs = (agent: AcpAgent) => agent.sessions.filter((s) => s.roles.includes("provider"));
 
 /** Step 3: submit the report for every graded job that's still funded. */
@@ -188,12 +193,9 @@ async function handleNew(agent: AcpAgent): Promise<void> {
     const req = requirementOf(s);
 
     if (s.status === "open" && !rec) {
-      if (!req || !canGrade(req)) {
-        await s.sendMessage(
-          "Sorry, the grader can't reach that agent. Send a link to an OpenServ marketplace agent, or a public https address that answers " +
-            'a POST of {"prompt": "..."} (or an OpenAI-style /chat/completions address plus its model name). No budget was set, so nothing was charged.',
-          "text",
-        );
+      const reason = await whyNot(agent, req);
+      if (reason) {
+        await s.sendMessage(`${reason} No budget was set, so nothing was charged.`, "text");
         saveJob({ ref, chainId: s.chainId, jobId: s.jobId, state: "declined" });
         console.log(`Job ${ref}: declined, no usable agent link.`);
         continue;
@@ -239,13 +241,13 @@ async function handleNew(agent: AcpAgent): Promise<void> {
 }
 
 async function main() {
-  const agent = await connect();
+  const agent = await connectAcp();
   try {
     console.log(`Connected. ${providerJobs(agent).length} active job(s) as provider.`);
     await submitGraded(agent);
     if (process.argv[2] !== "submit") await handleNew(agent);
   } finally {
-    await agent.stop();
+    await closeAcp();
   }
 }
 
