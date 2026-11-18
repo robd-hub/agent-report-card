@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "translate-es",
+          "prompt": "Translate into Spanish: 'The report card shows how reliable each AI agent is.'",
+          "criteria": "Accurate, natural Spanish that preserves the meaning, with no extra invented content.",
           "output": "La boleta de calificaciones muestra qué tan confiable es cada agente de IA.",
           "serv": {
             "score": 97,
@@ -24,6 +26,8 @@
         },
         {
           "taskId": "nuance",
+          "prompt": "What is the difference between 'ser' and 'estar' in Spanish? Keep it under 80 words.",
+          "criteria": "Under about 80 words, correctly explains ser for permanent or defining qualities and estar for states, locations or temporary conditions, with an example.",
           "output": "In Spanish, \"ser\" is used for permanent or essential characteristics, identity, origin, and time. \"Estar\" is used for temporary states, locations, emotions, and ongoing actions. For example, \"ser\" describes who you are or what something is generally like, while \"estar\" describes how you feel or where you are right now.",
           "serv": {
             "score": 96,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "After thorough search in the workspace and agent knowledge files, I could not find OpenServ's exact revenue for March 2026. The specific data for \"OpenServ revenue for March 2026\" is missing from the workspace documents and knowledge base. Therefore, I am unable to provide the exact revenue figure requested. I searched all available workspace documentation and knowledge files but found no relevant information.",
           "serv": {
             "score": 100,

@@ -18,6 +18,7 @@ import { loadAgents, loadReport, saveReport } from "../src/lib/data";
 import { fetchEvaluation, reppoConfigured, submitEvaluation } from "../src/lib/reppo";
 import { servCheck, servChat, servConfigured } from "../src/lib/serv";
 import type { AgentConfig, GradingRun, TaskResult } from "../src/lib/types";
+import { taskWording } from "../src/lib/types";
 
 /** Runs one task, trying once more if the agent errors or times out. */
 async function runWithRetry(agent: AgentConfig, prompt: string): Promise<AgentReply> {
@@ -50,7 +51,7 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
       const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
       const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
       console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
-      return { taskId: task.id, output, serv, reppo, ...(meta ? { meta } : {}) };
+      return { taskId: task.id, prompt: task.prompt, criteria: task.criteria, output, serv, reppo, ...(meta ? { meta } : {}) };
     }),
   );
   // A grade with a missing task wouldn't be fair, so don't save a partial run.
@@ -101,7 +102,8 @@ async function stepReppoQueue(agents: AgentConfig[]): Promise<number> {
   for (const next of open.filter((o) => o.t.reppo.status === "queued")) {
     if (inFlight >= MAX_IN_FLIGHT) break;
     {
-      const task = next.agent.tasks.find((x) => x.id === next.t.taskId)!;
+      // Judge the answer against the wording it was actually given.
+      const task = taskWording(next.t, next.agent)!;
       const outcome = await submitEvaluation({ prompt: task.prompt, criteria: task.criteria, output: next.t.output });
       if (outcome.status === "busy") {
         console.log("  Reppo says it's busy; will retry.");

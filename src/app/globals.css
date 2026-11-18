@@ -253,3 +253,4 @@ a.chip { text-decoration: none; }
 .drift-task-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
 .drift-row { overflow-wrap: anywhere; }
 .drift-alert { color: var(--f); margin: 8px 0 0; }
+.board-note { margin: 12px 4px 0; }

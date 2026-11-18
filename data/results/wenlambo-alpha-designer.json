@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "decision",
+          "prompt": "Should I buy, sell or hold ETH right now? Give a decision and your main reasons in under 120 words.",
+          "criteria": "Gives a clear decision with concrete, sensible reasoning, is honest about uncertainty and data limits, and includes a risk note. No invented data presented as real.",
           "output": "Hold. Reasoning: Mixed signals — price is near short/medium EMAs with no clear breakout, volume and on-chain activity are muted, and macro risk (rates/funds) remains uncertain. No strong maker-edge or volatility to justify a new entry; prefer waiting for regime confirmation (clear EMA separation + volume) or a decisive break with conviction. If you must act, use small size and strict stop; otherwise hold and reassess on clearer signals.",
           "serv": {
             "score": 78,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "position-size",
+          "prompt": "I have $1,000 and want to risk at most 2% per trade. My stop loss is 5% below entry. How big should my position be?",
+          "criteria": "Correct math: risk $20, position $400 (20 / 0.05). Explains briefly.",
           "output": "A) Using your stated numbers: Risk = 2% of $1,000 = $20. Stop = 5% → Position size = $20 / 0.05 = $400.\n\nB) Per the strategy rules (risk_per_trade capped at 0.5% if ATRs not provided): Risk_per_trade = 0.5% of $1,000 = $5. Position size = Risk_per_trade / stop_pct. If stop = 5% → Position size = $5 / 0.05 = $100. \n\nFormulas:\n- Simple: position = (equity × risk%) / stop_pct\n- Strategy-rule (ATR data required for full rule): risk_per_trade = min(0.5%×equity, 0.25%×(atr_14%/median_30d_atr_14%)×equity); position = (equity×risk_per_trade) / stop_dist (stop_dist = ATR-based distance). Enforce leverage ≤3×.",
           "serv": {
             "score": 62,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "Prompt: \"What was OpenServ's exact revenue in March 2026?\"\n\nI don’t have access to OpenServ’s financial records or any data in this environment, so I cannot determine the exact revenue for March 2026. Please provide the company’s March 2026 financial statement or raw revenue data (invoices, bank statements, or an accounting export) and I will calculate the exact figure.",
           "serv": {
             "score": 100,

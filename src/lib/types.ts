@@ -64,6 +64,14 @@ export type ReppoResult =
 
 export interface TaskResult {
   taskId: string;
+  /**
+   * The exact prompt and criteria this answer was given and judged against,
+   * saved with the answer so a later re-score grades the question the agent
+   * actually saw, even if the task's wording has since been edited. Runs from
+   * before this was added were filled in from git history (scripts/backfill-prompts.ts).
+   */
+  prompt?: string;
+  criteria?: string;
   output: string;
   serv: ServCheck | null;
   reppo: ReppoResult;
@@ -84,6 +92,13 @@ export interface GradingRun {
   /** True until every task has a finished Reppo evaluation. */
   provisional: boolean;
   summary: string;
+}
+
+/** The prompt and criteria an answer was judged on: its own saved copy, else the task's current wording. */
+export function taskWording(t: TaskResult, agent: AgentConfig): { prompt: string; criteria: string } | null {
+  if (t.prompt !== undefined) return { prompt: t.prompt, criteria: t.criteria ?? "" };
+  const task = agent.tasks.find((x) => x.id === t.taskId);
+  return task ? { prompt: task.prompt, criteria: task.criteria } : null;
 }
 
 export type Grade = "A" | "B" | "C" | "D" | "F";

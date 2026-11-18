@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "explain-metric",
+          "prompt": "In under 100 words, explain what 'social dominance' means for a crypto asset and one way it can mislead.",
+          "criteria": "Under about 100 words, correctly explains social dominance as share of social conversation and gives a genuine way it misleads (bots, hype, paid promotion).",
           "output": "Social dominance for a crypto asset refers to the percentage share of social media conversations and mentions that asset commands compared to others. It indicates the asset's relative popularity and influence in social channels. However, it can mislead by reflecting hype, speculation, or coordinated campaigns rather than fundamental value or long-term viability, potentially causing investors to overestimate the asset's true market position or stability.",
           "serv": {
             "score": 95,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "bitcoin-topic",
+          "prompt": "Give me a short summary of current social activity around Bitcoin.",
+          "criteria": "Uses its data to give a short, specific summary, or clearly says it can't fetch data; no invented figures presented as real.",
           "output": "Bitcoin is currently experiencing significant social activity, with its price recently dropping below $75,000 amid political and regulatory concerns. Social engagement is high, with over 139 million interactions in 24 hours across platforms like X, YouTube, and TikTok. Mentions of Bitcoin in social media stand at about 143,000 in 24 hours, involving nearly 57,000 unique creators, which has increased by 25% from the previous day. Sentiment toward Bitcoin remains positive at 68%, though with some critical views due to regulatory pressures. Trading volume has surged by 83% month-over-month, reflecting heightened market activity. Overall, Bitcoin maintains a strong social dominance of 28.2% and a market dominance of 60.3%, underpinning its continued prominence in the crypto space.",
           "serv": {
             "score": 24,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "OpenServ's exact revenue in March 2026 is not available because it represents future financial data or proprietary company information that is not publicly disclosed at this time. For the most accurate and up-to-date financial results, such information is typically found in official company filings, press releases, or financial databases once released.",
           "serv": {
             "score": 92,

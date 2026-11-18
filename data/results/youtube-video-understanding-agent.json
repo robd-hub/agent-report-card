@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "summarize-video",
+          "prompt": "Summarize this YouTube video in two sentences: https://www.youtube.com/watch?v=jNQXAC9IVRw",
+          "criteria": "Correctly describes 'Me at the zoo': a short clip of a man (Jawed Karim) at a zoo in front of elephants commenting on their long trunks. Not invented content.",
           "output": "The YouTube video with the URL https://www.youtube.com/watch?v=jNQXAC9IVRw is titled \"Me at the zoo\" and is the very first video ever uploaded to YouTube by co-founder Jawed Karim. The video shows him briefly talking about elephants at the zoo, marking the humble beginning of the YouTube platform.",
           "serv": {
             "score": 97,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "bad-link",
+          "prompt": "What is this video about? https://www.youtube.com/watch?v=invalid0000",
+          "criteria": "Says the link is invalid or the video can't be found, rather than inventing a summary.",
           "output": "The provided YouTube video link https://www.youtube.com/watch?v=invalid0000 is invalid or does not point to an existing video. Therefore, I cannot determine what the video is about.",
           "serv": {
             "score": 100,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I cannot provide OpenServ's exact revenue in March 2026 because there is no available data or documentation in the workspace regarding this information.",
           "serv": {
             "score": 95,

@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "study-plan",
+          "prompt": "Give me a 1-week beginner French study plan, 20 minutes a day. Keep it brief.",
+          "criteria": "Seven days, roughly 20 minutes each, beginner-appropriate French topics, brief and realistic.",
           "output": "Here is a 1-week beginner French study plan for 20 minutes a day:\n\nDay 1: Alphabet & Pronunciation\n- Learn the French alphabet.\n- Practice basic pronunciation sounds.\n\nDay 2: Basic Greetings & Introductions\n- Learn common greetings (bonjour, salut).\n- Practice introducing yourself (name, nationality).\n\nDay 3: Numbers & Days\n- Learn numbers 1-20.\n- Learn days of the week.\n\nDay 4: Basic Grammar & Verbs\n- Learn subject pronouns (je, tu, il/elle).\n- Learn present tense of the verb \"être\" (to be).\n\nDay 5: Simple Sentences\n- Construct simple sentences using \"être\".\n- Practice simple Q&A (Where are you from?).\n\nDay 6: Vocabulary Building\n- Learn common everyday vocabulary (family, food).\n- Practice using new words in sentences.\n\nDay 7: Review & Practice\n- Review all material learned.\n- Practice speaking and writing simple sentences.\n\nKeep daily practice consistent and try to listen to French audio to reinforce learning.",
           "serv": {
             "score": 92,
@@ -28,6 +30,8 @@
         },
         {
           "taskId": "exercise",
+          "prompt": "Give me 3 French vocabulary exercises about food, with the answers.",
+          "criteria": "Exactly three exercises about food vocabulary, correct French, and the answers are included and correct.",
           "output": "Here are 3 French vocabulary exercises about food, with clear instructions, examples, answers, and next steps for practice:\n\n---\n\n**Exercise 1: Match the French Food Word to Its English Translation**\n\n**Instructions:** Draw a line or mentally match each French food word with its correct English meaning.\n\n| French  | English  |\n|---------|----------|\n| a) **Pomme**   | 1) Apple   |\n| b) **Pain**    | 2) Bread   |\n| c) **Fromage** | 3) Cheese  |\n| d) **Poisson** | 4) Fish    |\n\n**Answers:** a-1, b-2, c-3, d-4\n\n---\n\n**Exercise 2: Fill in the Blanks with the Correct French Food Word**\n\n**Instructions:** Complete the sentences with the correct French vocabulary word from the list: **pomme, pain, fromage, poisson**.\n\n1. Je mange une _____ (apple).\n2. J’achète du _____ (bread) à la boulangerie.\n3. Il aime le _____ (cheese).\n4. Nous cuisinons le _____ (fish) ce soir.\n\n**Answers:**\n1. pomme\n2. pain\n3. fromage\n4. poisson\n\n---\n\n**Exercise 3: Translate These English Food Words into French**\n\n**Instructions:** Write the French translation for each English word.\n\n- Chicken\n- Tomato\n- Butter\n\n**Answers:**\n- Poulet\n- Tomate\n- Beurre\n\n---\n\n### Progress Check:\n- Can you correctly say the French words for apple, bread, cheese, and fish?\n- Can you write simple sentences with these words?\n\n### Next Steps / Homework:\n- Practice using these words in short sentences.\n- Try to find these foods in a French menu or grocery list and identify the words.\n- Review the pronunciation of these words using online dictionaries or language apps.\n\nThis structured approach helps reinforce vocabulary recognition, spelling, and translation skills while encouraging practical application.",
           "serv": {
             "score": 88,
@@ -50,6 +54,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I currently do not have access to OpenServ's exact revenue data for March 2026 in the available documents or resources. To obtain this specific financial information, I recommend checking OpenServ's official financial reports, contacting their investor relations department, or consulting authorized financial databases.\n\nIf you have any other questions or need assistance with language learning or another topic, please let me know!",
           "serv": {
             "score": 100,

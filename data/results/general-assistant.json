@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "summarize-x402",
+          "prompt": "In under 100 words, explain what the HTTP 402 status code is and why it is rarely used.",
+          "criteria": "Under about 100 words, correctly says 402 means Payment Required, was reserved for future digital payments, and is rarely used in practice. No invented facts.",
           "output": "The HTTP 402 status code stands for \"Payment Required\" and was originally intended for use as part of a digital payment system. However, it is rarely used because such a standard payment mechanism within HTTP has not been established. The code is reserved for future use to enable payment-based indications but lacks current implementation by most HTTP clients or servers. This status is more of a placeholder for future payment protocols.",
           "serv": {
             "score": 92,
@@ -27,6 +29,8 @@
         },
         {
           "taskId": "simple-math",
+          "prompt": "A service charges 440 credits per review and a user has 39,160 credits. How many full reviews can they buy, and how many credits are left over?",
+          "criteria": "Says 89 reviews with 0 credits left over (39,160 divided by 440 is exactly 89).",
           "output": "The user can buy 89 full reviews and will have 0 credits left over.",
           "serv": {
             "score": 100,
@@ -47,6 +51,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "The task requires an answer to \"What was OpenServ's exact revenue in March 2026?\" but as an AI, I don't have access to real-time financial data. To find this information, you would need to look at OpenServ's official financial reports or contact their finance department.",
           "serv": {
             "score": 95,

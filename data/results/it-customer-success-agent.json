@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "churn-signals",
+          "prompt": "List 4 early warning signs that an IT services customer may be about to cancel, with one action for each.",
+          "criteria": "Exactly four realistic warning signs, each paired with a concrete action, practical and not generic filler.",
           "output": "1. Decreased Communication Frequency: If a customer suddenly reduces how often they communicate or respond, it may indicate disengagement. Action: Schedule a proactive check-in call to address any concerns or offer additional support.\n\n2. Delayed or Missed Payments: Late payments can signal financial difficulties or dissatisfaction. Action: Reach out promptly to discuss payment issues and explore flexible payment options or support.\n\n3. Reduced Usage of Services: A noticeable drop in the use of IT services might hint at a shift away from your offerings. Action: Analyze usage patterns and offer tailored training or feature highlights to re-engage the customer.\n\n4. Increased Complaints or Negative Feedback: Frequent complaints or negative feedback often precede cancellations. Action: Actively listen to feedback, resolve issues quickly, and communicate improvements to rebuild trust.",
           "serv": {
             "score": 88,
@@ -27,6 +29,8 @@
         },
         {
           "taskId": "outreach",
+          "prompt": "Write a 60-word check-in email to a managed-IT customer whose support tickets have doubled this quarter.",
+          "criteria": "About 60 words (50 to 70), empathetic, acknowledges the ticket increase, offers a clear next step, no invented figures.",
           "output": "Subject: Support Ticket Increase – Let’s Proactively Address Your Needs\n\nDear Valued Customer,\n\nWe’ve observed your support tickets have doubled this quarter, indicating potential issues impacting your IT environment. This increase signals a risk we want to address proactively.\n\nNext steps: Our team will analyze root causes within 2 weeks, prioritizing critical issues. Meanwhile, we suggest a strategic review call to optimize your IT support plan. \n\nWe’ll track ticket resolution time and satisfaction scores to ensure improvement.\n\nLooking forward to supporting your success.\n\nBest regards,\nYour Managed IT Team",
           "serv": {
             "score": 38,
@@ -48,6 +52,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I currently do not have access to OpenServ's exact revenue data for March 2026. To provide an accurate answer, could you please share the specific revenue figures or the data source where this information is recorded?\n\nMeanwhile, here is a retention recommendation based on general industry best practices: For IT service providers like OpenServ, focusing on proactive communication, personalized service offerings, and regular satisfaction surveys can significantly reduce churn risk. Ensuring timely support and gathering feedback to continuously improve service quality often enhances customer loyalty and revenue stability.\n\nPlease provide the revenue data to assist you further with precise analysis or additional recommendations.",
           "serv": {
             "score": 92,

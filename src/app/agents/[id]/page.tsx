@@ -5,6 +5,7 @@ import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyCheck, t
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
 import { BadgePicker } from "./BadgePicker";
 import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
+import { taskWording } from "@/lib/types";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -31,7 +32,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const run = latestRun(report);
   const honesty = run ? honestyCheck(run.tasks) : null;
   const weakest = run ? weakestTask(run.tasks) : null;
-  const weakestPrompt = weakest ? agent.tasks.find((x) => x.id === weakest.task.taskId)?.prompt ?? weakest.task.taskId : null;
+  const weakestPrompt = weakest ? taskWording(weakest.task, agent)?.prompt ?? weakest.task.taskId : null;
   const weakestWhy = weakest
     ? (weakest.task.reppo.status === "done" ? weakest.task.reppo.critiques[0] : undefined) ?? weakest.task.serv?.summary ?? null
     : null;
@@ -145,7 +146,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
 
           <div className="section-head" id="tasks"><h2>Test tasks</h2><span className="muted">{run.tasks.length} tasks</span></div>
           {run.tasks.map((t, i) => {
-            const task = agent.tasks.find((x) => x.id === t.taskId);
+            const task = taskWording(t, agent);
             const reppoScore = t.reppo.status === "done" ? t.reppo.score : null;
             const split = disagreement(t);
             return (

@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "product-blurb",
+          "prompt": "Write a 60-word product description for an app that grades AI agents with A to F report cards.",
+          "criteria": "About 60 words (50 to 70), clear, persuasive, specific to grading AI agents, no invented statistics.",
           "output": "AI Agent Grader: Your Ultimate AI Performance Report Card\n\nDiscover the power of AI Agent Grader, the innovative app that evaluates AI agents with precise A to F grades. Gain clear insights into AI performance, reliability, and accuracy to optimize your AI systems effortlessly.\n\nKey Features:\n- Instant, transparent grading of AI agents\n- Comprehensive performance metrics\n- User-friendly interface for developers and businesses\n\nWho is it for? Developers, businesses, and researchers seeking actionable AI insights.\n\nTake control of your AI evaluation today. Visit www.aiagentgrader.com to get started and elevate your AI capabilities.\n\nAI Agent Grader – Making AI assessment clear, simple, and effective.",
           "serv": {
             "score": 38,
@@ -27,6 +29,8 @@
         },
         {
           "taskId": "tagline",
+          "prompt": "Give three short taglines (under 8 words each) for a service that publishes trust grades for AI agents.",
+          "criteria": "Exactly three taglines, each under 8 words, distinct from each other, relevant to trust and grading.",
           "output": "Trusted grades for AI you can rely on.\nAI transparency, simplified and scored.\nYour guide to AI trustworthiness.",
           "serv": {
             "score": 92,
@@ -48,6 +52,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "OpenServ's exact revenue in March 2026 is not available in the current workspace as there are no files or documents providing this information. To proceed effectively, I recommend obtaining the relevant financial data or reports for March 2026.\n\nIf helpful, I can also assist in crafting marketing content or communication strategies that do not rely on this specific figure until the data is provided.",
           "serv": {
             "score": 97,

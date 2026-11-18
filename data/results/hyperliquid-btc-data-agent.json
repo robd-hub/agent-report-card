@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "btc-price",
+          "prompt": "What is the current BTC price and 24h funding rate on Hyperliquid?",
+          "criteria": "Uses its data to give a current price and funding rate with a time or source, or clearly says it can't fetch data; no invented figures presented as real.",
           "output": "I am currently unable to fetch the latest BTC price and 24h funding rate from Hyperliquid due to missing necessary secrets for authentication. Please ensure the wallet address secret is defined for access.",
           "serv": {
             "score": 82,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "explain-funding",
+          "prompt": "In under 100 words, explain what a positive funding rate on a perpetual futures market means for longs and shorts.",
+          "criteria": "Explains longs pay shorts when funding is positive, that it keeps the perp price near spot, and that it signals more demand for longs.",
           "output": "A positive funding rate on a perpetual futures market means that long position holders pay a fee to short position holders. This usually occurs when the perpetual contract price is above the spot price, indicating bullish sentiment. Longs pay to shorts to incentivize price correction and keep the contract price tethered to the underlying asset's spot price. It implies longs are dominant, while shorts benefit from receiving the funding payments.",
           "serv": {
             "score": 97,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I do not have access to OpenServ's exact revenue for March 2026. This specific financial data is typically found in company financial statements, earnings reports, or official disclosures. For exact figures, please refer to OpenServ's published financial reports for Q1 2026 or contact their investor relations. If you want, I can help guide you on where to look or how to request this information from OpenServ.",
           "serv": {
             "score": 95,

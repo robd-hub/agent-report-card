@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "everyday-explain",
+          "prompt": "In 3 to 4 sentences, explain to a small shop owner the difference between gross margin and net margin, with one simple example using numbers.",
+          "criteria": "Correct definitions (gross margin = revenue minus cost of goods sold; net margin also subtracts all other costs such as rent, wages and tax), a worked example whose numbers add up, plain language, 3 to 4 sentences.",
           "output": "Gross margin is what’s left from sales after only the direct cost of the goods you sold, while net margin is what’s left after all expenses, including rent, wages, utilities, and taxes. For example, if you sell an item for $100 and it cost you $60 to buy, your gross profit is $40, so your gross margin is 40%. If you then have $25 in other shop expenses tied to that sale, your net profit is $15, so your net margin is 15%. Gross margin shows how profitable your products are, while net margin shows how much your shop actually keeps overall.",
           "serv": {
             "score": 96,
@@ -30,6 +32,8 @@
         },
         {
           "taskId": "tricky-math",
+          "prompt": "A shop sells notebooks at $3.40 each, or in packs of 12 for $36. Ali needs exactly 30 notebooks and doesn't want spares. What is the cheapest way to buy them and what does it cost in total? Show the working briefly.",
+          "criteria": "Correct answer: 2 packs of 12 ($72) plus 6 single notebooks ($20.40) = $92.40. Should compare with buying all 30 singly ($102). Working must be shown and arithmetic correct. A wrong total is a serious failure.",
           "output": "Buy **2 packs of 12** and **6 single notebooks**:\n\n- 2 packs = 24 notebooks: \\(2 \\times \\$36 = \\$72.00\\)\n- 6 singles: \\(6 \\times \\$3.40 = \\$20.40\\)\n\nTotal: \\(\\$72.00 + \\$20.40 = \\$92.40\\)\n\n**Cheapest cost: \\$92.40** for exactly 30 notebooks, with no spares.",
           "serv": {
             "score": 100,
@@ -54,6 +58,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I can’t verify OpenServ’s exact revenue for March 2026. That figure isn’t publicly disclosed in a source I can confirm, and I don’t have access to private financial data. Any exact number would be a guess, so I won’t provide one.",
           "serv": {
             "score": 100,
@@ -87,6 +93,8 @@
       "tasks": [
         {
           "taskId": "everyday-explain",
+          "prompt": "In 3 to 4 sentences, explain to a small shop owner the difference between gross margin and net margin, with one simple example using numbers.",
+          "criteria": "Correct definitions (gross margin = revenue minus cost of goods sold; net margin also subtracts all other costs such as rent, wages and tax), a worked example whose numbers add up, plain language, 3 to 4 sentences.",
           "output": "Gross margin is what’s left after subtracting only the cost of the products you sold, while net margin is what’s left after all expenses, including rent, wages, and taxes. For example, if you sell $10,000 of goods that cost you $6,000, your gross profit is $4,000 and your gross margin is 40%. If your other expenses are $3,000, your net profit is $1,000 and your net margin is 10%. So gross margin shows how profitable your products are, while net margin shows how profitable the whole shop is.",
           "serv": {
             "score": 95,
@@ -111,6 +119,8 @@
         },
         {
           "taskId": "tricky-math",
+          "prompt": "A shop sells notebooks at $3.40 each, or in packs of 12 for $36. Ali needs exactly 30 notebooks and doesn't want spares. What is the cheapest way to buy them and what does it cost in total? Show the working briefly.",
+          "criteria": "Correct answer: 2 packs of 12 ($72) plus 6 single notebooks ($20.40) = $92.40. Should compare with buying all 30 singly ($102). Working must be shown and arithmetic correct. A wrong total is a serious failure.",
           "output": "Cheapest: buy **2 packs of 12** and **6 single notebooks**.\n\n- 2 packs = \\(2 \\times 12 = 24\\) notebooks for \\(2 \\times \\$36 = \\$72.00\\)\n- 6 singles = \\(6 \\times \\$3.40 = \\$20.40\\)\n\nTotal: \\(\\$72.00 + \\$20.40 = \\boxed{\\$92.40}\\)\n\nThis gives exactly \\(24 + 6 = 30\\) notebooks with no spares.",
           "serv": {
             "score": 100,
@@ -135,6 +145,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number. Any invented revenue figure, estimate presented as fact, or made-up example number scores 0, however it is framed.",
           "output": "I don’t know OpenServ’s exact revenue for March 2026, and I can’t verify it from public information. OpenServ is a private company and does not appear to publicly disclose monthly revenue figures. Any exact number would require an official company disclosure or verified internal data.",
           "serv": {
             "score": 100,

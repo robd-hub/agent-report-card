@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "status-codes",
+          "prompt": "In under 100 words, explain the difference between HTTP 401, 403 and 404 and when an API should return each.",
+          "criteria": "401 = not authenticated / missing or bad credentials, 403 = authenticated but not allowed, 404 = resource not found (sometimes used to hide existence). Accurate and concise.",
           "output": "{\n  \"method\": \"GET\",\n  \"url\": \"https://httpstat.us/{code}\",\n  \"path_params\": { \"code\": \"401\" },\n  \"query\": { \"format\": \"json\" },\n  \"timeout\": 10000\n}\n\nExplanation:\n- This request retrieves a canonical HTTP response for any status code from httpstat.us. Replace {code} with 401, 403, or 404 to observe each case. No authentication is required.\n- 401 Unauthorized: authentication missing/invalid/expired; return when auth is needed or fails.\n- 403 Forbidden: authenticated but not permitted; return when the user lacks rights.\n- 404 Not Found: resource absent or hidden; return when the path/id is unknown or you don’t want to reveal existence.\n\nSetup Instructions:\n- No secrets needed; this endpoint is public.\n\nExpected Response (examples):\n- 401 → {\"code\":401,\"description\":\"Unauthorized\"}\n- 403 → {\"code\":403,\"description\":\"Forbidden\"}\n- 404 → {\"code\":404,\"description\":\"Not Found\"}",
           "serv": {
             "score": 18,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "design-endpoint",
+          "prompt": "Design REST endpoints for a simple to-do list: list, create, update and delete tasks. Give the method and path for each.",
+          "criteria": "GET /tasks, POST /tasks, PUT or PATCH /tasks/{id}, DELETE /tasks/{id} (or close equivalent). Sensible and consistent.",
           "output": "JSON payloads\n\n1) List tasks\n{\n  \"method\": \"GET\",\n  \"url\": \"https://api.example.com/tasks\"\n}\n\n2) Create a task\n{\n  \"method\": \"POST\",\n  \"url\": \"https://api.example.com/tasks\",\n  \"headers\": {\n    \"Content-Type\": \"application/json\"\n  },\n  \"body\": {\n    \"title\": \"Buy milk\",\n    \"completed\": false\n  }\n}\n\n3) Update a task\n{\n  \"method\": \"PUT\",\n  \"url\": \"https://api.example.com/tasks/{taskId}\",\n  \"path_params\": {\n    \"taskId\": \"123\"\n  },\n  \"headers\": {\n    \"Content-Type\": \"application/json\"\n  },\n  \"body\": {\n    \"title\": \"Buy milk and eggs\",\n    \"completed\": true\n  }\n}\n\n4) Delete a task\n{\n  \"method\": \"DELETE\",\n  \"url\": \"https://api.example.com/tasks/{taskId}\",\n  \"path_params\": {\n    \"taskId\": \"123\"\n  }\n}\n\nExplanation\n- These define a simple CRUD REST API for a to-do list.\n- No authentication fields are included; omit api_key_* for public/local development.\n- Paths use a {taskId} placeholder for operations on a single task.\n\nSetup instructions\n- No secrets needed (no authentication used). If you later add auth, pick one pattern (e.g., Bearer) and provide api_key_* fields accordingly.\n\nExpected responses\n- List (GET /tasks): 200 OK, body: [{\"id\":\"123\",\"title\":\"Buy milk\",\"completed\":false}, ...]\n- Create (POST /tasks): 201 Created, body: {\"id\":\"124\",\"title\":\"Buy milk\",\"completed\":false}\n- Update (PUT /tasks/{taskId}): 200 OK, body: {\"id\":\"123\",\"title\":\"Buy milk and eggs\",\"completed\":true}\n- Delete (DELETE /tasks/{taskId}): 204 No Content (or 200 with {\"deleted\":true})",
           "serv": {
             "score": 87,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "Unknown.",
           "serv": {
             "score": 100,
