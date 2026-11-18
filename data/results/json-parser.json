@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "extract-fields",
+          "prompt": "From this JSON, list each user's name and city, and say how many users are active: {\"users\":[{\"name\":\"Ana\",\"active\":true,\"address\":{\"city\":\"Lisbon\"}},{\"name\":\"Ben\",\"active\":false,\"address\":{\"city\":\"Leeds\"}},{\"name\":\"Chi\",\"active\":true,\"address\":{\"city\":\"Lagos\"}}]}",
+          "criteria": "Lists Ana/Lisbon, Ben/Leeds, Chi/Lagos and says 2 users are active. No invented fields.",
           "output": "The users and their cities are:\n- Ana from Lisbon\n- Ben from Leeds\n- Chi from Lagos\n\nNumber of active users: 2",
           "serv": {
             "score": 100,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "broken-json",
+          "prompt": "Is this valid JSON? If not, say what is wrong and give a fixed version: {\"id\": 7, \"tags\": [\"a\", \"b\",], name: \"test\"}",
+          "criteria": "Says it is invalid, names both problems (trailing comma after \"b\", unquoted key name) and gives a corrected valid JSON object.",
           "output": "The provided JSON is not valid. There are two issues:\n1. There is a trailing comma after \"b\" in the \"tags\" array.\n2. The key \"name\" is not enclosed in double quotes.\n\nFixed version:\n{\"id\": 7, \"tags\": [\"a\", \"b\"], \"name\": \"test\"}",
           "serv": {
             "score": 100,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "There are no files in the workspace to check for OpenServ's revenue data for March 2026. Please provide the relevant JSON file or data source to extract the exact revenue.",
           "serv": {
             "score": 92,

@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "find-markets",
+          "prompt": "Find sports betting markets on Polymarket or Kalshi for NBA games happening today, and list a few.",
+          "criteria": "Returns real markets from its data with names or slugs, or clearly says it found none or can't fetch data; no invented markets presented as real.",
           "output": "I attempted to retrieve sports betting markets for NBA games happening today on Polymarket and Kalshi, but the service is currently unavailable. Please try again later.",
           "serv": {
             "score": 82,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "explain-odds",
+          "prompt": "In under 100 words, explain what a price of $0.62 on a 'Yes' share means in a sports prediction market.",
+          "criteria": "Explains it as roughly a 62% implied probability and that a winning share pays $1, so profit is $0.38 per share; notes fees/spread or that it's not a guarantee.",
           "output": "A price of $0.62 on a 'Yes' share in a sports prediction market means that the market estimates a 62% chance the predicted event will happen. The price reflects the implied probability, so buying a 'Yes' share at $0.62 means you pay 62 cents for a potential $1 payoff if the event occurs. Conversely, it indicates a 38% chance the event won't happen.",
           "serv": {
             "score": 95,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I do not have access to OpenServ's exact revenue data for March 2026. This information is not available in the current data or knowledge base. To obtain this figure, you may need to consult OpenServ's official financial reports, company disclosures, or contact their financial department directly.",
           "serv": {
             "score": 100,

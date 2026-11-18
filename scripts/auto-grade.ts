@@ -36,6 +36,7 @@ import { checkPayment, findTxHash, loadPayments, MAX_PAYMENT_AGE_DAYS, savePayme
 import { badgeCheckUrl, CCD_ACCOUNT, CCD_FREE_GRADES, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
+import { taskWording } from "../src/lib/types";
 
 const SITE = "https://robd-hub.github.io/agent-report-card";
 const AGENTS_FILE = path.join(process.cwd(), "data", "agents.json");
@@ -483,7 +484,7 @@ async function main() {
 
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const lines = run.tasks.map((t) => {
-    const task = agent!.tasks.find((x) => x.id === t.taskId);
+    const task = taskWording(t, agent!);
     const reppo = t.reppo.status === "done" ? `${t.reppo.score}/100` : "not finished";
     const now = taskScore(t);
     const was = previous?.tasks.find((p) => p.taskId === t.taskId);

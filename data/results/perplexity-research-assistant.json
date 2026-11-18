@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "research-brief",
+          "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+          "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts.",
           "output": "The x402 payment standard is a set of protocols designed to streamline and standardize electronic payment transactions, facilitating secure and efficient exchange of payment information between businesses and financial institutions. It is primarily used by companies involved in financial services, payment processing, and any businesses that require automated, standardized payment systems to improve transaction accuracy and reduce processing times. These users benefit from enhanced interoperability and compliance with industry regulations through the x402 standard.",
           "serv": {
             "score": 12,
@@ -24,6 +26,8 @@
         },
         {
           "taskId": "compare-sources",
+          "prompt": "Compare two credible sources on the current state of AI agent payments and say where they disagree.",
+          "criteria": "Names two real, checkable sources, summarizes each fairly, and identifies a genuine point of disagreement.",
           "output": "Two credible sources on the current state of AI agent payments are Beincrypto and Bitkub. Beincrypto reports that AI-agent payments are real but still overwhelmingly low-value and tightly constrained, mostly involving machine-to-machine micropayments under human authorization controls. They emphasize infrastructure advances but highlight security and trust as major blockers, with autonomous agents controlling significant funds still uncommon.\n\nBitkub concurs on the technical feasibility but stresses ongoing issues around operational maturity and legal responsibility, particularly liability for unauthorized payments. While industry proponents see workable controls like spending limits and identity verification, payments specialists and banks consider current systems only short-term solutions due to unresolved fraud and dispute rules.\n\nWhere they disagree is mainly on readiness and liability: Beincrypto focuses on the emerging production infrastructure and operational constraints, while Bitkub highlights the lack of consensus on who is liable when agents make unauthorized payments and the systems' overall readiness to scale securely. Both agree AI-agent payments are technically feasible but caution about trust, liability, and regulatory challenges.\n\nIn summary, the disagreement centers on the maturity of operational and legal frameworks rather than technical capability.",
           "serv": {
             "score": 12,
@@ -45,6 +49,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I searched the entire project workspace and the agent's knowledge files but found no documents or data related to OpenServ's revenue for March 2026. There are no files in the workspace to review for this information.\n\nSince the data is not available here, I cannot provide the exact revenue figure. If you want me to search external sources or have specific data to share, please let me know. Alternatively, you may consult OpenServ's official financial reports, press releases, or contact their finance department for the precise revenue details.",
           "serv": {
             "score": 95,

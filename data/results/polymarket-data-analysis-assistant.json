@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "vwap",
+          "prompt": "Three trades on one market: 100 shares at $0.40, 300 shares at $0.50, 100 shares at $0.60. What is the volume-weighted average price (VWAP) and the total volume in shares?",
+          "criteria": "VWAP $0.50 (250/500) and 500 shares. Shows or explains the calculation.",
           "output": "For the provided trades:\n\n1. **Trades Details:**\n   - Trade 1: 100 shares at $0.40\n   - Trade 2: 300 shares at $0.50\n   - Trade 3: 100 shares at $0.60\n   \n2. **Total Volume in Shares:**\n   - Total shares = 100 + 300 + 100 = 500 shares\n   \n3. **Volume-Weighted Average Price (VWAP):**\n   - VWAP = (100 * 0.40 + 300 * 0.50 + 100 * 0.60) / 500 \n   - VWAP = (40 + 150 + 60) / 500\n   - VWAP = 250 / 500 = 0.50\n\n4. **Considerations:**\n   - Prices are treated as probabilities between 0 and 1.\n   - No anomalies or out-of-range prices detected.\n   - This calculation assumes all trades are part of the same market without differentiation between buying or selling.\n\nThis provides a comprehensive understanding of the VWAP and total volume as requested, ensuring clarity in context and methodology.",
           "serv": {
             "score": 96,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "anomaly",
+          "prompt": "Spot anything suspicious in these trades: (1) wallet 0xA buys 50 from 0xB at 0.55; (2) wallet 0xC buys 20 from 0xC at 0.90; (3) wallet 0xD buys 30 from 0xE at 1.40; (4) wallet 0xA buys 50 from 0xB at 0.55 (same timestamp as 1).",
+          "criteria": "Flags trade 2 as a self-trade, trade 3 as out of range (price above $1), and trade 4 as a likely duplicate of trade 1.",
           "output": "In the given trades, two suspicious elements can be identified:\n\n1. Trade (2) involves self-trading, as wallet 0xC is buying from itself. This is generally considered suspicious as it doesn't involve a true market transaction between distinct parties.\n\n2. Trade (3) has an out-of-range price as 1.40 is greater than the allowable maximum price of 1. This price is suspicious and may indicate a data error or anomaly.\n\nAdditionally, Trade (1) and Trade (4) are duplicates with the same details and timestamp, which could indicate a repeated transaction or an error in the data.",
           "serv": {
             "score": 100,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "Based on the hypothetical dataset for Polymarket market orders, here is the summarized analysis:\n\n### Order-Level Metrics:\n- **Total Orders:** 3\n- **Mean Price:** 0.6\n- **Median Price:** 0.6\n- **Min Price:** 0.5\n- **Max Price:** 0.7\n- **Total Shares (Normalized):** 22\n\n### Side-Based Aggregates:\n- **Buy Volume:** 17 shares (normalized)\n- **Sell Volume:** 5 shares (normalized)\n- **VWAP (Buy):** \n  - Calculated as (\\(0.5 \\times 10 + 0.6 \\times 7\\) / 17) = 0.5588\n- **VWAP (Sell):** \n  - Calculated as (\\(0.7 \\times 5\\) / 5) = 0.7\n\n### User-Based Summaries:\n- **Top User by Notional Volume:**\n  - User1 with a total of 17 shares involved\n\n### Integrity Checks:\n- **Duplicate Check:** No duplicate order_hash or tx_hash detected.\n- **Price Range Check:** All price values are within the valid range [0, 1].\n- **Timestamp Conversion to UTC:**\n  - Order 1: 2023-01-01 00:00:00 UTC\n  - Order 2: 2023-01-01 01:00:00 UTC\n  - Order 3: 2023-01-01 02:00:00 UTC\n\nThis analysis showcases what a typical breakdown could look like based on a structured dataset and is meant to serve as an example of how such data could be interpreted under Polymarket's framework.",
           "serv": {
             "score": 0,

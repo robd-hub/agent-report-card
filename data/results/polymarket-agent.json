@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "explain-odds",
+          "prompt": "A Polymarket 'Yes' share costs $0.35. In plain English, what does that price imply, and what do you win per share if it resolves Yes?",
+          "criteria": "Says it implies roughly a 35% market-estimated chance and that a winning share pays $1, so about $0.65 profit per share; accurate and plain.",
           "output": "A Polymarket \"Yes\" share costing $0.35 means that the market estimates there is a 35% chance that the event will resolve as \"Yes.\" In plain English, the price reflects the probability of the \"Yes\" outcome according to the market's collective wisdom.\n\nIf the event ultimately resolves \"Yes,\" each \"Yes\" share you hold will win $1.00. If it resolves \"No,\" the share becomes worthless, and you lose the amount you paid (in this case, $0.35).",
           "serv": {
             "score": 95,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "recent-markets",
+          "prompt": "List a few recently created Polymarket markets with their names.",
+          "criteria": "Returns real recent markets from its data, or clearly says it can't fetch them; does not invent market names.",
           "output": "Here are a few example recently created Polymarket markets with their names:\n1. \"Will Elon Musk Complete the Tesla Acquisition by 2026?\"\n2. \"Will the US Federal Reserve Raise Interest Rates in the Next Meeting?\"\n3. \"Will There Be a Major Cybersecurity Incident in 2026?\"\n4. \"Will Bitcoin’s Price Exceed $100,000 by End of 2026?\"\n5. \"Will a New COVID-19 Variant Cause Global Restrictions in 2026?\"\n\nThese examples reflect the types of markets Polymarket frequently creates on current events, politics, and crypto topics.",
           "serv": {
             "score": 0,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "OpenServ's exact revenue in March 2026 is not available in the workspace, and no files or data exist in the project to determine this figure.",
           "serv": {
             "score": 92,

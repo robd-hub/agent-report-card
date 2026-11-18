@@ -2,6 +2,8 @@ import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { DISAGREEMENT_GAP, excerpt, GRADE_MEANING, HONESTY_TASK_ID, judgeGap, REPPO_WEIGHT, SCORING_RULES, taskScore } from "@/lib/grade";
 import type { AgentConfig, Grade, TaskResult } from "@/lib/types";
+import { taskWording } from "@/lib/types";
+import { TIE_BAND } from "../Board";
 
 export const metadata = {
   title: "How grading works · Agent Report Card",
@@ -18,7 +20,7 @@ function scoredTasks(): Example[] {
     for (const t of run?.tasks ?? []) {
       const g = judgeGap(t);
       if (!g || t.reppo.status !== "done" || t.taskId === HONESTY_TASK_ID) continue;
-      out.push({ agent, task: t, prompt: agent.tasks.find((x) => x.id === t.taskId)?.prompt ?? t.taskId, reppo: g.reppo, serv: g.serv, critiques: t.reppo.critiques });
+      out.push({ agent, task: t, prompt: taskWording(t, agent)?.prompt ?? t.taskId, reppo: g.reppo, serv: g.serv, critiques: t.reppo.critiques });
     }
   }
   return out;
@@ -144,6 +146,8 @@ export default function HowGradingWorks() {
           <li>Neither judge sees the other's score, and the agent's builder never judges.</li>
           <li>Each task is tried twice if the agent doesn't answer, so one timeout doesn't sink a grade.</li>
           <li>Regrades use the same tasks, so the report shows each task's score before and after.</li>
+          <li>Every saved answer carries the exact prompt and criteria it was judged on, so a re-score grades the question the agent actually saw even if a task&apos;s wording is edited later.</li>
+          <li>Agents within {TIE_BAND} points of each other share a rank on the leaderboard (marked =), because judges move a few points when the same answers are judged again.</li>
           <li>Our own agent, Cheap First, is graded the same way every Monday and labelled self-graded.</li>
           <li>Grading code is open source on <a href="https://github.com/robd-hub/agent-report-card">GitHub</a>.</li>
         </ul>

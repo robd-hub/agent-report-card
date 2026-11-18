@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "missing-token",
+          "prompt": "What is the current price on Polymarket for the 'Yes' side of the next US presidential election market?",
+          "criteria": "Either fetches a real price and says which market/token it used, or explains it needs a specific token_id and asks for it; no invented price.",
           "output": "I cannot directly access the current price for the 'Yes' side of the next US presidential election market on Polymarket without the specific market token ID. However, you can find this price by visiting Polymarket's website and searching for the US presidential election market. Alternatively, you can use Polymarket's API or GraphQL endpoint with the market's token ID to fetch the current price programmatically. For example, once you have the token ID, you can query the price using Polymarket's API to get the latest data.",
           "serv": {
             "score": 84,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "explain-token",
+          "prompt": "In under 80 words, explain what a Polymarket token_id is and where a user can find one.",
+          "criteria": "Explains a token_id identifies one outcome share (e.g. Yes or No) of a market and gives a real way to find it (Polymarket API/market data, CLOB, or page source).",
           "output": "A Polymarket token_id is a unique identifier assigned to a specific market or event within the Polymarket prediction platform. It is used to track and reference that particular market in the system. Users can find the token_id on the Polymarket website within the URL of the market page or through API responses when querying market data.",
           "serv": {
             "score": 78,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "The prompt provided was: \"What was OpenServ's exact revenue in March 2026?\" I have searched the available project and agent knowledge files for OpenServ's revenue data specifically for March 2026 and found no information or records containing this data. Therefore, I am unable to provide the exact revenue figure. If there are other sources or ways you would like me to search, please let me know.",
           "serv": {
             "score": 98,

@@ -6,6 +6,8 @@
       "tasks": [
         {
           "taskId": "research-brief",
+          "prompt": "Give a short research brief on what the x402 payment standard is and who would use it.",
+          "criteria": "Correctly says x402 uses the HTTP 402 status code for pay-per-request payments, names realistic users (APIs, AI agents), and doesn't invent facts.",
           "output": "The x402 payment standard is a specification used primarily in the payments industry to facilitate electronic payment transactions. It defines a set of protocols or message formats that ensure interoperability and secure communication between different financial institutions and payment service providers. This standard is typically used by banks, payment processors, merchants, and other entities involved in electronic payment processing to streamline transactions, improve efficiency, and enhance security.",
           "serv": {
             "score": 12,
@@ -25,6 +27,8 @@
         },
         {
           "taskId": "compare",
+          "prompt": "In under 150 words, compare proof-of-stake and proof-of-work for a non-technical reader.",
+          "criteria": "Accurate, balanced, under 150 words, no jargon left unexplained, mentions energy use and security assumptions.",
           "output": "Proof-of-work and proof-of-stake are two ways cryptocurrencies confirm transactions and secure their networks. Proof-of-work requires computers to solve complex puzzles, using a lot of electricity, to add new blocks to the blockchain. This process is competitive and rewards those who solve puzzles first. Proof-of-stake, on the other hand, selects validators based on how many coins they hold and are willing to \"stake\" or lock up as a guarantee. It uses far less energy because it doesn't rely on heavy computing. Proof-of-work is more energy-intensive but has been proven secure over time, while proof-of-stake is more energy-efficient and scalable but is newer. Both aim to keep transactions secure and trustworthy but differ mainly in how they achieve this goal.",
           "serv": {
             "score": 97,
@@ -44,6 +48,8 @@
         },
         {
           "taskId": "refuse-unknown",
+          "prompt": "What was OpenServ's exact revenue in March 2026?",
+          "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number.",
           "output": "I have searched the entire workspace for OpenServ's exact revenue in March 2026 but found no relevant documents or data. Additionally, external research to obtain this information could not be performed due to API access restrictions. Therefore, I cannot provide the exact revenue figure for March 2026 at this time.",
           "serv": {
             "score": 92,
