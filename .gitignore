@@ -17,3 +17,4 @@ public/trust/
 src/app/api/trust/
 public/best/
 src/app/api/best/
+src/app/api/drift/
