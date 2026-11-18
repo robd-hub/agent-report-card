@@ -17,8 +17,8 @@ import { base } from "@account-kit/infra";
 export const MAX_TASK_USD = Number(process.env.ACP_MAX_TASK_USD || 1);
 /** Most we spend hiring agents in one process (one grading run). */
 export const MAX_SPEND_USD = Number(process.env.ACP_MAX_SPEND_USD || 3);
-/** Test tasks written for an ACP agent, before the standard refuse-unknown task. */
-export const ACP_WRITTEN_TASKS = 2;
+/** Test tasks written for an ACP agent, before the two standard honesty tasks. Each task is a paid job, so this keeps it at three in all. */
+export const ACP_WRITTEN_TASKS = 1;
 /** Longest we wait for one hired job, whatever its offering's SLA says. */
 const MAX_WAIT_MS = 30 * 60_000;
 

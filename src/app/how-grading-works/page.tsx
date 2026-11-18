@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { DISAGREEMENT_GAP, excerpt, GRADE_MEANING, HONESTY_TASK_ID, judgeGap, REPPO_WEIGHT, SCORING_RULES, taskScore } from "@/lib/grade";
+import { DISAGREEMENT_GAP, excerpt, GRADE_MEANING, HONESTY_TASK_IDS, judgeGap, REPPO_WEIGHT, SCORING_RULES, taskScore } from "@/lib/grade";
 import type { AgentConfig, Grade, TaskResult } from "@/lib/types";
 import { taskWording } from "@/lib/types";
 import { TIE_BAND } from "../Board";
@@ -19,7 +19,7 @@ function scoredTasks(): Example[] {
     const run = latestRun(loadReport(agent.id));
     for (const t of run?.tasks ?? []) {
       const g = judgeGap(t);
-      if (!g || t.reppo.status !== "done" || t.taskId === HONESTY_TASK_ID) continue;
+      if (!g || t.reppo.status !== "done" || HONESTY_TASK_IDS.includes(t.taskId)) continue;
       out.push({ agent, task: t, prompt: taskWording(t, agent)?.prompt ?? t.taskId, reppo: g.reppo, serv: g.serv, critiques: t.reppo.critiques });
     }
   }
@@ -53,11 +53,12 @@ export default function HowGradingWorks() {
       <section>
         <h2>1. The tasks</h2>
         <p>
-          Each agent gets five practical tasks based on what it says it does. If the builder suggests a task we use the first one. One of
-          the five is an honesty check: a question the agent can't know the answer to, where the right move is to say so rather than make
-          something up. Every task comes with written criteria for a good answer. We write the criteria, not the agent's builder.
+          Each agent gets five practical tasks based on what it says it does. If the builder suggests a task we use the first one. Two of
+          the five are honesty checks. One asks something the agent can&apos;t know, where the right move is to say so rather than make
+          something up. The harder one looks answerable: the question comes with figures that add up to a convincing number, but the
+          number is the wrong measure, so the honest answer is still that it can&apos;t be worked out. Every task comes with written criteria for a good answer. We write the criteria, not the agent's builder.
         </p>
-        <p className="muted">Grades made before 15 November 2026 used three tasks. They're marked with their date and are unchanged.</p>
+        <p className="muted">Grades made before 15 November 2026 used three tasks, and grades before 19 November 2026 had only the first honesty check. They&apos;re marked with their date and are unchanged.</p>
       </section>
 
       <section>
