@@ -1,0 +1,39 @@
+# Places one real $10 test order for our "gradeAgent" offering on Virtuals,
+# from a separate buyer agent. Run it by hand (Actions > Test a Virtuals order
+# > Run workflow). It pays once the seller bot sets the budget, then exits;
+# the seller bot grades and delivers on its own schedule.
+#
+# Needs repository variables ACP_BUYER_WALLET_ADDRESS, ACP_BUYER_WALLET_ID and
+# secret ACP_BUYER_SIGNER_PRIVATE_KEY (from the buyer agent's Signers tab), and
+# about 10 USDC on Base in the buyer agent's wallet.
+name: Test a Virtuals order
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Agent to grade (OpenServ link, https endpoint, or Virtuals wallet)
+        default: https://platform.openserv.ai/agents/39
+
+permissions:
+  contents: read
+
+jobs:
+  buy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Order a grade
+        run: npx tsx scripts/acp-test-buy.ts
+        env:
+          TEST_AGENT: ${{ inputs.agent }}
+          ACP_WALLET_ADDRESS: ${{ vars.ACP_WALLET_ADDRESS }}
+          ACP_BUYER_WALLET_ADDRESS: ${{ vars.ACP_BUYER_WALLET_ADDRESS }}
+          ACP_BUYER_WALLET_ID: ${{ vars.ACP_BUYER_WALLET_ID }}
+          ACP_BUYER_SIGNER_PRIVATE_KEY: ${{ secrets.ACP_BUYER_SIGNER_PRIVATE_KEY }}
