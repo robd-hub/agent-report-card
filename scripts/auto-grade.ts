@@ -28,6 +28,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadAgents, loadReport } from "../src/lib/data";
 import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
+import { ACP_WRITTEN_TASKS, closeAcp, fetchAcpAgent, findAcpWallet, MAX_TASK_USD, pickOffering } from "../src/lib/acp";
 export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
@@ -48,6 +49,17 @@ export const REFUSE_UNKNOWN: TestTask = {
 };
 
 type Outcome = "graded" | "rejected" | "needs-attention" | "duplicate";
+
+/**
+ * A grade paid through a Virtuals ACP job. These variables come from the
+ * workflow (scripts/acp-seller.ts), never from request text.
+ */
+export function acpPaidJob(env = process.env): { ref: string; amountUsd: number; client: string } | null {
+  const job = (env.ACP_JOB_REF ?? "").trim();
+  if (!/^acp-\d{1,12}-\d{1,30}$/.test(job)) return null;
+  const amountUsd = Number(env.ACP_PAID_USD);
+  return { ref: job, amountUsd: Number.isFinite(amountUsd) ? amountUsd : 0, client: (env.ACP_CLIENT ?? "").slice(0, 64) };
+}
 
 /** Splits a GitHub issue form body ("### Label\n\nvalue") into label -> value. */
 export function parseIssueForm(body: string): Record<string, string> {
@@ -101,8 +113,7 @@ export function firstSuggestedTask(text: string): string {
  * description. If the requester suggested a real request, SERV may turn it
  * into one of the tasks, but always writes the success criteria itself.
  */
-export async function writeTasks(agent: MarketplaceAgent, suggested = ""): Promise<{ description: string; tasks: TestTask[] }> {
-  const n = WRITTEN_TASKS;
+export async function writeTasks(agent: MarketplaceAgent, suggested = "", n = WRITTEN_TASKS): Promise<{ description: string; tasks: TestTask[] }> {
   const system =
     `You design fair test tasks for grading AI agents. Write exactly ${n} different tasks that test the agent's core job as described, from easy to hard. ` +
     "Each task must be self-contained text that the agent can answer in text alone: no files, images, wallets, payments, " +
@@ -200,7 +211,10 @@ async function main() {
   const marketplaceId = findMarketplaceId(link);
   const modelName = form["Model name (OpenAI-style endpoints only)"] ?? "";
   const endpoint = marketplaceId ? null : findEndpoint(link, modelName);
-  if (!marketplaceId && !endpoint) {
+  // Agents on Virtuals are named by their wallet address (only on paid Virtuals jobs,
+  // since grading them means paying them for test jobs).
+  const acpWallet = !marketplaceId && !endpoint && acpPaidJob() ? findAcpWallet(link) : null;
+  if (!marketplaceId && !endpoint && !acpWallet) {
     return finish(
       "needs-attention",
       "Thanks for your request! The automatic grader can reach agents on the OpenServ marketplace, or agents with a public https address that answers a POST request " +
@@ -214,8 +228,11 @@ async function main() {
   // can't grant it to themselves.
   const labelFree = process.env.FREE_GRADE === "true";
   const ccdOn = ccdEnabledForBot();
-  const baseTx = labelFree ? null : findTxHash(paymentText);
-  const ccdTx = labelFree || baseTx || !ccdOn ? null : findCcdTxHash(paymentText);
+  // Set only by scripts/acp-seller.ts for a job already paid into Virtuals
+  // ACP escrow, so there's no Base transaction to check here.
+  const acp = acpPaidJob();
+  const baseTx = labelFree ? null : acp ? acp.ref : findTxHash(paymentText);
+  const ccdTx = labelFree || baseTx || acp || !ccdOn ? null : findCcdTxHash(paymentText);
   const tx = baseTx ?? ccdTx;
   const badge = ccdOn ? findBadge(form["Concordium Agent Registry badge (optional)"] ?? "") : null;
 
@@ -223,7 +240,7 @@ async function main() {
   // grade and have a valid "Verified by Concordium" badge are approved with
   // no one involved. One per badge; our own agents don't count.
   let ccdFree = false;
-  if (!labelFree && !tx && ccdOn && badge && /\bfree\b/i.test(paymentText)) {
+  if (!labelFree && !tx && !acp && ccdOn && badge && /\bfree\b/i.test(paymentText)) {
     const given = loadPayments().filter((p) => p.tx.startsWith("free-concordium-"));
     if (given.some((p) => p.badge === badge)) {
       return finish("rejected", "This Concordium badge has already had its free grade. A regrade costs 5 CCD or 5 USDC; see the Get graded section on the site.");
@@ -272,13 +289,20 @@ async function main() {
   const agents = loadAgents();
   let agent = marketplaceId
     ? agents.find((a) => a.adapter === "openserv-marketplace" && a.marketplaceId === marketplaceId)
-    : agents.find((a) => a.endpoint === endpoint!.endpoint);
+    : acpWallet
+      ? agents.find((a) => a.adapter === "virtuals-acp" && a.acpWallet?.toLowerCase() === acpWallet.toLowerCase())
+      : agents.find((a) => a.endpoint === endpoint!.endpoint);
   const isRegrade = Boolean(agent);
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
   let payment = { amountUsd: 0, from: "" };
   let paidCcd: number | null = null;
-  if (!free && ccdTx) {
+  if (acp) {
+    if (loadPayments().some((p) => p.tx === acp.ref)) {
+      return finish("needs-attention", `Virtuals job ${acp.ref} was already recorded as paid, so it wasn't graded twice.`);
+    }
+    payment = { amountUsd: acp.amountUsd, from: acp.client };
+  } else if (!free && ccdTx) {
     const used = loadPayments().find((p) => p.tx === ccdTx);
     if (used) {
       return finish(
@@ -314,7 +338,9 @@ async function main() {
     ? ccdFree
       ? "Your agent's Verified by Concordium badge checks out, so this grade is free, as part of our offer for Concordium agents."
       : "Your free grade is approved, thank you."
-    : paidCcd !== null
+    : acp
+      ? "Your Virtuals payment is in escrow, thank you."
+      : paidCcd !== null
       ? `Your payment of ${paidCcd} CCD arrived on Concordium, thank you.`
       : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
 
@@ -340,6 +366,48 @@ async function main() {
       adapter: endpoint.adapter,
       endpoint: endpoint.endpoint,
       ...(endpoint.model ? { model: endpoint.model } : {}),
+      tasks: written.tasks,
+    };
+    agents.push(agent);
+    saveAgents(agents);
+  }
+
+  if (!agent && acpWallet) {
+    let detail: Awaited<ReturnType<typeof fetchAcpAgent>> = null;
+    try {
+      detail = await fetchAcpAgent(acpWallet);
+    } catch (e) {
+      console.error(e);
+    }
+    if (!detail) {
+      return finish("needs-attention", `${received} But we couldn't look up the Virtuals agent at ${acpWallet}. The maintainer will check.`);
+    }
+    const offering = pickOffering(detail);
+    if (!offering) {
+      return finish("needs-attention", `${received} But ${detail.name} has no public fixed-price offering at ${MAX_TASK_USD} USDC or less for us to test it through. The maintainer will check.`);
+    }
+    const name = detail.name.replace(/[\r\n]+/g, " ").trim().slice(0, 80) || acpWallet;
+    const about: MarketplaceAgent = {
+      id: 0,
+      name,
+      capabilities_description: `${detail.description ?? ""}\n\nOffering "${offering.name}": ${offering.description ?? ""}`.slice(0, 4000),
+      expected_output: typeof offering.deliverable === "string" ? offering.deliverable.slice(0, 800) : JSON.stringify(offering.deliverable ?? "").slice(0, 800),
+    };
+    let written: Awaited<ReturnType<typeof writeTasks>>;
+    try {
+      written = await writeTasks(about, suggested, ACP_WRITTEN_TASKS);
+    } catch (e) {
+      return finish("needs-attention", `${received} We couldn't prepare test tasks for ${name} automatically (${(e as Error).message}). The maintainer will finish this one by hand.`);
+    }
+    let id = slugify(name) || "virtuals-agent";
+    for (let k = 2; agents.some((a) => a.id === id); k++) id = `${slugify(name) || "virtuals-agent"}-${k}`;
+    agent = {
+      id,
+      name,
+      description: written.description.replace(/, on the OpenServ marketplace\.$/, ", on Virtuals."),
+      adapter: "virtuals-acp",
+      acpWallet,
+      acpOffering: offering.name,
       tasks: written.tasks,
     };
     agents.push(agent);
@@ -408,7 +476,7 @@ async function main() {
   if (!run) {
     return finish(
       "needs-attention",
-      `${received} We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : `at ${agent.endpoint}`} (each was tried twice). ` +
+      `${received} We tried to grade ${agent.name}, but it didn't answer all of our test tasks ${agent.adapter === "openserv-marketplace" ? "through the OpenServ marketplace" : agent.adapter === "virtuals-acp" ? "through Virtuals" : `at ${agent.endpoint}`} (each was tried twice). ` +
         "The maintainer will look into it and reply here, and will retry or refund.",
     );
   }
@@ -449,8 +517,11 @@ async function main() {
 }
 
 if (process.argv[1]?.endsWith("auto-grade.ts")) {
-  main().catch((e) => {
-    console.error(e);
-    finish("needs-attention", "Something went wrong while handling this request. The maintainer has been notified and will reply here.");
-  });
+  main()
+    .catch((e) => {
+      console.error(e);
+      finish("needs-attention", "Something went wrong while handling this request. The maintainer has been notified and will reply here.");
+    })
+    // A Virtuals lookup leaves an event stream open; close it so the run ends.
+    .finally(() => closeAcp());
 }

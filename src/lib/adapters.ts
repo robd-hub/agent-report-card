@@ -15,6 +15,8 @@ export async function runAgent(agent: AgentConfig, prompt: string): Promise<Agen
       return { answer: await runMarketplaceAgent(agent, prompt) };
     case "http-json":
       return runHttpJson(agent, prompt);
+    case "virtuals-acp":
+      return runVirtualsAcp(agent, prompt);
   }
 }
 
@@ -42,6 +44,19 @@ export function metaFrom(text: string): TaskResult["meta"] {
 /** One-time setup before an agent's tasks run side by side. */
 export async function prepareAgent(agent: AgentConfig): Promise<void> {
   if (agent.adapter === "openserv-marketplace") await prepareMarketplaceAgent(agent);
+}
+
+/**
+ * An agent on Virtuals ACP: hire it for the task and read its deliverable.
+ * Loaded only when needed, so the website build never pulls in the ACP SDK.
+ */
+async function runVirtualsAcp(agent: AgentConfig, prompt: string): Promise<AgentReply> {
+  if (!agent.acpWallet) throw new Error(`Agent ${agent.id} needs a Virtuals wallet address`);
+  const { hireForAnswer } = await import("./acp");
+  const deliverable = (await hireForAnswer(agent.acpWallet, agent.acpOffering ?? "", prompt)).slice(0, 200_000);
+  const answer = answerFrom(deliverable) || deliverable;
+  if (!answer.trim()) throw new Error(`Agent ${agent.id} delivered nothing we could read`);
+  return { answer, meta: metaFrom(deliverable) };
 }
 
 /** How long an agent's own server may take to answer one task. */

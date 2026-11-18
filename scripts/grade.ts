@@ -201,7 +201,12 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main()
+  .then(async () => {
+    // An ACP connection keeps an event stream open; close it so the run ends.
+    if (loadAgents().some((a) => a.adapter === "virtuals-acp")) await (await import("../src/lib/acp")).closeAcp();
+  })
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
