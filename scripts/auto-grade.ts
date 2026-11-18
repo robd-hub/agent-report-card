@@ -2,7 +2,9 @@
  * Handles one paid grade request from a GitHub issue, with no one involved:
  *
  *   1. Reads the request form (agent link and payment transaction).
- *   2. Checks the USDC payment on Base ($10 for a new grade, $5 for a regrade).
+ *   2. Checks the USDC payment on Base ($10 for a new grade, $5 for a regrade),
+ *      or, when Concordium is switched on, a CCD payment on the Concordium
+ *      test network (10 CCD, 5 for a regrade).
  *   3. Looks the agent up on the OpenServ marketplace. A new agent gets four
  *      test tasks written from its own marketplace description (one may be
  *      based on a task the requester suggested), plus the standard "admit
@@ -29,7 +31,8 @@ import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
 export { findEndpoint, findMarketplaceId };
 import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
-import { checkPayment, findTxHash, savePayment } from "../src/lib/payment";
+import { checkPayment, findTxHash, loadPayments, MAX_PAYMENT_AGE_DAYS, savePayment } from "../src/lib/payment";
+import { CCD_ACCOUNT, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
 import { servChat } from "../src/lib/serv";
 import type { AgentConfig, TestTask } from "../src/lib/types";
 
@@ -203,7 +206,11 @@ async function main() {
   // label. Only people with write access can label issues, so a requester
   // can't grant it to themselves.
   const free = process.env.FREE_GRADE === "true";
-  const tx = free ? null : findTxHash(paymentText);
+  const ccdOn = ccdEnabledForBot();
+  const baseTx = free ? null : findTxHash(paymentText);
+  const ccdTx = free || baseTx || !ccdOn ? null : findCcdTxHash(paymentText);
+  const tx = baseTx ?? ccdTx;
+  const badge = ccdOn ? findBadge(form["Concordium Agent Registry badge (optional)"] ?? "") : null;
   if (!free && !tx && /\bfree\b/i.test(paymentText)) {
     return finish(
       "rejected",
@@ -214,7 +221,8 @@ async function main() {
     return finish(
       "rejected",
       `We couldn't find a payment in your request. Send ${GRADE_PRICE_USD} USDC on Base to \`${PAY_ADDRESS}\` (${REGRADE_PRICE_USD} USDC for a regrade), then edit this request and paste the Basescan link` +
-        (process.env.CARD_PAYMENTS ? ", or pay by card on the site and paste the payment code it shows." : "."),
+        (process.env.CARD_PAYMENTS ? ", or pay by card on the site and paste the payment code it shows." : ".") +
+        (ccdOn ? ` You can also pay ${GRADE_PRICE_CCD} CCD (${REGRADE_PRICE_CCD} for a regrade) on the Concordium test network to \`${CCD_ACCOUNT}\` and paste the CCDExplorer link.` : ""),
     );
   }
 
@@ -226,7 +234,24 @@ async function main() {
   const price = isRegrade ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
   let payment = { amountUsd: 0, from: "" };
-  if (!free) {
+  let paidCcd: number | null = null;
+  if (!free && ccdTx) {
+    const used = loadPayments().find((p) => p.tx === ccdTx);
+    if (used) {
+      return finish(
+        "needs-attention",
+        `This payment was already used for request #${used.issue}. If you made this payment yourself and didn't open that request, reply here and the maintainer will sort it out.`,
+      );
+    }
+    // Loaded only here, so the Concordium SDK isn't needed for Base payments.
+    const { checkCcdPayment } = await import("../src/lib/concordiumChain");
+    const check = await checkCcdPayment(ccdTx, isRegrade ? REGRADE_PRICE_CCD : GRADE_PRICE_CCD, MAX_PAYMENT_AGE_DAYS);
+    if (!check.ok) {
+      return finish("rejected", `We couldn't confirm the payment for this request: ${check.reason}\n\nOnce that's fixed, edit this request and the grader will check again.`);
+    }
+    paidCcd = check.amountCcd;
+    payment = { amountUsd: 0, from: check.from };
+  } else if (!free) {
     const check = await checkPayment(tx!, price);
     if (!check.ok && check.needsMaintainer) return finish("needs-attention", check.reason);
     if (!check.ok && check.alreadyUsed) {
@@ -242,7 +267,11 @@ async function main() {
     }
     payment = check;
   }
-  const received = free ? "Your free grade is approved, thank you." : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
+  const received = free
+    ? "Your free grade is approved, thank you."
+    : paidCcd !== null
+      ? `Your payment of ${paidCcd} CCD arrived on Concordium, thank you.`
+      : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
 
   if (!agent && endpoint) {
     // Off the marketplace, the requester's own form is all we know about the agent.
@@ -299,6 +328,13 @@ async function main() {
 
   if (!agent) return finish("needs-attention", "Something went wrong while setting up this request. The maintainer has been notified and will reply here.");
 
+  // The owner's Concordium badge, so the grade is written on-chain against
+  // their registry entry. The page shows whose account owns the badge.
+  if (badge && agent.concordiumBadge !== badge) {
+    agent.concordiumBadge = badge;
+    saveAgents(agents.map((a) => (a.id === agent!.id ? agent! : a)));
+  }
+
   // Record the payment before grading, so the same transaction can't be used twice.
   // Free grades are recorded too, with no transaction, so they're counted.
   savePayment({
@@ -307,6 +343,7 @@ async function main() {
     agentId: agent.id,
     amountUsd: payment.amountUsd,
     from: payment.from,
+    ...(paidCcd !== null ? { currency: "CCD" as const, amountCcd: paidCcd } : {}),
     date: new Date().toISOString(),
     ...(process.env.ISSUE_AUTHOR ? { requester: process.env.ISSUE_AUTHOR } : {}),
   });
@@ -358,6 +395,7 @@ async function main() {
     ...(splits.length ? ["⚑ **Judges disagree** on these tasks, so we'll review them:", ...splits, ""] : []),
     `Full report: ${page}`,
     `Badge for your README: \`![Agent Report Card](${SITE}/badge/${agent.id}.svg)\``,
+    ...(ccdOn && !run.provisional ? ["", "Once the grade is final it is also written on the Concordium test network, with a fingerprint of the full report, and the report page links to it on CCDExplorer."] : []),
     "",
     "The report page and leaderboard update within a few minutes. Fix the weak spots and request a regrade to raise your grade.",
   ].join("\n");

@@ -1,0 +1,344 @@
+{
+  "anchors": {
+    "cheap-first": [
+      {
+        "runDate": "2026-11-16T16:06:31.288Z",
+        "grade": "A",
+        "score": 98,
+        "reportHash": "bc4c2bf0be297fb903c0a35085b5a0558a1d92dd85694adb66827d3d05a9f5e7",
+        "badge": "JyP9YGLug2S48Zqp7H82e",
+        "tx": "125351556e9bb84482722ff8e8099b8a56b9ba6d192523453c9c8f9b4d08d365",
+        "anchoredAt": "2026-11-18T08:42:08.576Z"
+      }
+    ],
+    "serv-baseline": [
+      {
+        "runDate": "2026-11-04T12:18:24.113Z",
+        "grade": "B",
+        "score": 86,
+        "reportHash": "a411812f245aa592f1b189ade97e9cfe5fbdb2136e1946f5d02e9b8c88eb25a9",
+        "tx": "d4b0e8da0e89ecbf449c6a96b20975c0321bd3492b921de2eb639fa2c716714d",
+        "anchoredAt": "2026-11-18T08:45:21.355Z"
+      }
+    ],
+    "grok-research-agent": [
+      {
+        "runDate": "2026-11-04T12:38:59.590Z",
+        "grade": "D",
+        "score": 62,
+        "reportHash": "2ded2f5fc45d6265b449485dc860d2e24eebd4841b06bf02a1eef7c704077f54",
+        "tx": "5b1e7d555d0b3a98a08ca7ab5cb343fc724cbc1a137601b55034075b3c7057cc",
+        "anchoredAt": "2026-11-18T08:45:31.030Z"
+      }
+    ],
+    "research-agent": [
+      {
+        "runDate": "2026-11-04T14:28:15.647Z",
+        "grade": "D",
+        "score": 69,
+        "reportHash": "0ecd16f775a350c05f308031a64c38bd6a6b2b9e2a7c056a489961898fc2ddfa",
+        "tx": "1a93ad6741ce21068508ccf3550f13c0d3e3720ec6ef31aba15b01d93e6d915e",
+        "anchoredAt": "2026-11-18T08:45:40.682Z"
+      }
+    ],
+    "perplexity-research-assistant": [
+      {
+        "runDate": "2026-11-04T14:30:33.061Z",
+        "grade": "D",
+        "score": 62,
+        "reportHash": "e0def6860bac7869b70113d7ac56d5bd0b2c824ea4f322287d10f3f371067c52",
+        "tx": "4af4a2b407d66a5cd70b9a4038b69900afe065456db6da12985d16a03ede01d7",
+        "anchoredAt": "2026-11-18T08:45:50.401Z"
+      }
+    ],
+    "essay-writer": [
+      {
+        "runDate": "2026-11-04T14:41:28.977Z",
+        "grade": "F",
+        "score": 55,
+        "reportHash": "f714ff09d4d1f6dbd67da73a0f310e54e6241430e95ab6ada122c14c8e064320",
+        "tx": "cb4f896ad4df2c5f5dedeac704b7e07e0b26afd4cd070bdf9f785778a6ae1e5c",
+        "anchoredAt": "2026-11-18T08:46:00.014Z"
+      }
+    ],
+    "copywriter": [
+      {
+        "runDate": "2026-11-04T15:41:50.694Z",
+        "grade": "C",
+        "score": 74,
+        "reportHash": "104c5989c6087efc3bee3c00c0e0460e3b4c257d7be51bc4c1c5ad05da551639",
+        "tx": "62be9f2467cbb4c8de69a2d69c2e585a783651cb34a4974d62158493f1a425ac",
+        "anchoredAt": "2026-11-18T08:46:05.223Z"
+      }
+    ],
+    "tokenomics-architect": [
+      {
+        "runDate": "2026-11-09T18:55:22.265Z",
+        "grade": "F",
+        "score": 47,
+        "reportHash": "31f6d9353037517a7ce7064de47cf631c405220f7ea29f2bbd647d469f98ff30",
+        "tx": "e00312d70e92e03966d91e759a75f8baa533d4fa0152ee3946efcce4f8099187",
+        "anchoredAt": "2026-11-18T08:46:14.889Z"
+      }
+    ],
+    "smart-contract-commentator": [
+      {
+        "runDate": "2026-11-04T15:44:47.048Z",
+        "grade": "C",
+        "score": 74,
+        "reportHash": "98a5d918c70b4dd23564560c45150eef9374b3841d580168682c2149c60d7731",
+        "tx": "c7ee5417744deea185dd343930c82fd26f5d901d06950fe75ad3baef6d8332ca",
+        "anchoredAt": "2026-11-18T08:46:24.546Z"
+      }
+    ],
+    "general-assistant": [
+      {
+        "runDate": "2026-11-04T18:37:48.466Z",
+        "grade": "B",
+        "score": 89,
+        "reportHash": "4cf5f94001f60433cf618b3f62b9e8a04d97546d187430715537ad164ee4a195",
+        "tx": "6d5b08367a28f8d9f4c0a0483043e63abe90c3dd0982805850bbf5d68e273bb1",
+        "anchoredAt": "2026-11-18T08:46:34.379Z"
+      }
+    ],
+    "multilingual-assistant": [
+      {
+        "runDate": "2026-11-04T18:39:26.942Z",
+        "grade": "B",
+        "score": 89,
+        "reportHash": "a94f7ef7268e7df4cd434b9aa7fe729cc50cffa893f19a2e0ef96eeeab662824",
+        "tx": "3c10ff02b5e795a5e04e7dc709b086056b43a1401e74efbda44dc906d635d25e",
+        "anchoredAt": "2026-11-18T08:46:39.204Z"
+      }
+    ],
+    "whitepaper-condenser": [
+      {
+        "runDate": "2026-11-04T19:02:26.762Z",
+        "grade": "F",
+        "score": 49,
+        "reportHash": "57812fc2fedf800154dd3eae69d166ee61d11e493a8b0c377ae4f6de7e2f45eb",
+        "tx": "c71b4d850f8b4784748706aaad5d2970ffb0d1bad1bbb32838e72e6edcaa57b5",
+        "anchoredAt": "2026-11-18T08:46:48.861Z"
+      }
+    ],
+    "code-quality-inspector": [
+      {
+        "runDate": "2026-11-04T18:54:13.112Z",
+        "grade": "B",
+        "score": 87,
+        "reportHash": "95a7b50eb173c8b30ce4ff0ef7df3b3c41badad58cff2183baaa3457499a5098",
+        "tx": "2da10e4fce5b9aa01bdae512a1692f59e6c14637172175d9f65dba5ea51c7bc5",
+        "anchoredAt": "2026-11-18T08:46:58.513Z"
+      }
+    ],
+    "coder": [
+      {
+        "runDate": "2026-11-05T08:47:08.302Z",
+        "grade": "A",
+        "score": 93,
+        "reportHash": "f2aff92d2e6e72bbd63ae69bb193e35e521a34a0f556960639eca3eb013dd555",
+        "tx": "e6df8bfe9e51e32338839cb10c3e66ede741579a3727c95163a6ff1dda05b206",
+        "anchoredAt": "2026-11-18T08:47:08.167Z"
+      }
+    ],
+    "fitbot": [
+      {
+        "runDate": "2026-11-05T08:46:08.335Z",
+        "grade": "F",
+        "score": 57,
+        "reportHash": "71366c27aeca5cf462609aa723f428ccc38a071d1d32890ab723d508eb1b5109",
+        "tx": "99dc7551a01cc5376b05703e487c2348eb15b99a5b4eeac2afbfc61c25161612",
+        "anchoredAt": "2026-11-18T08:47:12.992Z"
+      }
+    ],
+    "lingua-guide": [
+      {
+        "runDate": "2026-11-05T08:48:48.716Z",
+        "grade": "B",
+        "score": 82,
+        "reportHash": "f331ea0913880b478f6ca322227e4a0a4f79096743ff690ced49b7bd8900caf8",
+        "tx": "116089ab82ef69b29b842eeb9017547f9d44bcfeae30af23fc3531874cbe4c9c",
+        "anchoredAt": "2026-11-18T08:47:22.700Z"
+      }
+    ],
+    "it-customer-success-agent": [
+      {
+        "runDate": "2026-11-05T08:50:29.898Z",
+        "grade": "C",
+        "score": 72,
+        "reportHash": "b4972fa74b67a3af1cf0ee298018769815841dfc2dcf588d29de749feb7eb78d",
+        "tx": "d5485b65e6cfa6f102e6bc46f44c7a0ebadbf4cb6873744d7180b88128187f26",
+        "anchoredAt": "2026-11-18T08:47:32.373Z"
+      }
+    ],
+    "long-form-copywriter": [
+      {
+        "runDate": "2026-11-09T19:03:24.341Z",
+        "grade": "D",
+        "score": 62,
+        "reportHash": "db681e4a2b5e8dbf045640fcfde9501b874843220b67d8823519d140e9ec0541",
+        "tx": "2babcb36040c6e89993ebfeaa299c117e92e2acc6f0a7eb26c47bdce2a9da7d2",
+        "anchoredAt": "2026-11-18T08:47:42.243Z"
+      }
+    ],
+    "otc-term-sheet-writer": [
+      {
+        "runDate": "2026-11-09T21:47:01.328Z",
+        "grade": "F",
+        "score": 55,
+        "reportHash": "35ae68c05064ef25170eed33946ec8f85679e3dabb4ddff5035b534675c7ba83",
+        "tx": "c6218b6b5b417ec7bb19dfc21c54546b1c504ace92d6aaae1b1a76b409e9b1a6",
+        "anchoredAt": "2026-11-18T08:47:51.941Z"
+      }
+    ],
+    "token-utility-ideator": [
+      {
+        "runDate": "2026-11-09T19:17:43.273Z",
+        "grade": "F",
+        "score": 44,
+        "reportHash": "40d8b7f41bc26d19890cd5ec8c07305dc12b9c84212f23704fd4880a0a5dc111",
+        "tx": "c6c75c3fd8fee72d213304f74095983c0769799cbfcd573a17e067eec5279858",
+        "anchoredAt": "2026-11-18T08:47:57.115Z"
+      }
+    ],
+    "researcher-mini": [
+      {
+        "runDate": "2026-11-09T19:19:16.053Z",
+        "grade": "C",
+        "score": 76,
+        "reportHash": "664b59f676280818d98f45043daaee5bdb8946c69c825febba6628ffe2d417d3",
+        "tx": "7af5cfdcf58f0bc8c7b7ea09f7275fa6c49c260766ba1ce0a813412b6d9887b6",
+        "anchoredAt": "2026-11-18T08:48:06.852Z"
+      }
+    ],
+    "polymarket-agent": [
+      {
+        "runDate": "2026-11-09T19:42:47.641Z",
+        "grade": "C",
+        "score": 72,
+        "reportHash": "a47d5ac162b19769c76f34eea69f23085477147379b8bbb08d4f11c15b2112eb",
+        "tx": "0fb354660f4fce0545528d6fa5bb771a978c09b24cca5171ff96d50c00d214f0",
+        "anchoredAt": "2026-11-18T08:48:16.519Z"
+      }
+    ],
+    "lunarcrush-agent": [
+      {
+        "runDate": "2026-11-09T19:44:16.836Z",
+        "grade": "C",
+        "score": 77,
+        "reportHash": "81cc02fa07650d596fd85d056542075a5ac4602d1409a14217f708f6162aa888",
+        "tx": "6be37d6259cfe405f22ed52c9a580bf245b59bd41cfc96d16553b0bb2f7a7f1a",
+        "anchoredAt": "2026-11-18T08:48:26.158Z"
+      }
+    ],
+    "json-parser": [
+      {
+        "runDate": "2026-11-11T06:52:30.785Z",
+        "grade": "A",
+        "score": 99,
+        "reportHash": "69fb77a80ff932c2e32122011e2a50e85b25b8024c9af2cc15aa8cbc368c469d",
+        "tx": "6063b899edfe69917d8401ed27a2e0712339c627ead02ff225f9a2f8c4e81c65",
+        "anchoredAt": "2026-11-18T08:48:31.307Z"
+      }
+    ],
+    "data-analyst-agent": [
+      {
+        "runDate": "2026-11-11T06:53:13.207Z",
+        "grade": "A",
+        "score": 100,
+        "reportHash": "dee1c3435a0f10a56dc92324f288ff77a7953a410b602a9801046b19f66eb085",
+        "tx": "62aa86c439d18ba05f4f2af3948d6d079422fd2c40da97b7dff2904135d911cb",
+        "anchoredAt": "2026-11-18T08:48:41.054Z"
+      }
+    ],
+    "polymarket-data-analysis-assistant": [
+      {
+        "runDate": "2026-11-11T06:55:24.296Z",
+        "grade": "D",
+        "score": 69,
+        "reportHash": "a2e52d94072954941a9ae54b5dadcaaa4ed91eb689d05ea18b6c27a8eeedbe17",
+        "tx": "c6e741afdff452395b2e5910cfb12cca2b3ca26a8fb71454222e715278731ca2",
+        "anchoredAt": "2026-11-18T08:48:50.675Z"
+      }
+    ],
+    "sport-markets-agent": [
+      {
+        "runDate": "2026-11-11T06:56:29.909Z",
+        "grade": "A",
+        "score": 95,
+        "reportHash": "36c92d7b2c63e453c6a6c4bdfc8cf05c69b028709f3269effa1e30aa6a50f513",
+        "tx": "cb38d83d971e7fe99a0826d6b07f0c1351f7146390094c961b145d2638febd8f",
+        "anchoredAt": "2026-11-18T08:49:00.329Z"
+      }
+    ],
+    "dome-polymarket-price-agent": [
+      {
+        "runDate": "2026-11-11T06:58:07.534Z",
+        "grade": "B",
+        "score": 82,
+        "reportHash": "263e21e92498b093cd400636e91a630df460b515a4904a694015dd1477cadd37",
+        "tx": "662cfdcd3bcbc9c4d0cb05c3848738ad8070d9744876896f8184a84607003a85",
+        "anchoredAt": "2026-11-18T08:49:09.966Z"
+      }
+    ],
+    "youtube-video-understanding-agent": [
+      {
+        "runDate": "2026-11-11T06:59:04.045Z",
+        "grade": "A",
+        "score": 99,
+        "reportHash": "11889d9d5463080cdf997ee9005c527ac90663c0d9d86b16f68f6382e3111577",
+        "tx": "f91f29e337c020c913c869a0a35d09ff114742539e9cd1985865e1c2d3156086",
+        "anchoredAt": "2026-11-18T08:49:15.150Z"
+      }
+    ],
+    "hyperliquid-btc-data-agent": [
+      {
+        "runDate": "2026-11-11T07:00:05.543Z",
+        "grade": "A",
+        "score": 90,
+        "reportHash": "a9a467dbac95583fc9aff11c6ef788b176b5fd34fea08791df4d8d3bee3b6fd3",
+        "tx": "18a4e08a4ada9b92ef53a92e330e4e5317c5106a0ff66570d2ea57e3a7114562",
+        "anchoredAt": "2026-11-18T08:49:24.784Z"
+      }
+    ],
+    "wenlambo-alpha-designer": [
+      {
+        "runDate": "2026-11-11T07:02:07.725Z",
+        "grade": "C",
+        "score": 79,
+        "reportHash": "676b390365a270394a78b17cbda233faf1b87522f4cbcd0fdf7ac2e203bddb2f",
+        "tx": "d6288777976e0e36d141fa88ce3ff78a9abfe98e80de4387bf394aa78be4e056",
+        "anchoredAt": "2026-11-18T08:49:34.425Z"
+      }
+    ],
+    "rest-api-helper": [
+      {
+        "runDate": "2026-11-11T07:05:17.701Z",
+        "grade": "B",
+        "score": 82,
+        "reportHash": "cb6f2d79fd79be9dcaf9a1ccd720328b9b904e794604602724869a02464ecefd",
+        "tx": "74e4114399f5edb5fc8e8384c4ec97233666401c250bcbbb0f3f646f4fea6b37",
+        "anchoredAt": "2026-11-18T08:49:43.429Z"
+      }
+    ],
+    "twitter-scraping-agent": [
+      {
+        "runDate": "2026-11-11T07:33:40.057Z",
+        "grade": "C",
+        "score": 75,
+        "reportHash": "98ad3ee5b9baa0599fbe16909bfe0207dcdc5c413d84d242623a486f5010d163",
+        "tx": "caa4e15e0e87480b026136ee90235c0e8cd49d5e25d84265dcaba5b5fd6890eb",
+        "anchoredAt": "2026-11-18T08:49:53.171Z"
+      }
+    ]
+  },
+  "badges": {
+    "cheap-first": {
+      "badge": "JyP9YGLug2S48Zqp7H82e",
+      "tokenId": 1256,
+      "verified": false,
+      "owner": "3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
+      "checkedAt": "2026-11-18T08:41:57.243Z"
+    }
+  }
+}

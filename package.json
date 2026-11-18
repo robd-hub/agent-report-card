@@ -15,6 +15,7 @@
     "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts"
   },
   "dependencies": {
+    "@concordium/web-sdk": "^12.0.2",
     "@openserv-labs/client": "^2.5.3",
     "bcryptjs": "^3.0.3",
     "https-proxy-agent": "^7.0.6",

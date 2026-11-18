@@ -37,6 +37,11 @@ body:
       placeholder: https://basescan.org/tx/0x...
     validations:
       required: true
+  - type: input
+    id: concordium-badge
+    attributes:
+      label: Concordium Agent Registry badge (optional)
+      description: If your agent is in the Concordium Agent Registry, its badge (the token address, like JyP9YFFRjzw8JSc2qS8ai). Your grade is then recorded on Concordium against your registry entry, and your report page shows the badge.
   - type: textarea
     id: what-it-does
     attributes:
