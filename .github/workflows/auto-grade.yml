@@ -106,7 +106,7 @@ jobs:
               gh label create graded --repo "$GITHUB_REPOSITORY" --color 0E8A16 --description "Graded by the bot" 2>/dev/null || true
               gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label graded || true
               ;;
-            rejected)
+            rejected|duplicate)
               ;;
             *)
               gh label create needs-attention --repo "$GITHUB_REPOSITORY" --color D93F0B --description "The grading bot needs the maintainer" 2>/dev/null || true
