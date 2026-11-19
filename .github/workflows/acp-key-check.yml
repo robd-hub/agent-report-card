@@ -1,0 +1,20 @@
+# Checks the Virtuals signer secrets match the signers on app.virtuals.io: it
+# prints the public key each secret belongs to (never the secret itself).
+# Compare the ending with the one shown under the signer's name.
+name: Check Virtuals signer keys
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/acp-key-check.mjs
+        env:
+          ACP_SIGNER_PRIVATE_KEY: ${{ secrets.ACP_SIGNER_PRIVATE_KEY }}
+          ACP_BUYER_SIGNER_PRIVATE_KEY: ${{ secrets.ACP_BUYER_SIGNER_PRIVATE_KEY }}

@@ -1,4 +1,5 @@
-# Sells grades on Virtuals' Agent Commerce Protocol (ACP). Every 15 minutes
+# Sells grades on Virtuals' Agent Commerce Protocol (ACP). Started by the
+# watcher (acp-watch.yml) as soon as a job needs it, plus hourly as a backup.
 # scripts/acp-seller.ts catches up on the agent's jobs: it sets a budget on new
 # requests, grades one funded job, and submits finished reports (which releases
 # the buyer's USDC from escrow to the agent's wallet).
@@ -12,7 +13,7 @@ name: Sell grades on Virtuals
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "37 * * * *"
   workflow_dispatch:
 
 permissions:
