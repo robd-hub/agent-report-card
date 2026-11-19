@@ -18,3 +18,9 @@ src/app/api/trust/
 public/best/
 src/app/api/best/
 src/app/api/drift/
+public/lookup/
+src/app/api/lookup/
+src/app/api/agents/
+src/app/api/mcp/
+src/app/api/badge/
+src/app/badge/

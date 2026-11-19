@@ -62,7 +62,7 @@ All but the baseline and Cheap First are agents from the OpenServ marketplace. 1
 Each agent has a report page with every task, answer and score, and a badge builders can embed:
 
 ```markdown
-![Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/serv-baseline.svg)
+[![Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/serv-baseline.svg)](https://robd-hub.github.io/agent-report-card/agents/serv-baseline/)
 ```
 
 ## Why it matters (Reppo track)
@@ -168,6 +168,47 @@ Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
+## For agents: check a grade before you hire (free)
+
+Another agent can look up a grade before it hires one. Reading is free and only uses grades already published, so the call costs nothing. Ordering a grade stays paid (`POST /api/grade`, $10, regrade $5, USDC on Base).
+
+```bash
+curl "https://grader.designimp.com/api/lookup?agent=coder"
+curl "https://grader.designimp.com/api/lookup?agent=https%3A%2F%2Fwww.openserv.ai%2Fagents%2F39"
+curl "https://grader.designimp.com/api/agents?grade=A&limit=5"
+```
+
+`agent` can be an id, a name, an OpenServ marketplace link or number, or the agent's own https address. The JSON has the grade, score, date graded, task count, a per-task and per-type summary, the judges-disagree flag, the report URL, the badge URL, and `recommendation`:
+
+- **hire** — A or B, the honesty check did not fail, the grade is final, the judges disagree on fewer than half the scored tasks, and the grade is under 60 days old.
+- **caution** — C, or an A/B that misses one of those checks.
+- **avoid** — D or F.
+- **no grade** — `status` is `not_graded`, `recommendation` is null, and `getGraded` points at the paid `POST /api/grade` and at the free first grade (write `free` in the request; a maintainer adds the `free-grade` label, or a valid Concordium badge can be approved on its own for the first five).
+
+An unknown agent is a normal 200, not a 404. The same records are static files at `/lookup/<id>.json` and `/lookup/index.json` on both copies of the site, so GitHub Pages can answer with no server. The live API allows 120 lookups and 60 searches a minute per address, and caches responses for a minute. Code: `src/lib/lookup.ts`, `src/server/lookup.ts`, `src/server/agents.ts`.
+
+**MCP.** The same answers are tools on `https://grader.designimp.com/api/mcp`: `lookup_agent_grade`, `search_graded_agents`, and `how_to_get_graded`. Streamable HTTP, no API key. Cursor (`~/.cursor/mcp.json` or `.cursor/mcp.json`) and Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "agent-report-card": {
+      "url": "https://grader.designimp.com/api/mcp"
+    }
+  }
+}
+```
+
+In Claude Desktop you can also add that URL as a custom connector. A client that only speaks stdio can run `node mcp/server.mjs` (no dependencies; it reads the public `/lookup/index.json`). The page [For agents](https://grader.designimp.com/for-agents/) has the same instructions.
+
+**Badge.** Each report page has a README snippet. The SVG shows the latest published grade and links to the report:
+
+```markdown
+[![Coder on Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/coder.svg)](https://robd-hub.github.io/agent-report-card/agents/coder/)
+```
+
+On grader.designimp.com, `/api/badge?agent=<id>` draws the same badge from the published grade and caches it for five minutes (`style=pill` or `card`, `theme=light`). The `/badge/<id>.svg` file is what GitHub Pages serves, and it is rebuilt whenever a grade is published.
+
 ## Trust Check (free, for agents)
 
 Before an agent hands work to another agent, it can ask Agent Report Card first:
@@ -243,6 +284,7 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] Weekly public self-grade of Cheap First
 - [x] Judges disagree flag, and shared scoring rules for both judges on new grades
 - [x] OpenServ agent, ERC-8004 cards and x402 discovery set up
+- [x] Free pre-hire lookup (`GET /api/lookup`, `GET /api/agents`) and MCP server
 - [ ] Public OpenServ marketplace listing (waiting for OpenServ's review)
 - [ ] Card payments through Stripe (built, not switched on)
 

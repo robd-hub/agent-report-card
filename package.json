@@ -2,6 +2,9 @@
   "name": "agent-report-card",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "agent-report-card-mcp": "./mcp/server.mjs"
+  },
   "license": "MIT",
   "description": "Independent grades for AI agents, checked by SERV Reasoning and judged independently on Reppo.",
   "scripts": {
@@ -11,6 +14,7 @@
     "grade": "NODE_USE_ENV_PROXY=1 tsx scripts/grade.ts",
     "auto-grade": "tsx scripts/auto-grade.ts",
     "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
     "prebuild": "tsx scripts/prepare-server.ts && tsx scripts/badges.ts",
     "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts"
   },
