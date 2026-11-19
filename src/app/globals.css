@@ -254,3 +254,8 @@ a.chip { text-decoration: none; }
 .drift-row { overflow-wrap: anywhere; }
 .drift-alert { color: var(--f); margin: 8px 0 0; }
 .board-note { margin: 12px 4px 0; }
+.drift-urgent { font-weight: 600; }
+.drift-settings { margin-top: 12px; }
+.drift-settings summary { cursor: pointer; }
+.drift-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
+.drift-fields label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }

@@ -6,7 +6,7 @@
  * called and nothing is stored. Free. Only served on Vercel (route file written
  * by scripts/prepare-server.ts); the same check runs in the browser at /drift-watch.
  */
-import { analyzeDrift, fromObjects, parseLogs } from "@/lib/drift";
+import { analyzeDrift, driftOptions, fromObjects, parseLogs, type DriftOptions } from "@/lib/drift";
 
 const MAX_ROWS = 20_000;
 const MAX_BYTES = 10_000_000;
@@ -20,10 +20,12 @@ export async function POST(request: Request): Promise<Response> {
   const text = await request.text();
   if (text.length > MAX_BYTES) return json({ error: "Too big. Send at most 10 MB, or send length and refused instead of the answer text." }, 413);
   let parsed: ReturnType<typeof parseLogs>;
+  let options: Partial<DriftOptions> = {};
   try {
     const t = text.trim();
     if (t.startsWith("{")) {
       const body = JSON.parse(t);
+      if (body.options && typeof body.options === "object") options = driftOptions(body.options);
       const list = body.rows ?? body.logs ?? body.data ?? body.answers;
       parsed = Array.isArray(list) ? fromObjects(list) : parseLogs(t);
     } else {
@@ -34,13 +36,13 @@ export async function POST(request: Request): Promise<Response> {
   }
   if (!parsed.rows.length) return json({ error: 'No rows found. Each row needs a "task" and an "answer" (or "length").' }, 400);
   if (parsed.rows.length > MAX_ROWS) return json({ error: `Too many rows. Send at most ${MAX_ROWS}.` }, 413);
-  return json(analyzeDrift(parsed.rows, parsed.skipped));
+  return json(analyzeDrift(parsed.rows, parsed.skipped, undefined, options));
 }
 
 export function GET(): Response {
   return json({
     about: "Drift Watch: refusal rate and answer length per kind of task, recent against before. Free, no model, nothing stored.",
-    usage: 'POST {"rows": [{"time": "2026-11-18T09:00:00Z", "task": "price-lookup", "answer": "..."}]}',
+    usage: 'POST {"rows": [{"time": "2026-11-18T09:00:00Z", "task": "price-lookup", "answer": "..."}], "options": {"minPerWindow": 30, "refusalPoints": 0.1, "lengthChange": 0.3}}',
     page: "https://robd-hub.github.io/agent-report-card/drift-watch/",
   });
 }

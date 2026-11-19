@@ -37,7 +37,8 @@ export type FlagKind = "refusals-up" | "refusals-down" | "never-refuses" | "leng
 
 export interface DriftFlag {
   kind: FlagKind;
-  level: "alert" | "note";
+  /** "urgent" is an alert worth looking at first, such as answers getting shorter (possible truncation). */
+  level: "urgent" | "alert" | "note";
   message: string;
 }
 
@@ -55,16 +56,46 @@ export interface DriftReport {
   split: string; // how the rows were split into baseline and recent
   tasks: TaskDrift[];
   skipped: number; // rows with no task or no answer/length
+  options: DriftOptions; // the thresholds used
 }
 
-/** Fewest answers in each window before we compare them. */
-export const MIN_PER_WINDOW = 10;
+/** Thresholds an owner can set. Anything left out uses the defaults below. */
+export interface DriftOptions {
+  /** Fewest answers in each window before a task is compared. */
+  minPerWindow: number;
+  /** Smallest move in refusal rate that counts, as a fraction (0.1 = 10 points). */
+  refusalPoints: number;
+  /** Smallest change in average length that counts, as a fraction (0.3 = 30%). */
+  lengthChange: number;
+}
+
+/**
+ * Fewest answers in each window before we compare them. On a quiet task a
+ * 10 point move can be two requests, so we wait for a few dozen (suggested
+ * by a Reddit commenter who runs an LLM gateway).
+ */
+export const MIN_PER_WINDOW = 30;
 /** Refusal rate must move by at least this much (10 points), and at least double or halve. */
 export const REFUSAL_POINTS = 0.1;
 /** Average length must change by at least 30%. */
 export const LENGTH_CHANGE = 0.3;
 /** Fewest answers before "never refuses" is worth saying. */
 export const NEVER_REFUSES_MIN = 30;
+export const DEFAULT_OPTIONS: DriftOptions = { minPerWindow: MIN_PER_WINDOW, refusalPoints: REFUSAL_POINTS, lengthChange: LENGTH_CHANGE };
+
+/** Fills in defaults and keeps each threshold in a sensible range. */
+export function driftOptions(input: Partial<Record<keyof DriftOptions, unknown>> = {}): DriftOptions {
+  const num = (v: unknown, def: number, min: number, max: number) => {
+    const n = typeof v === "string" ? Number(v) : typeof v === "number" ? v : NaN;
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
+  };
+  return {
+    minPerWindow: Math.round(num(input.minPerWindow, MIN_PER_WINDOW, 1, 100_000)),
+    refusalPoints: num(input.refusalPoints, REFUSAL_POINTS, 0.01, 1),
+    lengthChange: num(input.lengthChange, LENGTH_CHANGE, 0.01, 10),
+  };
+}
+
 /** With timestamps, the recent window is the last 7 days. */
 export const RECENT_DAYS = 7;
 
@@ -227,18 +258,18 @@ function stats(rows: DriftRow[]): WindowStats {
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
-function flagsFor(base: WindowStats, recent: WindowStats): DriftFlag[] {
+function flagsFor(base: WindowStats, recent: WindowStats, o: DriftOptions): DriftFlag[] {
   const flags: DriftFlag[] = [];
-  const enough = base.n >= MIN_PER_WINDOW && recent.n >= MIN_PER_WINDOW;
+  const enough = base.n >= o.minPerWindow && recent.n >= o.minPerWindow;
   if (enough) {
     const up = recent.refusalRate - base.refusalRate;
-    if (up >= REFUSAL_POINTS && recent.refusalRate >= base.refusalRate * 2) {
+    if (up >= o.refusalPoints && recent.refusalRate >= base.refusalRate * 2) {
       flags.push({
         kind: "refusals-up",
         level: "alert",
         message: `Refusals rose from ${pct(base.refusalRate)} to ${pct(recent.refusalRate)}. Usually a tool broke, a source went away or the model got more cautious.`,
       });
-    } else if (-up >= REFUSAL_POINTS && recent.refusalRate <= base.refusalRate / 2) {
+    } else if (-up >= o.refusalPoints && recent.refusalRate <= base.refusalRate / 2) {
       flags.push({
         kind: "refusals-down",
         level: "alert",
@@ -247,11 +278,20 @@ function flagsFor(base: WindowStats, recent: WindowStats): DriftFlag[] {
     }
     if (base.avgLength > 0) {
       const change = recent.avgLength / base.avgLength - 1;
-      if (Math.abs(change) >= LENGTH_CHANGE) {
+      // Up and down mean different things, so they get different messages. A
+      // drop is louder: it can be the model quietly cutting answers short.
+      const from = `from ${base.avgLength.toLocaleString("en")} to ${recent.avgLength.toLocaleString("en")} characters`;
+      if (change >= o.lengthChange) {
         flags.push({
-          kind: change > 0 ? "length-up" : "length-down",
+          kind: "length-up",
           level: "alert",
-          message: `Average length went from ${base.avgLength.toLocaleString("en")} to ${recent.avgLength.toLocaleString("en")} characters (${change > 0 ? "+" : ""}${Math.round(change * 100)}%). Jumps like this are nearly always a prompt edit, a model swap or a tool change.`,
+          message: `Answers got longer, ${from} (+${Math.round(change * 100)}%). Usually a tool returning more, a prompt edit or a model swap.`,
+        });
+      } else if (-change >= o.lengthChange / (1 + o.lengthChange)) {
+        flags.push({
+          kind: "length-down",
+          level: "urgent",
+          message: `Answers got shorter, ${from} (${Math.round(change * 100)}%). Check a few by hand: this can be the model quietly cutting answers off, as well as a prompt edit or model swap.`,
         });
       }
     }
@@ -268,7 +308,8 @@ function flagsFor(base: WindowStats, recent: WindowStats): DriftFlag[] {
 }
 
 /** Split the rows into baseline and recent, then compare each kind of task. */
-export function analyzeDrift(rows: DriftRow[], skipped = 0, now?: number): DriftReport {
+export function analyzeDrift(rows: DriftRow[], skipped = 0, now?: number, options: Partial<DriftOptions> = {}): DriftReport {
+  const o = driftOptions(options);
   let baseline: DriftRow[];
   let recent: DriftRow[];
   let split: string;
@@ -297,16 +338,17 @@ export function analyzeDrift(rows: DriftRow[], skipped = 0, now?: number): Drift
   const result: TaskDrift[] = tasks.map((task) => {
     const b = stats(baseline.filter((r) => r.task === task));
     const r = stats(recent.filter((x) => x.task === task));
-    return { task, baseline: b, recent: r, flags: flagsFor(b, r) };
+    return { task, baseline: b, recent: r, flags: flagsFor(b, r, o) };
   });
-  result.sort((a, b) => Number(b.flags.some((f) => f.level === "alert")) - Number(a.flags.some((f) => f.level === "alert")) || b.recent.n + b.baseline.n - (a.recent.n + a.baseline.n));
+  const weight = (t: TaskDrift) => (t.flags.some((f) => f.level === "urgent") ? 2 : t.flags.some((f) => f.level === "alert") ? 1 : 0);
+  result.sort((a, b) => weight(b) - weight(a) || b.recent.n + b.baseline.n - (a.recent.n + a.baseline.n));
 
-  const compared = result.some((t) => t.baseline.n >= MIN_PER_WINDOW && t.recent.n >= MIN_PER_WINDOW);
-  const status = result.some((t) => t.flags.some((f) => f.level === "alert")) ? "alert" : compared ? "steady" : "not-enough-data";
-  return { version: 1, status, rows: rows.length, split, tasks: result, skipped };
+  const compared = result.some((t) => t.baseline.n >= o.minPerWindow && t.recent.n >= o.minPerWindow);
+  const status = result.some((t) => weight(t) > 0) ? "alert" : compared ? "steady" : "not-enough-data";
+  return { version: 1, status, rows: rows.length, split, tasks: result, skipped, options: o };
 }
 
-/** A made-up log to try the page with: a lookup tool breaks and a prompt edit makes summaries longer. */
+/** A made-up log to try the page with: a lookup tool breaks, a prompt edit makes summaries longer, and support replies start getting cut off. */
 export function sampleLogs(): string {
   const lines: string[] = [];
   const start = Date.UTC(2026, 9, 1);
@@ -320,7 +362,8 @@ export function sampleLogs(): string {
       lines.push(JSON.stringify({ time, task: "price-lookup", answer: lookupRefuses ? "I can't find a price for that item right now." : `The current price is $${(10 + rand() * 90).toFixed(2)}.` }));
       const words = Math.round((late ? 140 : 70) + rand() * 20);
       lines.push(JSON.stringify({ time, task: "summary", answer: "word ".repeat(words).trim() + "." }));
-      lines.push(JSON.stringify({ time, task: "support-reply", answer: rand() < 0.1 ? "Sorry, I don't have access to your order history." : "Thanks for reaching out. Your refund has been sent and should arrive in 3 to 5 days." }));
+      const reply = late ? "Thanks for reaching out. Your refund has been" : "Thanks for reaching out. Your refund has been sent and should arrive in 3 to 5 days.";
+      lines.push(JSON.stringify({ time, task: "support-reply", answer: rand() < 0.1 ? "Sorry, I don't have access to your order history." : reply }));
     }
   }
   return lines.join("\n");
