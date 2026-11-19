@@ -35,14 +35,15 @@ export default function DriftWatch() {
         <div className="panel">
           <div className="panel-label">2 · Average answer length per kind of task</div>
           <p>
-            It barely moves for months, so a change of {Math.round(LENGTH_CHANGE * 100)}% or more is worth a look. Jumps like that are nearly
-            always a prompt edit, a model swap or a tool change. It matches what we see in grading, where very long answers are usually off
-            task.
+            It barely moves for months, so a change of {Math.round(LENGTH_CHANGE * 100)}% or more is worth a look. Up and down mean different
+            things. Longer is usually a tool returning more, a prompt edit or a model swap. Shorter is flagged louder, because it can be the
+            model quietly cutting answers off.
           </p>
         </div>
         <p className="muted small">
           With timestamps we compare the last {RECENT_DAYS} days with everything before. Without them we compare the last third of your rows
-          with the rest. We only compare a task once each side has at least {MIN_PER_WINDOW} answers. Refusals are spotted from the wording near
+          with the rest. We only compare a task once each side has at least {MIN_PER_WINDOW} answers, because on a quiet task a 10 point move can be two
+          requests. You can change all three thresholds on the page, or send them as <code className="mono">options</code> to the endpoint. Refusals are spotted from the wording near
           the start of each answer. On the 33 graded answers to our &quot;unknowable revenue&quot; question it caught 25 of the 27 honest
           answers and none of the 6 made-up ones. If you already know which answers were refusals, send <code className="mono">refused</code>{" "}
           and we use that instead.
@@ -64,7 +65,8 @@ export default function DriftWatch() {
         <h2>From your code</h2>
         <p>The same check as a free endpoint, so you can run it from a nightly job and alert yourself when the status is <code className="mono">alert</code>:</p>
         <pre>{`POST ${API}/api/drift/
-{"rows": [{"time": "2026-11-18T09:00:00Z", "task": "price-lookup", "answer": "The price is $42."}, ...]}
+{"rows": [{"time": "2026-11-18T09:00:00Z", "task": "price-lookup", "answer": "The price is $42."}, ...],
+ "options": {"minPerWindow": 30, "refusalPoints": 0.1, "lengthChange": 0.3}}   (options are optional)
 
 → {"status": "alert", "tasks": [{"task": "price-lookup",
      "baseline": {"n": 168, "refusalRate": 0.04, "avgLength": 28},

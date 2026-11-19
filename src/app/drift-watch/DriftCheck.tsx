@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { analyzeDrift, parseLogs, sampleLogs, type DriftReport, type WindowStats } from "@/lib/drift";
+import { analyzeDrift, DEFAULT_OPTIONS, parseLogs, sampleLogs, type DriftOptions, type DriftReport, type WindowStats } from "@/lib/drift";
 
 const STATUS: Record<DriftReport["status"], { label: string; chip: string }> = {
   alert: { label: "Something changed", chip: "chip-bad" },
@@ -16,6 +16,11 @@ export function DriftCheck() {
   const [text, setText] = useState("");
   const [report, setReport] = useState<DriftReport | null>(null);
   const [error, setError] = useState("");
+  // Thresholds as the owner types them: answers per window, refusal points, length %.
+  const [minN, setMinN] = useState(String(DEFAULT_OPTIONS.minPerWindow));
+  const [refPts, setRefPts] = useState(String(Math.round(DEFAULT_OPTIONS.refusalPoints * 100)));
+  const [lenPct, setLenPct] = useState(String(Math.round(DEFAULT_OPTIONS.lengthChange * 100)));
+  const options = (): Partial<DriftOptions> => ({ minPerWindow: Number(minN), refusalPoints: Number(refPts) / 100, lengthChange: Number(lenPct) / 100 });
 
   function run(input: string) {
     setError("");
@@ -26,7 +31,7 @@ export function DriftCheck() {
         setError("No rows found. Each row needs a task (or type) and an answer (or length).");
         return;
       }
-      setReport(analyzeDrift(rows, skipped));
+      setReport(analyzeDrift(rows, skipped, undefined, options()));
     } catch (e) {
       setReport(null);
       setError(`Couldn't read that: ${(e as Error).message}`);
@@ -69,6 +74,15 @@ export function DriftCheck() {
           Try an example
         </button>
       </div>
+      <details className="drift-settings">
+        <summary className="muted small">Thresholds</summary>
+        <div className="drift-fields">
+          <label>Answers needed in each window <input className="trust-input" type="number" min={1} value={minN} onChange={(e) => setMinN(e.target.value)} /></label>
+          <label>Refusal change, points <input className="trust-input" type="number" min={1} max={100} value={refPts} onChange={(e) => setRefPts(e.target.value)} /></label>
+          <label>Length change, % <input className="trust-input" type="number" min={1} value={lenPct} onChange={(e) => setLenPct(e.target.value)} /></label>
+        </div>
+        <p className="muted small">Change these and press Check again. On quiet tasks a small move can be just a couple of requests, so keep the first one at a few dozen.</p>
+      </details>
       {error && <p className="muted small">{error}</p>}
       {report && (
         <div className="drift-result">
@@ -82,12 +96,12 @@ export function DriftCheck() {
             <div className="drift-task" key={t.task}>
               <div className="drift-task-head">
                 <strong>{t.task}</strong>
-                {t.flags.some((f) => f.level === "alert") ? <span className="chip chip-bad">Changed</span> : t.baseline.n >= 10 && t.recent.n >= 10 ? <span className="chip chip-ok">Steady</span> : <span className="chip">Too few to compare</span>}
+                {t.flags.some((f) => f.level === "urgent") ? <span className="chip chip-bad">Check now</span> : t.flags.some((f) => f.level === "alert") ? <span className="chip chip-bad">Changed</span> : t.baseline.n >= report.options.minPerWindow && t.recent.n >= report.options.minPerWindow ? <span className="chip chip-ok">Steady</span> : <span className="chip">Too few to compare</span>}
               </div>
               <div className="drift-row mono small"><span className="muted">Before</span> {win(t.baseline)}</div>
               <div className="drift-row mono small"><span className="muted">Recent</span> {win(t.recent)}</div>
               {t.flags.map((f) => (
-                <p key={f.kind} className={f.level === "alert" ? "drift-alert" : "muted small"}>{f.message}</p>
+                <p key={f.kind} className={f.level === "urgent" ? "drift-alert drift-urgent" : f.level === "alert" ? "drift-alert" : "muted small"}>{f.message}</p>
               ))}
             </div>
           ))}
