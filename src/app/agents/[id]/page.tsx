@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyParts, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
+import { kindScores } from "@/lib/taskKinds";
 import { BadgePicker } from "./BadgePicker";
 import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
 import { taskWording } from "@/lib/types";
@@ -31,6 +32,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const report = loadReport(agent.id);
   const run = latestRun(report);
   const honesty = run ? honestyParts(run.tasks) : [];
+  const kinds = run ? kindScores(run.tasks, agent) : [];
   const weakest = run ? weakestTask(run.tasks) : null;
   const weakestPrompt = weakest ? taskWording(weakest.task, agent)?.prompt ?? weakest.task.taskId : null;
   const weakestWhy = weakest
@@ -109,6 +111,20 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
               <p className="meaning"><b>What {run.grade === "A" || run.grade === "F" ? "an" : "a"} {run.grade} means:</b> {GRADE_MEANING[run.grade]}</p>
             )}
             <p className="verdict">{run.summary || "No summary yet."}</p>
+            {kinds.length > 2 && (
+              <>
+                <div className="panel-label trend-head">By task type</div>
+                <div className="kind-scores">
+                  {kinds.map((k) => (
+                    <div key={k.kind} className="kind-score" title={`${k.count} ${k.count === 1 ? "task" : "tasks"}`}>
+                      <b className="mono">{k.score ?? "—"}</b>
+                      <span>{k.label}</span>
+                      <small className="muted">{k.count} {k.count === 1 ? "task" : "tasks"}</small>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
             {report.runs.length > 1 && (
               <>
                 <div className="panel-label trend-head">Score history</div>

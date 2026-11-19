@@ -259,3 +259,17 @@ a.chip { text-decoration: none; }
 .drift-settings summary { cursor: pointer; }
 .drift-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
 .drift-fields label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
+
+/* Score per task type on a report */
+.kind-scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 8px; }
+.kind-score { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); }
+.kind-score b { font-size: 1.4rem; }
+.kind-score span { font-size: .85rem; }
+.kind-score small { font-size: .72rem; }
+.cal-table th { text-align: left; font: 500 .72rem var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.cal-table td:first-child { width: auto; font-size: inherit; }
+.cal-table td:nth-child(2) { width: auto; white-space: normal; }
+@media (max-width: 640px) { .cal-table { font-size: .85rem; } }
+.cal-list { display: grid; gap: 10px; }
+.cal-row p { margin: 6px 0; }
+.cal-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

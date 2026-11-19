@@ -2,7 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import type { AgentConfig, AgentReport, GradingRun } from "./types";
 
-const DATA = path.join(process.cwd(), "data");
+/**
+ * Where agents and results live. ARC_DATA_DIR points the grading scripts at
+ * another folder, such as data/calibration for the grader test, so test
+ * agents never land on the public leaderboard.
+ */
+const DATA = path.resolve(process.cwd(), process.env.ARC_DATA_DIR || "data");
 
 export function loadAgents(): AgentConfig[] {
   return JSON.parse(fs.readFileSync(path.join(DATA, "agents.json"), "utf8")) as AgentConfig[];
