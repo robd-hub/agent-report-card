@@ -1,0 +1,78 @@
+# Watches for Virtuals orders, so buyers aren't left waiting on GitHub's
+# schedule (which often skips hours). One run stays up for about 5.5 hours,
+# checking the agent's jobs every 2 minutes; when a job needs work it starts
+# "Sell grades on Virtuals" (acp-seller.yml), which does the actual pricing,
+# grading and delivering. Before it ends, it starts the next watcher run, and
+# an hourly schedule restarts it if the chain ever breaks.
+#
+# Free on a public repository. Needs the same settings as acp-seller.yml.
+name: Watch for Virtuals orders
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+# One watcher at a time; a newer start waits for the current one.
+concurrency:
+  group: acp-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    if: vars.ACP_WALLET_ADDRESS != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      ACP_WALLET_ADDRESS: ${{ vars.ACP_WALLET_ADDRESS }}
+      ACP_WALLET_ID: ${{ vars.ACP_WALLET_ID }}
+      ACP_BUILDER_CODE: ${{ vars.ACP_BUILDER_CODE }}
+      ACP_SIGNER_PRIVATE_KEY: ${{ secrets.ACP_SIGNER_PRIVATE_KEY }}
+      GH_TOKEN: ${{ github.token }}
+      RUN_MINUTES: "330"
+      EVERY_SECONDS: "120"
+      # After starting the seller, wait this long before starting it again
+      # (it may still be grading, or Virtuals may be having a bad moment).
+      RETRY_MINUTES: "10"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Watch
+        run: |
+          end=$(( $(date +%s) + RUN_MINUTES * 60 ))
+          last=0
+          out="$RUNNER_TEMP/check.out"
+          while [ "$(date +%s)" -lt "$end" ]; do
+            git pull -q --rebase origin main || true
+            : > "$out"
+            if GITHUB_OUTPUT="$out" timeout 90 npx tsx scripts/acp-seller.ts check; then
+              n=$(sed -n 's/^actionable=//p' "$out")
+              busy=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow acp-seller.yml --limit 5 --json status \
+                -q '[.[] | select(.status != "completed")] | length' || echo 1)
+              now=$(date +%s)
+              if [ "${n:-0}" -gt 0 ] && [ "${busy:-1}" = "0" ] && [ $(( now - last )) -ge $(( RETRY_MINUTES * 60 )) ]; then
+                echo "Starting the seller for $n job(s)."
+                gh workflow run acp-seller.yml --repo "$GITHUB_REPOSITORY" --ref main && last=$now
+              fi
+            else
+              echo "Check failed (Virtuals may be down); trying again shortly."
+            fi
+            sleep "$EVERY_SECONDS"
+          done
+
+      # Not after a cancel, so cancelling a run stops the chain (the hourly
+      # schedule still brings it back within the hour).
+      - name: Start the next watcher
+        if: success() || failure()
+        run: gh workflow run acp-watch.yml --repo "$GITHUB_REPOSITORY" --ref main

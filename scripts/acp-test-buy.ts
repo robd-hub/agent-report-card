@@ -3,9 +3,9 @@
  * from a separate buyer agent (an agent can't hire itself). Run by hand from
  * .github/workflows/acp-test-buy.yml.
  *
- * It creates the job, waits for our seller bot to set the budget (the seller
- * runs every 15 minutes), checks the budget is the expected price, pays it
- * into escrow, then exits. The seller bot grades the agent on a later run and
+ * It creates the job, waits for our seller bot to set the budget (the watcher
+ * starts the seller within a few minutes), checks the budget is the expected
+ * price, pays it into escrow, then exits. The seller bot grades the agent on a later run and
  * submits the report, which completes the job.
  *
  *   ACP_BUYER_WALLET_ADDRESS=... ACP_BUYER_WALLET_ID=... ACP_BUYER_SIGNER_PRIVATE_KEY=... \

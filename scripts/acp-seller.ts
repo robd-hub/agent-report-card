@@ -18,6 +18,7 @@
  *
  *   npx tsx scripts/acp-seller.ts          # all three steps
  *   npx tsx scripts/acp-seller.ts submit   # step 3 only (after the site is republished)
+ *   npx tsx scripts/acp-seller.ts check    # just count jobs needing steps 1-3 (used by acp-watch.yml)
  *
  * Progress per job is kept in data/acp-jobs.json, so a job is never graded
  * twice. The buyer's request text is untrusted: it's only parsed for a link,
@@ -240,9 +241,29 @@ async function handleNew(agent: AcpAgent): Promise<void> {
   }
 }
 
+/**
+ * Jobs a full run would act on: new requests, funded jobs not yet graded, and
+ * graded jobs whose report hasn't been submitted. Used by the watcher, which
+ * only starts the (heavier) seller workflow when this is above zero.
+ */
+export function countActionable(sessions: Pick<JobSession, "chainId" | "jobId" | "status">[], jobs: AcpJobRecord[]): number {
+  return sessions.filter((s) => {
+    const rec = jobs.find((j) => j.ref === jobRef(s.chainId, s.jobId));
+    if (s.status === "open") return !rec;
+    if (s.status === "funded") return !rec || rec.state === "budget-set" || rec.state === "graded";
+    return false;
+  }).length;
+}
+
 async function main() {
   const agent = await connectAcp();
   try {
+    if (process.argv[2] === "check") {
+      const n = countActionable(providerJobs(agent), loadJobs());
+      console.log(`${n} job(s) need the seller.`);
+      if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `actionable=${n}\n`);
+      return;
+    }
     console.log(`Connected. ${providerJobs(agent).length} active job(s) as provider.`);
     await submitGraded(agent);
     if (process.argv[2] !== "submit") await handleNew(agent);
