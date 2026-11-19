@@ -11,18 +11,20 @@ export function BadgePicker({ agentId, agentName, grade, score, siteUrl, basePat
   const [theme, setTheme] = useState<Theme>("dark");
   const [matchShape, setMatchShape] = useState<"pill" | "card">("card");
   const [accent, setAccent] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"readme" | "code" | null>(null);
   const widget = useRef<HTMLDivElement>(null);
 
   const img = (s: "pill" | "card") => `${agentId}-${s}-${theme}.svg`;
   const accentOk = /^#[0-9a-f]{6}$/i.test(accent);
-  const report = `${siteUrl}/agents/${agentId}/`;
+  const site = (siteUrl || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+  const report = `${site}/agents/${agentId}/`;
+  const readme = `[![${agentName} on Agent Report Card](${site}/badge/${agentId}.svg)](${report})`;
   const code =
     style === "match"
-      ? `<div data-arc-agent="${agentId}" data-style="${matchShape}"${accentOk ? ` data-accent="${accent}"` : ""}></div>\n<script src="${siteUrl}/badge.js" async></script>`
+      ? `<div data-arc-agent="${agentId}" data-style="${matchShape}"${accentOk ? ` data-accent="${accent}"` : ""}></div>\n<script src="${site}/badge.js" async></script>`
       : format === "markdown"
-        ? `[![Agent Report Card grade](${siteUrl}/badge/${img(style)})](${report})`
-        : `<a href="${report}"><img src="${siteUrl}/badge/${img(style)}" alt="Agent Report Card grade" height="${style === "pill" ? 32 : 124}"></a>`;
+        ? `[![Agent Report Card grade](${site}/badge/${img(style)})](${report})`
+        : `<a href="${report}"><img src="${site}/badge/${img(style)}" alt="Agent Report Card grade" height="${style === "pill" ? 32 : 124}"></a>`;
   // A ready-made post: X shows the report's grade card as the link picture.
   const tweet = grade
     ? `${agentName} got ${/^[AEF]/.test(grade) ? "an" : "a"} ${grade} (${score}/100) on Agent Report Card, judged independently on @reppo and checked by SERV Reasoning. Every answer and critique is public:`
@@ -40,16 +42,42 @@ export function BadgePicker({ agentId, agentName, grade, score, siteUrl, basePat
     document.body.appendChild(s);
   }, [style, matchShape, accent, theme, basePath]);
 
-  const copy = async () => {
+  const copy = async (text: string, which: "readme" | "code") => {
+    let ok = false;
     try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch {
+      // Clipboard is blocked on some pages. Fall back to the older copy command.
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      document.body.appendChild(area);
+      area.select();
+      try {
+        ok = document.execCommand("copy");
+      } catch {
+        ok = false;
+      }
+      document.body.removeChild(area);
+    }
+    if (!ok) return;
+    setCopied(which);
+    setTimeout(() => setCopied(null), 1500);
   };
 
   return (
     <div className="badge-picker">
+      <div className="panel-label">README</div>
+      <p className="muted small">Paste this into a GitHub README. The image is the latest published grade and the link opens this report.</p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`${basePath}/badge/${agentId}.svg`} alt={`${agentName} on Agent Report Card`} />
+      <pre>{readme}</pre>
+      <div className="badge-actions">
+        <button type="button" className="btn btn-ghost" onClick={() => copy(readme, "readme")}>{copied === "readme" ? "Copied" : "Copy README snippet"}</button>
+      </div>
       <div className="seg" role="group" aria-label="Badge style">
         {(["card", "pill", "match"] as const).map((s) => (
           <button key={s} type="button" className={style === s ? "on" : ""} onClick={() => setStyle(s)}>
@@ -106,7 +134,7 @@ export function BadgePicker({ agentId, agentName, grade, score, siteUrl, basePat
       </p>
       <pre>{code}</pre>
       <div className="badge-actions">
-        <button type="button" className="btn btn-ghost" onClick={copy}>{copied ? "Copied" : "Copy code"}</button>
+        <button type="button" className="btn btn-ghost" onClick={() => copy(code, "code")}>{copied === "code" ? "Copied" : "Copy code"}</button>
         <a className="btn btn-ghost" href={shareUrl} target="_blank" rel="noopener noreferrer">Share on X</a>
       </div>
       <p className="muted small">Sharing the report link on X, Telegram or LinkedIn shows a grade card like the one below, so every post points back here.</p>

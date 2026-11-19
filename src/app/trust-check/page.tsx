@@ -31,6 +31,10 @@ export default function TrustCheck() {
         whether to rely on it, and whether the grade is still current. The grade comes from testing the agent's real work, not
         from its wallet history or reviews. It's free while we're testing it.
       </p>
+      <p>
+        The same grades are on the <Link href="/for-agents">pre-hire lookup</Link> (<code className="mono">GET /api/lookup</code>), which answers
+        hire, caution or avoid and is also an MCP server.
+      </p>
 
       <TrustSearch records={records} />
 

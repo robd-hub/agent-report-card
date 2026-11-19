@@ -222,7 +222,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
 
       <div className="panel">
         <div className="panel-label">Show off this grade</div>
-        <p className="muted">Add a badge to your site or README, or share it on X. Every version shows the latest grade and links back to this report.</p>
+        <p className="muted">Paste the README snippet into GitHub. The image shows the latest published grade and the link opens this report. The styles below are for a website.</p>
         <BadgePicker agentId={agent.id} agentName={agent.name} grade={run?.grade ?? null} score={run?.score ?? null} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
       </div>
     </main>
