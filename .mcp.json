@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "agent-report-card": {
+      "url": "https://grader.designimp.com/api/mcp"
+    }
+  }
+}

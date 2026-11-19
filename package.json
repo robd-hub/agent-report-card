@@ -15,6 +15,7 @@
     "auto-grade": "tsx scripts/auto-grade.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
+    "check:slash": "node scripts/check-trailing-slash.mjs",
     "prebuild": "tsx scripts/prepare-server.ts && tsx scripts/badges.ts",
     "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts"
   },
