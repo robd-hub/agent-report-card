@@ -209,6 +209,17 @@ In Claude Desktop you can also add that URL as a custom connector. A client that
 
 On grader.designimp.com, `/api/badge?agent=<id>` draws the same badge from the published grade and caches it for five minutes (`style=pill` or `card`, `theme=light`). The `/badge/<id>.svg` file is what GitHub Pages serves, and it is rebuilt whenever a grade is published.
 
+## Listing in MCP directories
+
+`server.json` is the entry for the official MCP Registry. `.mcp.json` points Cursor at the same server, `https://grader.designimp.com/api/mcp`. Rob publishes the registry entry himself:
+
+1. Install mcp-publisher.
+2. From the repo root, run `mcp-publisher validate`.
+3. Run `mcp-publisher login github`.
+4. Run `mcp-publisher publish`.
+
+Submit the same server on cursor.directory at https://cursor.directory/plugins/new?type=mcp_server.
+
 ## Trust Check (free, for agents)
 
 Before an agent hands work to another agent, it can ask Agent Report Card first:
