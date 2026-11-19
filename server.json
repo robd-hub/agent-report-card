@@ -7,8 +7,17 @@
     "url": "https://github.com/robd-hub/agent-report-card",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://grader.designimp.com/for-agents/",
+  "icons": [
+    {
+      "src": "https://grader.designimp.com/erc8004/agent-report-card.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "1000x1000"
+      ]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",

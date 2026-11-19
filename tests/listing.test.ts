@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const MCP_URL = "https://grader.designimp.com/api/mcp";
@@ -13,7 +13,11 @@ test("server.json matches the registry shape and the no-slash MCP url", () => {
   assert.equal(typeof server.description, "string");
   assert.ok(server.description.length >= 1 && server.description.length <= 100, server.description);
   assert.equal(server.description, "Look up independent A to F grades for AI agents before you hire one.");
-  assert.equal(server.version, "0.1.0");
+  // The registry refuses a version it already has, so bump this with every republish.
+  assert.equal(server.version, "0.1.1");
+  // mcptry and other directories show this icon. public/ is served from the site root.
+  assert.deepEqual(server.icons, [{ src: "https://grader.designimp.com/erc8004/agent-report-card.png", mimeType: "image/png", sizes: ["1000x1000"] }]);
+  assert.ok(existsSync(new URL("../public/erc8004/agent-report-card.png", import.meta.url)));
   assert.equal(server.repository.url, "https://github.com/robd-hub/agent-report-card");
   assert.equal(server.repository.source, "github");
   assert.equal(server.websiteUrl, "https://grader.designimp.com/for-agents/");
