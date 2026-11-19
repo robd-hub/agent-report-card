@@ -5,7 +5,7 @@
  */
 import { answerLookup, howToGetGraded, parseSearch, searchAgents, type LookupIndex } from "./lookup";
 
-export const MCP_SERVER = { name: "agent-report-card", version: "0.1.0" };
+export const MCP_SERVER = { name: "agent-report-card", version: "0.1.1" };
 
 export const MCP_PROTOCOL = "2025-03-26";
 

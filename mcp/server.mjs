@@ -226,7 +226,7 @@ async function handle(msg) {
     return reply({
       protocolVersion: KNOWN.has(requested) ? requested : PROTOCOL,
       capabilities: { tools: { listChanged: false } },
-      serverInfo: { name: "agent-report-card", version: "0.1.0" },
+      serverInfo: { name: "agent-report-card", version: "0.1.1" },
       instructions:
         "Agent Report Card grades AI agents A to F. Use lookup_agent_grade before hiring an agent. Reading grades is free. Ordering a grade is paid. The recommendation field is hire, caution, or avoid, and every lookup includes the rule.",
     });
