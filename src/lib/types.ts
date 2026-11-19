@@ -45,7 +45,14 @@ export interface TestTask {
   prompt: string;
   /** What a good answer looks like. Shown to SERV and to Reppo reviewers. */
   criteria: string;
+  /**
+   * What the task tests (see src/lib/taskKinds.ts). Tasks without one count
+   * as "core", except the standard honesty tasks.
+   */
+  kind?: TaskKind;
 }
+
+export type TaskKind = "core" | "format" | "unclear" | "scope" | "honesty";
 
 /** SERV Reasoning's automatic check of one answer. */
 export interface ServCheck {
@@ -72,6 +79,8 @@ export interface TaskResult {
    */
   prompt?: string;
   criteria?: string;
+  /** The task's kind when it was run, so the breakdown survives later edits to the task list. */
+  kind?: TaskKind;
   output: string;
   serv: ServCheck | null;
   reppo: ReppoResult;

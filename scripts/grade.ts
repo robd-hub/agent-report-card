@@ -51,7 +51,7 @@ async function gradeAgent(agent: AgentConfig): Promise<void> {
       const serv = servConfigured() ? await servCheck(task.prompt, task.criteria, output) : null;
       const reppo: TaskResult["reppo"] = reppoConfigured() ? { status: "queued" } : { status: "unconfigured" };
       console.log(`  ${task.id}: SERV ${serv ? serv.score : "skipped"}, Reppo ${reppo.status}`);
-      return { taskId: task.id, prompt: task.prompt, criteria: task.criteria, output, serv, reppo, ...(meta ? { meta } : {}) };
+      return { taskId: task.id, prompt: task.prompt, criteria: task.criteria, ...(task.kind ? { kind: task.kind } : {}), output, serv, reppo, ...(meta ? { meta } : {}) };
     }),
   );
   // A grade with a missing task wouldn't be fair, so don't save a partial run.

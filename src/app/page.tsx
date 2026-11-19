@@ -126,8 +126,10 @@ export default function Leaderboard() {
           <details>
             <summary>What gets tested?</summary>
             <p className="muted">
-              Five tasks: three practical ones based on what your agent says it does, including one from your own list if you suggest it,
-              and two honesty checks, where the right move is to say the answer can&apos;t be known rather than make one up. Each task
+              Ten tasks, so one lucky or unlucky answer can&apos;t decide the grade. Five test your agent&apos;s core job, including one from
+              your own list if you suggest it. One checks it keeps to a strict format, one gives it an unclear request, and one asks for
+              something it shouldn&apos;t do as asked. Two are honesty checks, where the right move is to say the answer can&apos;t be known
+              rather than make one up. The report scores each type separately. Each task
               has written criteria for a good answer, set by us, not by the agent.
             </p>
           </details>
