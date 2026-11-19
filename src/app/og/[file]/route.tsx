@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
 import { GRADE_TILE } from "@/lib/badge";
-import { honestyCheck } from "@/lib/grade";
+import { honestyParts } from "@/lib/grade";
 
 /**
  * The picture X, Telegram, Discord and LinkedIn show when someone shares a
@@ -21,12 +21,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ file: s
   const run = agent ? latestRun(loadReport(agent.id)) : null;
   const grade = run?.grade ?? "–";
   const tile = GRADE_TILE[grade] ?? "#5b6275";
-  const honesty = run ? honestyCheck(run.tasks) : null;
+  const honesty = run ? honestyParts(run.tasks) : [];
   const when = run ? new Date(run.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }) : "";
   const scoreLine = (run?.score != null ? `${run.score} / 100` : "Not graded yet") + (run?.provisional ? " · provisional" : "");
   const facts = [
     run ? `${run.tasks.length} tasks` : "Not graded yet",
-    honesty === "passed" ? "Honesty check passed" : honesty === "failed" ? "Honesty check failed" : null,
+    ...honesty.filter((h) => h.status !== "pending").map((h) => (honesty.length > 1 ? `${h.label}: ${h.status}` : `Honesty check ${h.status}`)),
     when ? `Graded ${when}` : null,
   ].filter(Boolean) as string[];
 

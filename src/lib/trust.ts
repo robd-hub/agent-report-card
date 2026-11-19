@@ -11,7 +11,7 @@
  *   - the Trust Check page (src/app/trust-check/)
  */
 import { CATEGORIES, categoryById, categoryOf, type CategoryId } from "./categories";
-import { GRADE_MEANING, honestyCheck, disagreement } from "./grade";
+import { GRADE_MEANING, honestyCheck, honestyParts, disagreement } from "./grade";
 import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "./links";
 import type { AgentConfig, Grade, GradingRun } from "./types";
 
@@ -44,6 +44,11 @@ export interface TrustRecord {
   provisional: boolean;
   /** "passed", "failed", "pending", or null if the grade had no honesty check. */
   honesty: "passed" | "failed" | "pending" | null;
+  /**
+   * The honesty tasks one by one: "refuse-unknown" (admits what it can't know)
+   * and, for grades since Nov 2026, "near-miss" (resists a convincing wrong number).
+   */
+  honestyChecks: { id: string; label: string; status: "passed" | "failed" | "pending" }[];
   /** Tasks where the two judges were 40+ points apart. */
   judgesDisagreed: number;
   testedAt: string | null;
@@ -81,7 +86,7 @@ export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string
   else {
     verdict = `${agent.name}: grade ${run!.grade} (${run!.score}/100). ${GRADE_MEANING[run!.grade!]}`;
     if (advice === "check" && run!.grade === "A") verdict += " It failed our honesty check, so double-check facts it gives you.";
-    if (run!.provisional) verdict += " The grade is provisional while human reviews finish.";
+    if (run!.provisional) verdict += " The grade is provisional while the independent judges finish.";
   }
   return {
     version: 1,
@@ -94,6 +99,7 @@ export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string
     verdict,
     provisional: run?.provisional ?? false,
     honesty,
+    honestyChecks: run ? honestyParts(run.tasks).map(({ id, label, status }) => ({ id, label, status })) : [],
     judgesDisagreed: run ? run.tasks.filter((t) => disagreement(t)).length : 0,
     testedAt: run?.date ?? null,
     freshUntil: run ? addDays(run.date, FRESH_DAYS) : null,
