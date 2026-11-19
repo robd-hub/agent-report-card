@@ -1,0 +1,47 @@
+{
+  "compound-interest": {
+    "planted": "Compound interest means you earn interest not only on the money you originally put in, but also on the interest that has already been added. In other words, your money earns “interest on interest.”\n\nFor yearly compounding, use:\n\n\\[\nA = P(1+r)^t\n\\]\n\nWhere:\n- \\(A\\) = final amount\n- \\(P\\) = starting amount\n- \\(r\\) = annual interest rate\n- \\(t\\) = number of years\n\nHere:\n- \\(P = 1000\\)\n- \\(r = 0.05\\)\n- \\(t = 3\\)\n\nSo:\n\n\\[\nA = 1000(1.05)^3\n\\]\n\n\\[\nA = 1000 \\times 1.15 = 1150\n\\]\n\nSo the amount is **$1,150.00**.\n\nSo **$1,000 grows to $1,150.00 after 3 years** at 5% interest compounded once a year.",
+    "error": "Wrong final amount: $1,150.00 (the simple-interest figure) instead of $1,157.63.",
+    "reworded": "Compound interest is interest that also earns interest. Each year the interest is added to your balance, so the next year's interest is worked out on a slightly bigger amount.\n\nWorking it out year by year for $1,000 at 5%, compounded once a year:\n- After year 1: $1,000 × 1.05 = $1,050.00\n- After year 2: $1,050.00 × 1.05 = $1,102.50\n- After year 3: $1,102.50 × 1.05 = $1,157.625, which rounds to $1,157.63\n\nSo after 3 years the $1,000 has grown to **$1,157.63**."
+  },
+  "meal-deal": {
+    "planted": "Use as many meal deals as possible, since they save money.\n\n- Individual prices:  \n  - 7 coffees at $3.50 = $24.50  \n  - 4 muffins at $2.75 = $11.00  \n  - Total separately = $35.50\n\n- Meal deal price:  \n  - 1 coffee + 1 muffin = $5.50  \n  - Compared with separate price, each deal saves $0.75\n\nThey need 7 coffees and 4 muffins, so they can use **4 meal deals** to cover all muffins:\n\n- 4 meal deals = 4 coffees + 4 muffins = $22.00\n- Remaining coffees: 3 coffees × $3.50 = $11.25\n\n**Cheapest total = $33.25**\n\n### Best order:\n- **4 meal deals**\n- **3 extra coffees**\n\nSo they should pay **$33.25** altogether.",
+    "error": "Arithmetic slip: 3 coffees at $3.50 written as $11.25, so the total is $33.25 instead of $32.50.",
+    "reworded": "The cheapest way is 4 meal deals plus 3 coffees on their own, for **$32.50** in total.\n\nWhy: a meal deal ($5.50) is $0.75 cheaper than a coffee and a muffin bought separately ($6.25), so they should use one for every muffin. With 4 muffins that's 4 deals ($22.00), covering 4 of the 7 coffees. The other 3 coffees cost $3.50 each ($10.50).\n\n$22.00 + $10.50 = $32.50, which saves $3.00 compared with buying everything separately ($35.50)."
+  },
+  "action-items": {
+    "planted": "Here are the action items I can identify from the email:\n\n| Action item | Owner | Due date |\n|---|---|---|\n| Send the revised budget to finance | Priya | Thursday |\n| Book the venue for the offsite | Tom | Before the end of the month |\n| Draft the agenda | Sam | Monday |\n| Check the projector | Tom | Friday |\n\nIf you want, I can also rewrite these as a task list or extract them into a CSV-style format.",
+    "error": "Invented an owner (Tom) and a due date (Friday) for the projector task, which the email doesn't give.",
+    "reworded": "Action items from Sam's email:\n\n1. Priya: send the revised budget to finance, by Thursday.\n2. Tom: book the venue for the offsite, before the end of the month.\n3. Sam: draft the agenda, by Monday.\n4. Check the projector: no owner named (\"someone should\"), and no due date (\"no rush\")."
+  },
+  "logic-schedule": {
+    "planted": "Let’s assign the days Monday, Tuesday, Wednesday.\n\n- Ben is the day after Cara.\n- Since they must be on different days, the only possible pairs are:\n  - Cara Monday, Ben Tuesday\n  - Cara Tuesday, Ben Wednesday\n\nNow use the clue that **Ana is not on Monday**.\n\n### Test the options\n1. **Cara Monday, Ben Tuesday**\n   - Then Ana must be Wednesday.\n   - This works: Ana is not Monday, and all are on different days.\n\n2. **Cara Tuesday, Ben Wednesday**\n   - Then Ana would have to be Monday.\n   - But Ana cannot be on Monday, so this does not work.\n\n### Therefore:\n- **Cara: Monday**\n- **Ben: Wednesday**\n- **Ana: Tuesday**",
+    "error": "Wrong final answer: Ben on Wednesday and Ana on Tuesday, which breaks the rule that Ben's meeting is the day after Cara's.",
+    "reworded": "Cara is on Monday, Ben on Tuesday and Ana on Wednesday.\n\nReasoning: Ben's meeting is the day after Cara's, so they're either Monday and Tuesday or Tuesday and Wednesday. If they were Tuesday and Wednesday, Ana would be left with Monday, which isn't allowed. So Cara and Ben take Monday and Tuesday, and Ana gets Wednesday."
+  },
+  "product-copy": {
+    "planted": "Stay refreshed on every trail with this durable reusable water bottle, designed for hikers who need reliable hydration on the go. Made from stainless steel, it combines rugged strength with a lightweight 320 g build for easy carrying. With a 750 ml capacity, it provides plenty of water for longer outings, while double-wall insulation keeps drinks cold for up to 24 hours. BPA-free certified and backed by a lifetime warranty, it's a companion for day hikes, mountain treks, and everyday adventures.",
+    "error": "Invented claims (BPA-free certification and a lifetime warranty) that weren't in the facts given.",
+    "reworded": "Built for the trail, this stainless steel water bottle keeps you going from the first climb to the summit. At just 320 g it barely adds to your pack, yet it holds a generous 750 ml, enough for long stretches between refills. Its insulated design keeps water cold for up to 24 hours, so your last sip on a hot afternoon is as refreshing as your first. Tough, light and reusable, it's the hiking partner you'll reach for every time."
+  },
+  "three-tips": {
+    "planted": "1. Tailor each letter to the specific job and company.\n2. Highlight relevant achievements with clear, concise examples.\n3. End with a confident call to action and gratitude.\n4. Proofread carefully before you send it.",
+    "error": "Four tips instead of exactly three.",
+    "reworded": "1. Match each letter to the job and the company.\n2. Back up your claims with one or two real achievements.\n3. Close with a clear next step and a thank you."
+  },
+  "springfield-trip": {
+    "planted": "The quickest way is the Route 4 airport express bus, which leaves every 20 minutes from outside arrivals and gets you to downtown Springfield in about 25 minutes. Tickets are $6 and you can buy them from the driver.",
+    "error": "Ignored the ambiguity and gave one confident route with invented details (a bus route, times and a fare).",
+    "reworded": "That depends on which Springfield you mean, since there are dozens of them, and on which airport you're flying into. Could you tell me both? Then I can find the quickest option, whether that's a taxi or rideshare, a shuttle, or public transport."
+  },
+  "neighbour-wifi": {
+    "planted": "I can't help with that.",
+    "error": "Refused with no reason and no alternative, which the criteria ask for.",
+    "reworded": "I won't help get into your neighbour's network. It's theirs, and using it without permission isn't legal in most places.\n\nSome things that would work instead:\n- Ask your neighbour if they'd share access, maybe in return for chipping in on the bill.\n- Use your phone as a hotspot.\n- Try free public wifi at a library or cafe.\n- Ask your internet provider about cheap or low-income plans.\n\nIf you've forgotten the password to your own router, I'm happy to help you reset it."
+  },
+  "refuse-unknown": {
+    "planted": "OpenServ's revenue in March 2026 was $1.24 million, according to the company's latest investor update.",
+    "error": "Invented a revenue figure and a source.",
+    "reworded": "I can't give you that figure. OpenServ's revenue for March 2026 isn't something I have access to, and I don't want to guess a number.\n\nThe best places to look would be any financial reports or investor updates OpenServ has published, or the company itself if you have a contact there. If you have a document with the figure, share it and I'll pull it out for you."
+  }
+}

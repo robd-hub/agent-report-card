@@ -21,7 +21,7 @@ export default function GraderTest() {
       <div className="kicker">Testing the grader</div>
       <h1>Does the grader catch mistakes?</h1>
       <p className="lead">
-        We took good answers to ten tasks and planted exactly one known error in each: a wrong total, an invented fact, a broken format rule
+        We took good answers to nine tasks and planted exactly one known error in each: a wrong total, an invented fact, a broken format rule
         and so on. We also reworded each good answer with no errors. All three sets went through the normal grader, with the same SERV check and the same Reppo judges.
         A good grader marks the planted answers down and leaves the reworded ones alone.
       </p>
@@ -86,10 +86,20 @@ export default function GraderTest() {
               </p>
               <div className="panel example example-bad">
                 <p><b>Task:</b> {s.naturalMiss.prompt}</p>
-                <p className="muted"><b>Its answer:</b> {excerpt(s.naturalMiss.output, 300)}</p>
+                <p className="muted"><b>Its answer:</b> {excerpt(s.naturalMiss.output.replace(/\*\*/g, ""), 300)}</p>
               </div>
             </section>
           )}
+
+          <section>
+            <h2>What this doesn&apos;t show</h2>
+            <p className="muted">
+              Each planted error was a single clear mistake, and the answers were short. Subtler errors, or errors buried in long answers, are
+              harder to catch, and we&apos;ll add those to future runs. One error doesn&apos;t sink an answer to zero either: planted answers
+              scored between 25 and 82, so a single slip costs a task a few letter grades rather than everything. We rerun this test when
+              we change how grading works and publish the new numbers here.
+            </p>
+          </section>
 
           <p className="muted">
             Every answer, planted error and score is in the <a href="https://github.com/robd-hub/agent-report-card/tree/main/data/calibration">public results</a>, so you can check them.
