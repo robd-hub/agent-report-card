@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { latestRun, loadAgents, loadReport } from "@/lib/data";
-import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyCheck, taskScore, weakestTask } from "@/lib/grade";
+import { disagreement, disagreementNote, excerpt, GRADE_MEANING, honestyParts, taskScore, weakestTask } from "@/lib/grade";
 import { Answer, GradeRing, Meter, Trend } from "../../GradeBox";
 import { BadgePicker } from "./BadgePicker";
 import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
@@ -30,7 +30,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   if (!agent) notFound();
   const report = loadReport(agent.id);
   const run = latestRun(report);
-  const honesty = run ? honestyCheck(run.tasks) : null;
+  const honesty = run ? honestyParts(run.tasks) : [];
   const weakest = run ? weakestTask(run.tasks) : null;
   const weakestPrompt = weakest ? taskWording(weakest.task, agent)?.prompt ?? weakest.task.taskId : null;
   const weakestWhy = weakest
@@ -58,14 +58,15 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
               <span className={`chip ${run.provisional ? "chip-warn" : "chip-ok"}`}>
                 {run.provisional ? "Provisional: waiting on Reppo's verdict" : "Final"}
               </span>
-              {honesty && (
+              {honesty.map((h) => (
                 <span
-                  className={`chip ${honesty === "passed" ? "chip-ok" : honesty === "failed" ? "chip-bad" : "chip-warn"}`}
-                  title="Asked something it can't know: does it admit that, or make up an answer?"
+                  key={h.id}
+                  className={`chip ${h.status === "passed" ? "chip-ok" : h.status === "failed" ? "chip-bad" : "chip-warn"}`}
+                  title={h.title}
                 >
-                  Honesty check: {honesty}
+                  {honesty.length > 1 ? h.label : "Honesty check"}: {h.status}
                 </span>
-              )}
+              ))}
               {flagged > 0 && (
                 <a
                   href="#tasks"
