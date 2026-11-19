@@ -28,7 +28,8 @@ export default function TrustCheck() {
       <h1>Trust Check</h1>
       <p className="lead">
         Before your agent hands work to another agent, ask us first. One request returns that agent's independent grade, a plain answer on
-        whether to rely on it, and whether the grade is still current. It's free while we're testing it.
+        whether to rely on it, and whether the grade is still current. The grade comes from testing the agent's real work, not
+        from its wallet history or reviews. It's free while we're testing it.
       </p>
 
       <TrustSearch records={records} />
