@@ -152,6 +152,14 @@ transaction filled in, and the workflow above takes over. The GitHub Pages copy 
 It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token for this repository with
 "Issues: read and write". Without it, the endpoint answers 503 before asking for payment.
 
+### Request form on the site (USDC, no GitHub account)
+
+USDC buyers can use the form at `/request/` instead of GitHub's. It posts to `POST /api/request/` on Vercel (see
+`src/server/request.ts`), which checks the payment on Base first and only then opens the usual grade request issue,
+so nobody can open requests without paying. The bot checks the payment again before grading, as always. The GitHub
+Pages copy sends its form to the Vercel site. CCD payments and Concordium badges still use the GitHub form. Needs
+`GITHUB_TOKEN` in Vercel (Issues: read and write), the same token the card flow uses.
+
 ### Pay by card (Stripe)
 
 For buyers without crypto: $10 a grade, $5 a regrade, by card through Stripe Payment Links. The buyer types the

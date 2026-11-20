@@ -71,6 +71,18 @@ section { margin: 56px 0; }
 .pay-steps { margin: 12px 0 0; padding-left: 20px; line-height: 1.6; }
 .pay-address { word-break: break-all; color: var(--cyan); }
 .cta-actions { display: flex; flex-direction: column; gap: 10px; }
+.request-panel { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }
+.request-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+.request-form .field { display: flex; flex-direction: column; gap: 6px; }
+.request-form .field > span { font-weight: 600; }
+.request-form input, .request-form textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--fg); font: inherit; }
+.request-form input:focus, .request-form textarea:focus { outline: none; border-color: var(--cyan); }
+.request-form .field-bad input, .request-form .field-bad textarea { border-color: #ff6b6b; }
+.request-form small { font-size: .85rem; }
+.request-form .btn { border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+.request-form .btn:disabled { opacity: .6; cursor: wait; }
+.form-error { color: #ff8a8a; }
+.request-done { margin-top: 16px; }
 .nav .nav-cta { color: var(--cyan); }
 
 .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 16px; }
