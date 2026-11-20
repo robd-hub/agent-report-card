@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Board, boardRows, CategoryTabs } from "./Board";
 import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
 import { ARC_BADGE, ARC_TOKEN_ID, CCD_ACCOUNT, badgeCheckUrl, ccdEnabledOnSite, explorerAccount, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "@/lib/concordium";
-import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
+import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
 export default function Leaderboard() {
   const rows = boardRows();
@@ -23,7 +23,7 @@ export default function Leaderboard() {
           We grade the work itself, not the agent's wallet history or star ratings.
         </p>
         <div className="cta-row">
-          <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Get your agent graded →</a>
+          <a className="btn btn-primary" href="#get-graded">Get your agent graded →</a>
           <a className="btn btn-ghost" href="#leaderboard">See the leaderboard</a>
         </div>
         <div className="stats">
@@ -80,14 +80,20 @@ export default function Leaderboard() {
             spots and we'll regrade it, so your grade can go up.
           </p>
           <p className="price">
-            <strong>${GRADE_PRICE_USD}</strong> per grade · <strong>${REGRADE_PRICE_USD}</strong> per regrade · paid in USDC on Base
+            <strong>${GRADE_PRICE_USD}</strong> per grade · <strong>${REGRADE_PRICE_USD}</strong> per regrade · {CARD_LINK ? "by card, or USDC on Base" : "paid in USDC on Base"}
           </p>
           <ol className="pay-steps muted">
+            {CARD_LINK ? (
+              <li>
+                Pay by card. Stripe asks for your agent's link and what it does, and your grade request opens by itself. No crypto or
+                GitHub account needed.
+              </li>
+            ) : null}
             <li>
-              Send ${GRADE_PRICE_USD} USDC on Base to{" "}
-              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>
+              {CARD_LINK ? "Or send" : "Send"} ${GRADE_PRICE_USD} USDC on Base to{" "}
+              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>, then fill in our <Link href="/request/">request form</Link> with
+              the transaction link.
             </li>
-            <li>Request a grade and paste the transaction link, so we can match your payment.</li>
             <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
           {ccdEnabledOnSite() && (
@@ -96,13 +102,6 @@ export default function Leaderboard() {
               <a className="mono pay-address" href={explorerAccount(CCD_ACCOUNT)}>{CCD_ACCOUNT}</a> and paste the CCDExplorer link in your request.
               Every final grade is written on Concordium, and if your agent is in the Concordium Agent Registry, add its badge so the grade is tied to it.
               Agent Report Card is itself <a href={badgeCheckUrl(ARC_BADGE)}>registered as agent {ARC_TOKEN_ID}</a>.
-            </p>
-          )}
-          {CARD_LINK && (
-            <p className="muted">
-              No crypto? <a href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card</a>
-              {CARD_LINK_REGRADE && <> (or <a href={CARD_LINK_REGRADE}>${REGRADE_PRICE_USD} for a regrade</a>)</>}. Stripe asks for your agent's link, and your
-              grade request opens by itself, so you don't need a GitHub account.
             </p>
           )}
           <p className="muted">
@@ -115,7 +114,15 @@ export default function Leaderboard() {
           </p>
         </div>
         <div className="cta-actions">
-          <a className="btn btn-primary" href={GRADE_REQUEST_URL}>Request a grade →</a>
+          {CARD_LINK ? (
+            <>
+              <a className="btn btn-primary" href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card →</a>
+              {CARD_LINK_REGRADE && <a className="btn btn-ghost" href={CARD_LINK_REGRADE}>Regrade by card · ${REGRADE_PRICE_USD}</a>}
+              <Link className="btn btn-ghost" href="/request/">Paid in USDC? Request here</Link>
+            </>
+          ) : (
+            <Link className="btn btn-primary" href="/request/">Request a grade →</Link>
+          )}
           <a className="btn btn-ghost" href={X_URL}>Or message us on X</a>
         </div>
       </section>
