@@ -156,7 +156,10 @@ It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token f
 
 USDC buyers can use the form at `/request/` instead of GitHub's. It posts to `POST /api/request/` on Vercel (see
 `src/server/request.ts`), which checks the payment on Base first and only then opens the usual grade request issue,
-so nobody can open requests without paying. The bot checks the payment again before grading, as always. The GitHub
+so nobody can open requests without paying. The bot checks the payment again before grading, as always.
+Buyers with a browser wallet (MetaMask, Coinbase Wallet) pay in one step: the form asks `/api/request/` to check the
+details and quote the price (`"check": true`), the wallet sends the USDC on Base (`src/lib/wallet.ts`, no library),
+and the form sends the request with the new transaction. The GitHub
 Pages copy sends its form to the Vercel site. CCD payments and Concordium badges still use the GitHub form. Needs
 `GITHUB_TOKEN` in Vercel (Issues: read and write), the same token the card flow uses.
 

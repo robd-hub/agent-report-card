@@ -82,6 +82,9 @@ section { margin: 56px 0; }
 .request-form .btn { border: 0; cursor: pointer; font: inherit; font-weight: 600; }
 .request-form .btn:disabled { opacity: .6; cursor: wait; }
 .form-error { color: #ff8a8a; }
+.form-status { color: var(--cyan); }
+.linkish { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.linkish:disabled { opacity: .6; cursor: wait; }
 .request-done { margin-top: 16px; }
 .nav .nav-cta { color: var(--cyan); }
 
