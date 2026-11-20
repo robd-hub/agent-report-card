@@ -148,6 +148,14 @@
         "reportHash": "f2aff92d2e6e72bbd63ae69bb193e35e521a34a0f556960639eca3eb013dd555",
         "tx": "e6df8bfe9e51e32338839cb10c3e66ede741579a3727c95163a6ff1dda05b206",
         "anchoredAt": "2026-11-18T08:47:08.167Z"
+      },
+      {
+        "runDate": "2026-11-19T09:52:41.469Z",
+        "grade": "A",
+        "score": 100,
+        "reportHash": "5cf7e11b3e3afa4dbdaa14791c263badce3bbeaedfb77a0f0d0ee5c6adb7a834",
+        "tx": "c85fa23ef8548057812b90a2e5a2827407f7284814ba03caf2792ebb357d876c",
+        "anchoredAt": "2026-11-20T05:49:24.867Z"
       }
     ],
     "fitbot": [
