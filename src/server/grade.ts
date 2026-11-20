@@ -18,6 +18,9 @@
  * before asking for any payment.
  */
 import { findEndpoint, findMarketplaceId } from "@/lib/requests";
+import { issueBody } from "@/lib/issueBody";
+
+export { issueBody };
 import { loadAgents } from "@/lib/data";
 import { GRADE_PRICE_USD, REGRADE_PRICE_USD } from "@/lib/links";
 import { decodePayment, encodeHeader, paymentFrom, paymentRequired, paymentRequiredV2, requirements, settlePayment, settlePaymentV2, verifyPayment, verifyPaymentV2, type Offer, type PaymentRequirements } from "@/lib/x402";
@@ -63,13 +66,6 @@ export function offer(priceUsd: number): Offer {
 }
 
 const clean = (v: unknown, max: number) => String(v ?? "").replace(/\r/g, "").trim().slice(0, max);
-
-/** The issue body, in the same "### Label" form the grading bot reads. */
-export function issueBody(fields: Record<string, string>): string {
-  return Object.entries(fields)
-    .map(([label, value]) => `### ${label}\n\n${value.trim() || "_No response_"}`)
-    .join("\n\n");
-}
 
 /** A 402 in both x402 versions: a v1 JSON body, and the v2 offer in the PAYMENT-REQUIRED header. */
 function challenge(resource: string, error: string, o: Offer, req: PaymentRequirements, extra: Record<string, string> = {}): Response {

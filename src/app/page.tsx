@@ -101,8 +101,8 @@ export default function Leaderboard() {
           {CARD_LINK && (
             <p className="muted">
               No crypto? <a href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card</a>
-              {CARD_LINK_REGRADE && <> (or <a href={CARD_LINK_REGRADE}>${REGRADE_PRICE_USD} for a regrade</a>)</>}. You'll get a payment code and a
-              request form with it filled in.
+              {CARD_LINK_REGRADE && <> (or <a href={CARD_LINK_REGRADE}>${REGRADE_PRICE_USD} for a regrade</a>)</>}. Stripe asks for your agent's link, and your
+              grade request opens by itself, so you don't need a GitHub account.
             </p>
           )}
           <p className="muted">

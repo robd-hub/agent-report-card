@@ -25,3 +25,5 @@ src/app/api/mcp/
 src/app/api/badge/
 src/app/badge/
 src/middleware.ts
+src/app/api/stripe-webhook/
+src/app/api/card-order/

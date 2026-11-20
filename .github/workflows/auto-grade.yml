@@ -58,6 +58,9 @@ jobs:
           # Optional, for card payments through Stripe.
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           CARD_PAYMENTS: ${{ vars.CARD_PAYMENT_LINK }}
+          # Set to 1 while testing with Stripe test mode: test payments are then
+          # checked (never graded). Remove it once live.
+          STRIPE_ALLOW_TEST: ${{ vars.STRIPE_ALLOW_TEST }}
           # Optional: accept CCD payments on the Concordium test network.
           CONCORDIUM_ENABLED: ${{ vars.CONCORDIUM_ENABLED }}
 
@@ -105,6 +108,9 @@ jobs:
               gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY"
               gh label create graded --repo "$GITHUB_REPOSITORY" --color 0E8A16 --description "Graded by the bot" 2>/dev/null || true
               gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label graded || true
+              ;;
+            test-payment)
+              gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY"
               ;;
             rejected|duplicate)
               ;;
