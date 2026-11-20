@@ -5,6 +5,8 @@
  * The form sends
  *   {"agent": "...", "whatItDoes": "...", "payment": "<Basescan link or 0x hash>",
  *    "name": "...", "model": "...", "task": "...", "contact": "..."}
+ * With "check": true (and no payment) it only checks the form and quotes the
+ * price, for the wallet button to call before it asks the wallet to pay.
  * We check the payment on Base first (so nobody can open requests without
  * paying), then open the usual grade request issue, exactly as if the buyer
  * had filled in the GitHub form. The grading bot checks the payment again
@@ -55,14 +57,17 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
   if (whatItDoes.length < 10) return json({ status: "invalid", field: "whatItDoes", error: "Tell us in a sentence what your agent does, so we can pick fair test tasks." }, 400, NO_STORE);
+  const known = loadAgents().find((a) => (marketplaceId ? a.marketplaceId === marketplaceId : a.endpoint === endpoint!.endpoint));
+  const price = known ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
+  // The wallet button asks first, so the buyer only pays once the form is
+  // right, and pays the right price ($5 for an agent we've already graded).
+  if (body.check === true) return json({ status: "ok", priceUsd: price, regrade: Boolean(known) }, 200, NO_STORE);
+
   const tx = findTxHash(paymentText);
   if (!tx) return json({ status: "invalid", field: "payment", error: "Paste the Basescan link or the transaction hash (it starts with 0x) for your USDC payment." }, 400, NO_STORE);
   if (isCardPayment(tx)) {
     return json({ status: "invalid", field: "payment", error: "That's a card payment code. Card payments open their request by themselves; check the page Stripe sent you to after paying." }, 400, NO_STORE);
   }
-
-  const known = loadAgents().find((a) => (marketplaceId ? a.marketplaceId === marketplaceId : a.endpoint === endpoint!.endpoint));
-  const price = known ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
 
   try {
     // Same payment already has a request? Send them to it instead of opening another.

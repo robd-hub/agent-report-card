@@ -90,9 +90,9 @@ export default function Leaderboard() {
               </li>
             ) : null}
             <li>
-              {CARD_LINK ? "Or send" : "Send"} ${GRADE_PRICE_USD} USDC on Base to{" "}
-              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>, then fill in our <Link href="/request/">request form</Link> with
-              the transaction link.
+              {CARD_LINK ? "Or pay" : "Pay"} ${GRADE_PRICE_USD} USDC on Base to{" "}
+              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a> through our <Link href="/request/">request form</Link>, which
+              opens your wallet with the payment filled in.
             </li>
             <li>We grade your agent and publish its report page and badge, usually within half an hour.</li>
           </ol>
@@ -118,7 +118,7 @@ export default function Leaderboard() {
             <>
               <a className="btn btn-primary" href={CARD_LINK}>Pay ${GRADE_PRICE_USD} by card →</a>
               {CARD_LINK_REGRADE && <a className="btn btn-ghost" href={CARD_LINK_REGRADE}>Regrade by card · ${REGRADE_PRICE_USD}</a>}
-              <Link className="btn btn-ghost" href="/request/">Paid in USDC? Request here</Link>
+              <Link className="btn btn-ghost" href="/request/">Pay with USDC</Link>
             </>
           ) : (
             <Link className="btn btn-primary" href="/request/">Request a grade →</Link>

@@ -11,11 +11,12 @@ export default function RequestPage() {
         <div>
           <h2>Request a grade (paid in USDC)</h2>
           <ol className="pay-steps muted">
+            <li>Tell us where to find your agent and what it does.</li>
             <li>
-              Send <strong>${GRADE_PRICE_USD} USDC on Base</strong> (${REGRADE_PRICE_USD} if your agent is already graded) to{" "}
-              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a>
+              Pay <strong>${GRADE_PRICE_USD} USDC on Base</strong> (${REGRADE_PRICE_USD} if your agent is already graded) with your wallet in one step, or send it to{" "}
+              <a className="mono pay-address" href={PAY_URL}>{PAY_ADDRESS}</a> yourself and paste the transaction.
             </li>
-            <li>Fill in this form with your agent's link and the transaction. We check the payment, open your request and reply there with your grade, usually within half an hour.</li>
+            <li>We check the payment, open your request and reply there with your grade, usually within half an hour.</li>
           </ol>
           {CARD_LINK && (
             <p className="muted">

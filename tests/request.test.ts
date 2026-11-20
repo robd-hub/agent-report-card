@@ -5,6 +5,7 @@ import { PAY_ADDRESS } from "../src/lib/links";
 import { USDC_BASE } from "../src/lib/payment";
 import { resetRateLimits } from "../src/lib/rateLimit";
 import { POST } from "../src/server/request";
+import { transferData, USDC_ON_BASE } from "../src/lib/wallet";
 
 const TX = "0x" + "ab".repeat(32);
 const TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
@@ -100,4 +101,32 @@ test("an already-graded agent pays the regrade price", async () => {
   } finally {
     f.restore();
   }
+});
+
+test("the wallet button gets a quote before paying, and nothing opens", async () => {
+  process.env.GITHUB_TOKEN = "ghp_x";
+  resetRateLimits();
+  const f = fakeFetch(0);
+  try {
+    const fresh = await send({ agent: "https://example.com/agent", whatItDoes: "Writes research summaries.", check: true } as unknown as Record<string, string>);
+    assert.equal(fresh.body.status, "ok");
+    assert.equal(fresh.body.priceUsd as unknown as number, 10);
+    const regrade = await send({ agent: "https://platform.openserv.ai/agents/1046", whatItDoes: "Writes code.", check: true } as unknown as Record<string, string>);
+    assert.equal(regrade.body.priceUsd as unknown as number, 5);
+    const bad = await send({ agent: "nope", whatItDoes: "Writes code.", check: true } as unknown as Record<string, string>);
+    assert.equal(bad.body.field, "agent");
+    assert.equal(f.created.length, 0);
+  } finally {
+    f.restore();
+  }
+});
+
+test("the wallet asks USDC to transfer the exact price to our address", () => {
+  const data = transferData(PAY_ADDRESS, 10);
+  assert.equal(data.slice(0, 10), "0xa9059cbb");
+  assert.equal(data.length, 2 + 8 + 64 * 2);
+  assert.equal("0x" + data.slice(34, 74), PAY_ADDRESS.toLowerCase());
+  assert.equal(BigInt("0x" + data.slice(74)), 10_000_000n);
+  assert.equal(BigInt("0x" + transferData(PAY_ADDRESS, 5).slice(74)), 5_000_000n);
+  assert.equal(USDC_ON_BASE, USDC_BASE);
 });
