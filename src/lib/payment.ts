@@ -3,12 +3,15 @@
  *   - a USDC transfer on Base, to our address, of at least the price. Reads
  *     the public Base chain over JSON-RPC, so no key is needed.
  *   - a card payment through a Stripe Payment Link, identified by its
- *     checkout id (cs_live_...). Needs STRIPE_SECRET_KEY.
+ *     checkout id (cs_live_...). Needs STRIPE_SECRET_KEY. Test-mode
+ *     payments (cs_test_...) count only with STRIPE_ALLOW_TEST, and the bot
+ *     never grades on them.
  * Either way it must be recent and not already used for another request.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { PAY_ADDRESS } from "./links";
+import { getSession, isTestSession, testAllowed } from "./stripe";
 
 /** Circle's native USDC on Base. */
 export const USDC_BASE = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
@@ -61,24 +64,22 @@ export const isCardPayment = (ref: string) => ref.startsWith("cs_");
 
 /** Confirms a Stripe checkout was paid, in US dollars, for at least the price. */
 async function checkCardPayment(id: string, minUsd: number, now: Date): Promise<PaymentCheck> {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return { ok: false, needsMaintainer: true, reason: "Card payments aren't switched on yet, so we couldn't check this one. The maintainer will look at it." };
-  if (id.startsWith("cs_test_") && !process.env.STRIPE_ALLOW_TEST) return { ok: false, reason: "That's a Stripe test payment, not a real one." };
-  const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${key}` } });
-  if (res.status === 404) return { ok: false, reason: "Stripe doesn't know that payment code. Check you copied it in full." };
-  if (!res.ok) throw new Error(`Stripe returned ${res.status}`);
-  const session = (await res.json()) as { payment_status?: string; amount_total?: number; currency?: string; created?: number };
+  if (!process.env.STRIPE_SECRET_KEY) return { ok: false, needsMaintainer: true, reason: "Card payments aren't switched on yet, so we couldn't check this one. The maintainer will look at it." };
+  const test = isTestSession(id);
+  if (test && !testAllowed()) return { ok: false, reason: "That's a Stripe test payment, not a real one." };
+  const session = await getSession(id);
+  if (!session) return { ok: false, reason: "Stripe doesn't know that payment code. Check you copied it in full." };
   if (session.payment_status !== "paid") return { ok: false, reason: "That card payment hasn't gone through yet." };
   if ((session.currency ?? "").toLowerCase() !== "usd") return { ok: false, reason: "That card payment wasn't in US dollars." };
   const amountUsd = (session.amount_total ?? 0) / 100;
   if (amountUsd + 1e-9 < minUsd) return { ok: false, reason: `That card payment was $${amountUsd}, but this request costs $${minUsd}.` };
   const paidAt = new Date((session.created ?? 0) * 1000);
   if ((now.getTime() - paidAt.getTime()) / 86_400_000 > MAX_PAYMENT_AGE_DAYS) return { ok: false, reason: `That payment is more than ${MAX_PAYMENT_AGE_DAYS} days old.` };
-  return { ok: true, amountUsd, from: "card", paidAt };
+  return { ok: true, amountUsd, from: "card", paidAt, ...(test ? { test: true } : {}) };
 }
 
 export type PaymentCheck =
-  | { ok: true; amountUsd: number; from: string; paidAt: Date }
+  | { ok: true; amountUsd: number; from: string; paidAt: Date; test?: boolean }
   | { ok: false; reason: string; alreadyUsed?: boolean; needsMaintainer?: boolean };
 
 interface Log {

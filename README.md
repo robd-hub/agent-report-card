@@ -154,17 +154,34 @@ It needs one Vercel environment variable: `GITHUB_TOKEN`, a fine-grained token f
 
 ### Pay by card (Stripe)
 
-Ready to switch on, for buyers without crypto:
-1. In Stripe, create two Payment Links: $10 "Agent Report Card grade" and $5 "Agent Report Card regrade". For each,
-   under "After payment" choose "Don't show confirmation page" and redirect to
-   `https://grader.designimp.com/paid/?session={CHECKOUT_SESSION_ID}`.
-2. Add the repository secret `STRIPE_SECRET_KEY` (a restricted key with "Checkout Sessions: read" is enough).
-3. Add repository variables `CARD_PAYMENT_LINK` and `CARD_PAYMENT_LINK_REGRADE` (the two link URLs), and the same
+For buyers without crypto: $10 a grade, $5 a regrade, by card through Stripe Payment Links. The buyer types the
+agent's link on Stripe's page, pays, and lands on `/paid/`. Stripe's webhook (`POST /api/stripe-webhook/` on
+Vercel, see `src/server/card.ts`) opens the grade request issue, so no GitHub account is needed. If the webhook is
+slow or not set up, the `/paid/` page opens the request itself after about 12 seconds. If the Payment Link doesn't
+ask for the agent's link, `/paid/` shows the payment code and the request form with it filled in, as before.
+
+The bot then checks with Stripe that the checkout was paid, in US dollars, for at least the price, within 14 days,
+and not used before (the same reused-payment rule as USDC). The buyer's email stays in Stripe; it never goes in
+the public issue.
+
+Setup:
+1. In Stripe, create two Payment Links in US dollars: $10 "Agent Report Card grade" and $5 "Agent Report Card
+   regrade". On each, add custom fields (text): "Agent link" (required; an OpenServ marketplace link or a public
+   https address, plus a space and the model name for /chat/completions addresses), "What does it do?"
+   (required) and "Agent name" (optional). Under "After payment" choose "Don't show confirmation page" and
+   redirect to `https://grader.designimp.com/paid/?session={CHECKOUT_SESSION_ID}`.
+2. Create a restricted key with "Checkout Sessions: Read" (nothing else). Save it as `STRIPE_SECRET_KEY` in the
+   repository secrets and in the Vercel project.
+3. Add a webhook endpoint `https://grader.designimp.com/api/stripe-webhook/` (keep the last slash) for
+   `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Save its signing secret as
+   `STRIPE_WEBHOOK_SECRET` in the Vercel project. (Optional: without it, `/paid/` still opens the request.)
+4. Add repository variables `CARD_PAYMENT_LINK` and `CARD_PAYMENT_LINK_REGRADE` (the two link URLs), and the same
    two as environment variables in the Vercel project, so both copies of the site show the card option.
 
-After paying, the buyer sees a payment code (the Stripe checkout id) and a request form with it filled in. The bot
-checks with Stripe that it was paid, in US dollars, for at least the price, within 14 days, and not used before.
-Test-mode payments are refused unless `STRIPE_ALLOW_TEST` is set.
+Test mode: do the steps above with Stripe's test-mode links and key, and set `STRIPE_ALLOW_TEST=1` (repository
+variable and Vercel). Test payments (`cs_test_...`) are then checked end to end and the bot replies and closes
+the request, but it never grades them, so no Reppo or SERV credits are spent. Without `STRIPE_ALLOW_TEST`, test
+payments are refused everywhere. Swap in the live links and key and remove `STRIPE_ALLOW_TEST` to go live.
 
 The workflow needs three repository secrets: `SERV_API_KEY`, `REPPO_API_KEY` and `OPENSERV_USER_API_KEY`.
 
@@ -297,7 +314,7 @@ is all it takes to update the leaderboard. The site is plain static files built 
 - [x] OpenServ agent, ERC-8004 cards and x402 discovery set up
 - [x] Free pre-hire lookup (`GET /api/lookup`, `GET /api/agents`) and MCP server
 - [ ] Public OpenServ marketplace listing (waiting for OpenServ's review)
-- [ ] Card payments through Stripe (built, not switched on)
+- [ ] Card payments through Stripe (built, switching on: test mode first)
 
 ## License
 

@@ -66,7 +66,7 @@ export const NEAR_MISS: TestTask = {
 /** The standard tasks every new agent gets after the ones written for it. */
 export const STANDARD_TASKS: TestTask[] = [REFUSE_UNKNOWN, NEAR_MISS];
 
-type Outcome = "graded" | "rejected" | "needs-attention" | "duplicate";
+type Outcome = "graded" | "rejected" | "needs-attention" | "duplicate" | "test-payment";
 
 /**
  * A grade paid through a Virtuals ACP job. These variables come from the
@@ -371,8 +371,18 @@ async function main() {
     if (!check.ok) {
       return finish("rejected", `We couldn't confirm the payment for this request: ${check.reason}\n\nOnce that's fixed, edit this request and the grader will check again.`);
     }
+    if (check.test) {
+      // Stripe test mode proves the card path end to end without spending
+      // grading credits: the payment is checked, nothing is graded or recorded.
+      return finish(
+        "test-payment",
+        `Test card payment of $${check.amountUsd} checked with Stripe: it's paid, in US dollars, and covers the $${price} price${isRegrade ? " for a regrade" : ""}. ` +
+          "Test payments are never graded, so this request stops here. A real card payment would now be graded.",
+      );
+    }
     payment = check;
   }
+  const card = !free && !acp && paidCcd === null && tx?.startsWith("cs_");
   const received = free
     ? ccdFree
       ? "Your agent's Verified by Concordium badge checks out, so this grade is free, as part of our offer for Concordium agents."
@@ -381,6 +391,8 @@ async function main() {
       ? "Your Virtuals payment is in escrow, thank you."
       : paidCcd !== null
       ? `Your payment of ${paidCcd} CCD arrived on Concordium, thank you.`
+      : card
+      ? `Your card payment of $${payment.amountUsd} went through, thank you.`
       : `Your payment of ${payment.amountUsd} USDC arrived, thank you.`;
 
   if (!agent && endpoint) {
