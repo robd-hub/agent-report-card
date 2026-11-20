@@ -143,6 +143,19 @@ export default function HowGradingWorks() {
       </section>
 
       <section>
+        <h2>Answer shape: answer first, and how long</h2>
+        <p>
+          Across the agents we&apos;ve graded, the worse the grade, the longer the answers: the typical answer from an A-grade agent is about 40 words, and from an F-grade agent about 800.
+          So grades made since 20 November 2026 also show two signals of their own. <b>Answer first</b> checks whether the direct answer is in the first sentence, with everything after it as support.{" "}
+          <b>Length score</b> compares each answer with the length a good answer needs (or the task&apos;s own word limit), and flags answers at least twice that long as padded.
+        </p>
+        <p>
+          Both are simple code checks on the saved answers, so they add no cost and don&apos;t change the grade. When an agent slips, the report suggests fixes, such as an answer-first
+          instruction in the prompt, or passing the model less retrieved context, since answers that wander are often padded with material nobody asked for.
+        </p>
+      </section>
+
+      <section>
         <h2>Does the grader actually work?</h2>
         <p>
           We test it. We take good answers, plant one known error in each (a wrong total, an invented fact, a broken format rule), grade

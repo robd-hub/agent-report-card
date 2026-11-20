@@ -7,6 +7,7 @@ import { kindScores } from "@/lib/taskKinds";
 import { BadgePicker } from "./BadgePicker";
 import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
 import { taskWording } from "@/lib/types";
+import { runShape, type TaskShape } from "@/lib/shape";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -38,6 +39,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const weakestWhy = weakest
     ? (weakest.task.reppo.status === "done" ? weakest.task.reppo.critiques[0] : undefined) ?? weakest.task.serv?.summary ?? null
     : null;
+  const shape = run ? runShape(run.tasks, agent) : null;
   const flagged = run ? run.tasks.filter((t) => disagreement(t) !== null).length : 0;
   const previous = report.runs.length > 1 ? report.runs.at(-2)! : null;
   const ccd = loadCcd();
@@ -134,6 +136,8 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             )}
           </div>
 
+          {shape && <ShapePanel shape={shape} />}
+
           {onChain && (
             <div className="panel">
               <div className="panel-label">Checked on Concordium</div>
@@ -176,6 +180,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                   <Meter label="Independent judges (Reppo)" value={reppoScore} tone="violet" />
                   <Meter label="SERV Reasoning check" value={t.serv?.score ?? null} />
                 </div>
+                <ShapeLine s={shape?.tasks.find((x) => x.taskId === t.taskId) ?? null} />
                 {split && (
                   <p className="split-note">
                     <b>⚑ Judges disagree.</b> {disagreementNote(split)}
@@ -226,5 +231,70 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
         <BadgePicker agentId={agent.id} agentName={agent.name} grade={run?.grade ?? null} score={run?.score ?? null} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
       </div>
     </main>
+  );
+}
+
+/** The answer-shape signals for a run: answer first, length score, padding, and fixes. */
+function ShapePanel({ shape }: { shape: NonNullable<ReturnType<typeof runShape>> }) {
+  const af = shape.answerFirst;
+  const lengths = shape.tasks.filter((t) => t.length);
+  return (
+    <div className="panel shape">
+      <div className="panel-label">Answer shape</div>
+      <p className="muted small">
+        Does it give the answer first, and keep to a sensible length? These are simple code checks on the saved answers. They don&apos;t change the grade, so you can work on them on their own.
+      </p>
+      <div className="kind-scores">
+        {af && (
+          <div className="kind-score" title="Tasks where the direct answer is in the first sentence, out of those with a checkable answer.">
+            <b className="mono">{af.first}/{af.checked}</b>
+            <span>Answer first</span>
+            <small className="muted">answer in the first sentence</small>
+          </div>
+        )}
+        {shape.lengthScore !== null && (
+          <div className="kind-score" title="100 when an answer is within 10% of the length a good answer needs, falling to 0 at three times that.">
+            <b className="mono">{shape.lengthScore}</b>
+            <span>Length score</span>
+            <small className="muted">{lengths.length - shape.overCount} of {lengths.length} within length</small>
+          </div>
+        )}
+        <div className="kind-score" title="Answers at least twice as long as a complete answer needs.">
+          <b className="mono">{shape.padded.length}</b>
+          <span>Padded answers</span>
+          <small className="muted">twice the length needed or more</small>
+        </div>
+      </div>
+      {shape.fixes.length > 0 ? (
+        <div className="shape-fixes">
+          <div className="panel-label">How to fix it</div>
+          <ul>{shape.fixes.map((f) => <li key={f}>{f}</li>)}</ul>
+        </div>
+      ) : (
+        <p className="muted small">No problems here: answers come first and stay within length.</p>
+      )}
+    </div>
+  );
+}
+
+/** One task's answer-shape result, under its scores. */
+function ShapeLine({ s }: { s: TaskShape | null }) {
+  if (!s || (!s.answerFirst && !s.length)) return null;
+  const a = s.answerFirst;
+  const l = s.length;
+  const answer =
+    a?.status === "first" ? { ok: true, text: "Answer first" }
+    : a?.status === "buried" ? { ok: false, text: `Answer buried: it comes after ${a.wordsBefore} words` }
+    : a?.status === "slow-start" ? { ok: false, text: `Slow start: opens with "${a.opener}…"` }
+    : null;
+  return (
+    <p className="shape-line muted small">
+      {answer && <span className={answer.ok ? "ok" : "warn"}>{answer.ok ? "✓" : "⚑"} {answer.text}</span>}
+      {l && (
+        <span className={l.padded || l.over ? "warn" : "ok"}>
+          {l.padded ? "⚑ Padded" : l.over ? "⚑ Too long" : "✓ Length"}: {l.words} words ({l.source === "limit" ? "limit" : "a good answer needs about"} {l.target})
+        </span>
+      )}
+    </p>
   );
 }

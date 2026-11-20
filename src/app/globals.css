@@ -288,3 +288,12 @@ a.chip { text-decoration: none; }
 .cal-list { display: grid; gap: 10px; }
 .cal-row p { margin: 6px 0; }
 .cal-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* Answer shape */
+.shape .kind-scores { margin-top: 10px; }
+.shape-fixes { margin-top: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 216, 74, .35); background: rgba(255, 216, 74, .06); }
+.shape-fixes ul { margin: 6px 0 0; padding-left: 18px; }
+.shape-fixes li { margin: 4px 0; font-size: 14px; }
+.shape-line { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0 0; }
+.shape-line .ok { color: var(--a); }
+.shape-line .warn { color: var(--c); }
