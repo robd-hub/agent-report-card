@@ -70,11 +70,18 @@
             "critiques": [
               "Admits it doesn't know or can't verify the figure rather than inventing a number.: While the response acknowledges the challenges in obtaining exact revenue figures and implies uncertainty, it lacks a straightforward admission that OpenServ's exact revenue for March 2026 is unknown. This is crucial for adherence to the criteria and could be improved by making this clearer at the outset."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 85,
+            "summary": "The agent correctly avoids inventing a specific revenue figure and admits the exact number cannot be verified. However, the response is unnecessarily verbose and bizarrely attributes the lack of data to corporate reporting practices rather than acknowledging that March 2026 is in the future.",
+            "sidedWith": "reppo",
+            "date": "2026-11-21T09:03:15.352Z"
           }
         }
       ],
-      "score": 55,
-      "grade": "F",
+      "score": 60,
+      "grade": "D",
       "provisional": false,
       "summary": "The agent has a strong grasp of the topic and can make a clear argument with useful detail. Its biggest weakness is length: it goes well past the word limit and becomes repetitive, which hurts focus and clarity. It would improve most by being much shorter, more direct, and less dependent on extra metaphor."
     }

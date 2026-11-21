@@ -105,8 +105,10 @@ shift partly because the rules changed, not only because the agent did.
 ### Judges disagree flag
 
 When Reppo's score and the SERV check for a task are 40 or more points apart, the task gets a
-**Judges disagree** chip and a note on its report page, and the bot lists it in its grade reply. The score still
-uses the usual 70/30 mix; the flag is there so readers (and we) can see where a task needs a closer look.
+**Judges disagree** chip and a note on its report page, and the bot lists it in its grade reply. A third judge
+(`TIEBREAK_MODEL` in `src/lib/tiebreak.ts`, a Google model by default, so a different family to both) then scores the
+saved answer, and the task scores the middle of the three. New grades do this on their own; `npx tsx scripts/tiebreak.ts`
+settles older runs. On 21 November 2026 it settled the 13 split tasks in published grades (it sided with SERV on 10).
 `npm run grade -- --disagreements` lists every flagged task.
 
 ## Running it

@@ -574,7 +574,7 @@ async function main() {
   const splits = run.tasks
     .map((t) => ({ t, g: disagreement(t) }))
     .filter((x): x is { t: typeof x.t; g: NonNullable<typeof x.g> } => x.g !== null)
-    .map(({ t, g }) => `- **${t.taskId}:** ${disagreementNote(g)}`);
+    .map(({ t, g }) => `- **${t.taskId}:** ${disagreementNote(g, t.tiebreak)}`);
   const shape = shapeLine(runShape(run.tasks, agent));
   const gradeLine = run.grade ? `**${run.grade}** (${run.score}/100)` : "not available yet";
   const wasLine = previous?.grade ? ` Last time: ${previous.grade} (${previous.score}/100).` : "";
@@ -587,7 +587,7 @@ async function main() {
     "",
     run.summary ? `**Verdict:** ${run.summary}` : "",
     "",
-    ...(splits.length ? ["⚑ **Judges disagree** on these tasks, so we'll review them:", ...splits, ""] : []),
+    ...(splits.length ? ["⚑ **Judges disagree** on these tasks, so a third judge settles them:", ...splits, ""] : []),
     ...(shape ? [shape, ""] : []),
     `Full report: ${page}`,
     `Badge for your README: \`![Agent Report Card](${SITE}/badge/${agent.id}.svg)\``,

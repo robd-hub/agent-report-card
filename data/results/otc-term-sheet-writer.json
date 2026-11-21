@@ -44,6 +44,13 @@
               "The response scored 83 due to low instruction adherence, primarily because it exceeded the word limit and included excessive detail instead of a concise cover email. It was accepted because it met the minimum passing score of 70 but flagged for review due to its borderline score.",
               "Scores by area: safety 100/100, completeness 75/100, factual_accuracy 100/100, instruction_adherence 50/100."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 20,
+            "summary": "The agent provided a good cover email at the end, but completely failed to follow the length and format constraints by unnecessarily generating a full term sheet, CSV, and checklists. This excessive output grossly violates the under-120-word limit set by the prompt.",
+            "sidedWith": "serv",
+            "date": "2026-11-21T09:04:05.574Z"
           }
         },
         {
@@ -68,7 +75,7 @@
           }
         }
       ],
-      "score": 55,
+      "score": 41,
       "grade": "F",
       "provisional": false,
       "summary": "The agent’s strength is that it can produce the right kind of business output and often captures the key terms accurately. Its biggest weakness is instruction following: it tends to ignore format, length, or the need to say when it cannot verify something. It would improve most by staying tightly within the user’s constraints and refusing unsupported requests instead of inventing details."

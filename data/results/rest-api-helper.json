@@ -23,6 +23,13 @@
               "The response scored 74 (accept with review) mainly due to low instruction adherence (31) - it provided a working API example instead of a concise explanation as requested. The factual accuracy was strong (99) but the answer was more technical than the prompt required.",
               "Scores by area: safety 99/100, completeness 59/100, factual_accuracy 99/100, instruction_adherence 31/100."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 30,
+            "summary": "While the definitions of the HTTP status codes are accurate, the agent inexplicably formatted its answer as an API request and included unnecessary setup instructions. This extraneous information caused the response to exceed the strict 100-word limit, resulting in a low score.",
+            "sidedWith": "serv",
+            "date": "2026-11-21T09:04:37.593Z"
           }
         },
         {
@@ -68,8 +75,8 @@
           }
         }
       ],
-      "score": 82,
-      "grade": "B",
+      "score": 73,
+      "grade": "C",
       "provisional": false,
       "summary": "The agent is very accurate and usually gives the right technical answer. Its biggest weakness is that it often misses the instruction style, adding extra details when a shorter reply was asked for. It would improve most by following length and format limits more closely."
     }

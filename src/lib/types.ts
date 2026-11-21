@@ -102,6 +102,22 @@ export interface TaskResult {
    * includes them (Cheap First says which model answered and what it cost).
    */
   meta?: { answeredBy?: string; model?: string; costUsd?: number };
+  /**
+   * The third judge's score, added only when Reppo and SERV are
+   * DISAGREEMENT_GAP or more points apart (src/lib/tiebreak.ts). The task then
+   * scores the middle of the three.
+   */
+  tiebreak?: Tiebreak;
+}
+
+/** A third judge from a different model family, used to settle a split task. */
+export interface Tiebreak {
+  model: string;
+  score: number; // 0-100
+  summary: string;
+  /** The judge whose score the third judge was closer to. */
+  sidedWith: "reppo" | "serv";
+  date: string;
 }
 
 export interface GradingRun {

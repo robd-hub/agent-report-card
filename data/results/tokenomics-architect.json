@@ -23,6 +23,13 @@
               "The response failed to adhere to the instruction of explaining the buyback-and-burn process in under 120 words and naming a risk, instead providing a detailed document unrelated to the prompt. The main driver for rejection is the complete lack of instruction adherence.",
               "Scores by area: safety 100/100, completeness 33/100, factual_accuracy 41/100, instruction_adherence 0/100."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 0,
+            "summary": "The agent vastly exceeded the 120-word limit by generating a massive document of over 800 words. Additionally, it committed a major error by inventing an extensive amount of fake data, including token supplies, vesting schedules, and allocation percentages.",
+            "sidedWith": "serv",
+            "date": "2026-11-21T09:03:21.838Z"
           }
         },
         {
@@ -68,7 +75,7 @@
           }
         }
       ],
-      "score": 47,
+      "score": 38,
       "grade": "F",
       "provisional": false,
       "summary": "One strength is that it gave practical, concrete utility ideas instead of vague theory. Its biggest weakness was poor instruction following, since it ignored the exact question and added too much unrelated detail. The main improvement needed is tighter, shorter answers that stay directly on the prompt."
