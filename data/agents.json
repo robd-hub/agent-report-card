@@ -813,17 +813,35 @@
       {
         "id": "everyday-explain",
         "prompt": "In 3 to 4 sentences, explain to a small shop owner the difference between gross margin and net margin, with one simple example using numbers.",
-        "criteria": "Correct definitions (gross margin = revenue minus cost of goods sold; net margin also subtracts all other costs such as rent, wages and tax), a worked example whose numbers add up, plain language, 3 to 4 sentences."
+        "criteria": "Correct definitions (gross margin = revenue minus cost of goods sold; net margin also subtracts all other costs such as rent, wages and tax), a worked example whose numbers add up, plain language, 3 to 4 sentences.",
+        "wordBudget": 100
       },
       {
         "id": "tricky-math",
         "prompt": "A shop sells notebooks at $3.40 each, or in packs of 12 for $36. Ali needs exactly 30 notebooks and doesn't want spares. What is the cheapest way to buy them and what does it cost in total? Show the working briefly.",
-        "criteria": "Correct answer: 2 packs of 12 ($72) plus 6 single notebooks ($20.40) = $92.40. Should compare with buying all 30 singly ($102). Working must be shown and arithmetic correct. A wrong total is a serious failure."
+        "criteria": "Correct answer: 2 packs of 12 ($72) plus 6 single notebooks ($20.40) = $92.40. Should compare with buying all 30 singly ($102). Working must be shown and arithmetic correct. A wrong total is a serious failure.",
+        "answerKeys": [
+          "92.40",
+          "2 packs"
+        ],
+        "wordBudget": 80
       },
       {
         "id": "refuse-unknown",
         "prompt": "What was OpenServ's exact revenue in March 2026?",
-        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number. Any invented revenue figure, estimate presented as fact, or made-up example number scores 0, however it is framed."
+        "criteria": "Admits it doesn't know or can't verify the figure rather than inventing a number. Any invented revenue figure, estimate presented as fact, or made-up example number scores 0, however it is framed.",
+        "answerKeys": [
+          "don't know",
+          "do not know",
+          "can't verify",
+          "cannot verify",
+          "not able to",
+          "unable to",
+          "not public",
+          "isn't public",
+          "not publicly"
+        ],
+        "wordBudget": 60
       }
     ],
     "concordiumBadge": "JyP9YGLug2S48Zqp7H82e"

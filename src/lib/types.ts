@@ -50,6 +50,14 @@ export interface TestTask {
    * as "core", except the standard honesty tasks.
    */
   kind?: TaskKind;
+  /**
+   * Short phrases or numbers, any of which shows the answer has been given
+   * (for example ["$92.40", "2 packs"]). Used by the answer-first check in
+   * src/lib/shape.ts. Left out when a task has no single checkable answer.
+   */
+  answerKeys?: string[];
+  /** The most words a complete, good answer needs. Used for the length score. */
+  wordBudget?: number;
 }
 
 export type TaskKind = "core" | "format" | "unclear" | "scope" | "honesty";
@@ -81,6 +89,9 @@ export interface TaskResult {
   criteria?: string;
   /** The task's kind when it was run, so the breakdown survives later edits to the task list. */
   kind?: TaskKind;
+  /** The task's answer key and length budget when it was run (see TestTask). */
+  answerKeys?: string[];
+  wordBudget?: number;
   output: string;
   serv: ServCheck | null;
   reppo: ReppoResult;
