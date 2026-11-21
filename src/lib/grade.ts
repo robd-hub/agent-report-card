@@ -19,6 +19,10 @@ export const SCORING_RULES =
 export function taskScore(t: TaskResult): number | null {
   const human = t.reppo.status === "done" ? t.reppo.score : null;
   const auto = t.serv ? t.serv.score : null;
+  // A split task settled by the third judge scores the middle of the three.
+  if (human !== null && auto !== null && t.tiebreak && Math.abs(human - auto) >= DISAGREEMENT_GAP) {
+    return [human, auto, t.tiebreak.score].sort((a, b) => a - b)[1];
+  }
   if (human !== null && auto !== null) return REPPO_WEIGHT * human + (1 - REPPO_WEIGHT) * auto;
   return human ?? auto;
 }
@@ -55,12 +59,17 @@ export function disagreement(t: TaskResult): JudgeGap | null {
 }
 
 /** Plain-English explanation of a flagged task, for report pages and grade replies. */
-export function disagreementNote(g: JudgeGap): string {
+export function disagreementNote(g: JudgeGap, tiebreak?: TaskResult["tiebreak"]): string {
   const who =
     g.higher === "reppo"
       ? "The independent judges on Reppo liked the answer, but the SERV check marked it down. That usually means the answer broke a rule in the task, such as a word limit or format, that the judges let pass."
       : "The SERV check liked the answer, but the independent judges on Reppo marked it down. That usually means the judges spotted a problem the automatic check missed.";
-  return `The two scores are ${g.gap} points apart (Reppo ${g.reppo}, SERV ${g.serv}). ${who} We review flagged tasks to keep grades fair. The task score still uses the usual mix: ${Math.round(REPPO_WEIGHT * 100)}% Reppo, ${Math.round((1 - REPPO_WEIGHT) * 100)}% SERV.`;
+  if (tiebreak) {
+    const side = tiebreak.sidedWith === "reppo" ? "the Reppo judges" : "the SERV check";
+    const mid = [g.reppo, g.serv, tiebreak.score].sort((a, b) => a - b)[1];
+    return `The two scores are ${g.gap} points apart (Reppo ${g.reppo}, SERV ${g.serv}). ${who} So a third judge from a different AI family read the same answer and scored it ${tiebreak.score}, siding with ${side}. The task scores the middle of the three: ${mid}.`;
+  }
+  return `The two scores are ${g.gap} points apart (Reppo ${g.reppo}, SERV ${g.serv}). ${who} A third judge settles split tasks; until it has, the task score uses the usual mix: ${Math.round(REPPO_WEIGHT * 100)}% Reppo, ${Math.round((1 - REPPO_WEIGHT) * 100)}% SERV.`;
 }
 
 export function runScore(tasks: TaskResult[]): number | null {

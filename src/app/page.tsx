@@ -200,7 +200,8 @@ export default function Leaderboard() {
             <p className="muted">
               When the Reppo judges and the SERV check are {DISAGREEMENT_GAP} or more points apart on a task, the report flags it with
               "Judges disagree" and explains the gap. Most often the answer broke a rule in the task, like a word limit, and only one judge
-              marked it down. We review flagged tasks and fix unclear tasks or scoring, so grades stay fair. Since 16 November 2026 both
+              marked it down. A third judge from a different AI family then reads the same answer, and the task scores the middle of the
+              three, so no split is left unsettled. Since 16 November 2026 both
               judges get the same written rules on word limits, format and made-up facts, and a long answer is only marked down when the
               task set a limit. Grades from before then are unchanged.
             </p>

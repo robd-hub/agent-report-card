@@ -23,6 +23,13 @@
               "The response scored highly (95) but requires review due to low confidence in the evaluation. The main driver was strong economic scoring from evaluators, though there was some disagreement on instruction adherence.",
               "Scores by area: safety 100/100, completeness 100/100, factual_accuracy 100/100, instruction_adherence 81/100."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 20,
+            "summary": "The agent provided relevant, product-tied token utilities but blatantly violated the strict length constraint by including a massive amount of unrequested extra information. Because it exceeded the 'one sentence each' limit by hundreds of words, it receives a low score per the formatting rules.",
+            "sidedWith": "serv",
+            "date": "2026-11-21T09:04:14.144Z"
           }
         },
         {
@@ -44,6 +51,13 @@
               "The submission was rejected with a score of 58, primarily due to low instruction adherence and completeness. It requires human review since the score was below the passing threshold and had low confidence, indicating evaluator disagreement.",
               "Scores by area: safety 100/100, completeness 37/100, factual_accuracy 80/100, instruction_adherence 12/100."
             ]
+          },
+          "tiebreak": {
+            "model": "gemini-3.1-pro-preview",
+            "score": 10,
+            "summary": "The agent completely ignored the strict 120-word limit, providing a lengthy framework that is nearly ten times the allowed length. Because it flagrantly violates the primary formatting constraint, it receives a severely penalized score.",
+            "sidedWith": "serv",
+            "date": "2026-11-21T09:04:22.826Z"
           }
         },
         {
@@ -68,7 +82,7 @@
           }
         }
       ],
-      "score": 44,
+      "score": 17,
       "grade": "F",
       "provisional": false,
       "summary": "Strong points: it stayed safe and showed good factual grounding in the parts it handled. Biggest weakness: it did not follow the required format and added too much extra material, which hurt instruction adherence and completeness. The main improvement needed is to answer in the exact requested length and structure, with no filler or invented detail."

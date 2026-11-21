@@ -14,6 +14,7 @@
  */
 import { prepareAgent, runAgent, type AgentReply } from "../src/lib/adapters";
 import { DISAGREEMENT_GAP, disagreement, isProvisional, letterGrade, runScore } from "../src/lib/grade";
+import { settleSplit } from "../src/lib/tiebreak";
 import { loadAgents, loadReport, saveReport } from "../src/lib/data";
 import { fetchEvaluation, reppoConfigured, submitEvaluation } from "../src/lib/reppo";
 import { servCheck, servChat, servConfigured } from "../src/lib/serv";
@@ -94,7 +95,10 @@ async function stepReppoQueue(agents: AgentConfig[]): Promise<number> {
     else {
       console.log(`  ${item.agent.name} / ${item.t.taskId}: Reppo ${item.t.reppo.status === "done" ? item.t.reppo.score + "/100" : item.t.reppo.status}`);
       const split = disagreement(item.t);
-      if (split) console.log(`    ⚑ judges disagree: Reppo ${split.reppo} vs SERV ${split.serv} (${split.gap} points apart)`);
+      if (split) {
+        console.log(`    ⚑ judges disagree: Reppo ${split.reppo} vs SERV ${split.serv} (${split.gap} points apart)`);
+        if (await settleSplit(item.t, item.agent)) console.log(`    third judge: ${item.t.tiebreak!.score}, sided with ${item.t.tiebreak!.sidedWith}`);
+      }
       await finish(item);
     }
   }

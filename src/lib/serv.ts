@@ -34,12 +34,12 @@ export async function servChat(system: string, user: string, model = process.env
 }
 
 /** Ask SERV Reasoning to score an answer against the task's criteria. */
-export async function servCheck(prompt: string, criteria: string, output: string): Promise<{ score: number; summary: string }> {
+export async function servCheck(prompt: string, criteria: string, output: string, model?: string): Promise<{ score: number; summary: string }> {
   const system =
     "You are a strict, fair evaluator of AI agent answers. " +
     'Reply with JSON only: {"score": <integer 0-100>, "summary": "<one or two sentences>"}.';
   const user = `Task given to the agent:\n${prompt}\n\nWhat a good answer looks like:\n${criteria}\n\n${SCORING_RULES}\n\nThe agent's answer:\n${output.slice(0, 40_000)}`;
-  const text = await servChat(system, user);
+  const text = await servChat(system, user, model);
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error(`SERV check did not return JSON: ${text}`);
   const parsed = JSON.parse(match[0]) as { score: number; summary: string };

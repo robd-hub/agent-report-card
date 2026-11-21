@@ -179,11 +179,13 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
                 <div className="meters">
                   <Meter label="Independent judges (Reppo)" value={reppoScore} tone="violet" />
                   <Meter label="SERV Reasoning check" value={t.serv?.score ?? null} />
+                  {t.tiebreak && <Meter label="Third judge (tie-breaker)" value={t.tiebreak.score} />}
                 </div>
                 <ShapeLine s={shape?.tasks.find((x) => x.taskId === t.taskId) ?? null} />
                 {split && (
                   <p className="split-note">
-                    <b>⚑ Judges disagree.</b> {disagreementNote(split)}
+                    <b>⚑ Judges disagree{t.tiebreak ? ", settled by a third judge" : ""}.</b> {disagreementNote(split, t.tiebreak)}
+                    {t.tiebreak && <><br /><span className="muted"><b>Third judge:</b> {t.tiebreak.summary}</span></>}
                   </p>
                 )}
                 {previous && (() => {

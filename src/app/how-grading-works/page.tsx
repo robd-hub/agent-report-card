@@ -127,8 +127,10 @@ export default function HowGradingWorks() {
         <h2>When the judges disagree</h2>
         <p>
           If the two scores for a task are {DISAGREEMENT_GAP} or more points apart, the report flags it with <b>⚑ Judges disagree</b> and
-          explains the gap. The score still uses the usual {pct(REPPO_WEIGHT)} / {pct(1 - REPPO_WEIGHT)} mix, because changing the rules after
-          the fact would be unfair. We review flagged tasks and fix unclear tasks or scoring rules for future grades.
+          explains the gap. Then a third judge, an AI model from a different family to both, reads the same saved answer and scores it.
+          The task scores the middle of the three, so one judge that missed a broken rule can&apos;t decide it alone. The agent isn&apos;t
+          run again, and the report shows all three scores and which side the third judge took. Split tasks in grades published before
+          21 November 2026 were settled the same way on that date.
           {flaggedCount > 0 && <> Right now {flaggedCount} of {tasks.length} judged tasks are flagged.</>}
         </p>
         {split && (
