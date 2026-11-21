@@ -12,6 +12,7 @@
 import { categoryById, type CategoryId } from "@/lib/categories";
 import { loadAgents, loadReport } from "@/lib/data";
 import { bestAnswer, CATEGORIES, categoryForTask, trustRecord } from "@/lib/trust";
+import { ccdFacts, loadCcd } from "@/lib/concordium";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
 const CORS: Record<string, string> = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };
@@ -22,7 +23,7 @@ function json(body: unknown, status = 200): Response {
 
 export function GET(request: Request): Response {
   const params = new URL(request.url).searchParams;
-  const records = loadAgents().map((a) => trustRecord(a, loadReport(a.id).runs, SITE));
+  const records = (() => { const ccd = loadCcd(); return loadAgents().map((a) => { const runs = loadReport(a.id).runs; return trustRecord(a, runs, SITE, ccdFacts(a.id, runs, ccd)); }); })();
   const limit = Math.min(10, Math.max(1, Number(params.get("limit")) || 3));
   const category = params.get("category")?.trim().toLowerCase();
   const task = params.get("task")?.trim();

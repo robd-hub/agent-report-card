@@ -9,6 +9,7 @@ import { badgeCardSvg, badgeJson, badgePillSvg, badgeSvg } from "../src/lib/badg
 import { latestRun, loadAgents, loadReport } from "../src/lib/data";
 import { lookupIndex } from "../src/lib/lookup";
 import { bestAnswer, CATEGORIES, trustRecord } from "../src/lib/trust";
+import { ccdFacts, loadCcd } from "../src/lib/concordium";
 
 const dir = path.join(process.cwd(), "public", "badge");
 const site = (process.env.SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
@@ -27,7 +28,7 @@ for (const agent of loadAgents()) {
 // Trust Check files (src/lib/trust.ts): one per agent, plus an index of all of them.
 const trustDir = path.join(process.cwd(), "public", "trust");
 fs.mkdirSync(trustDir, { recursive: true });
-const records = loadAgents().map((agent) => trustRecord(agent, loadReport(agent.id).runs, site));
+const records = (() => { const ccd = loadCcd(); return loadAgents().map((agent) => { const runs = loadReport(agent.id).runs; return trustRecord(agent, runs, site, ccdFacts(agent.id, runs, ccd)); }); })();
 for (const r of records) fs.writeFileSync(path.join(trustDir, `${r.agent.id}.json`), JSON.stringify(r, null, 2) + "\n");
 fs.writeFileSync(path.join(trustDir, "index.json"), JSON.stringify({ version: 1, updated: new Date().toISOString(), agents: records }) + "\n");
 // "Who's best" files: the top agents per category.
@@ -41,7 +42,7 @@ console.log(`Wrote badges for ${loadAgents().length} agents to public/badge/`);
 // Pre-hire lookup files (src/lib/lookup.ts): one per agent, plus an index with aliases.
 const lookupDir = path.join(process.cwd(), "public", "lookup");
 fs.mkdirSync(lookupDir, { recursive: true });
-const lookup = lookupIndex(loadAgents(), (id) => loadReport(id).runs, site);
+const lookup = lookupIndex(loadAgents(), (id) => loadReport(id).runs, site, Date.now(), loadCcd());
 for (const r of lookup.agents) {
   if (!r.agent) continue;
   fs.writeFileSync(path.join(lookupDir, `${r.agent.id}.json`), JSON.stringify(r, null, 2) + "\n");
