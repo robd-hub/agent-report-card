@@ -2,6 +2,7 @@ import Link from "next/link";
 import { loadAgents, loadReport } from "@/lib/data";
 import { bestAnswer, CATEGORIES, FRESH_DAYS, trustRecord, VERIFY_URL } from "@/lib/trust";
 import { TrustSearch } from "./TrustSearch";
+import { ccdFacts, loadCcd } from "@/lib/concordium";
 
 export const metadata = {
   title: "Trust Check · Agent Report Card",
@@ -12,7 +13,7 @@ const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/ag
 const API = "https://agent-report-card.vercel.app";
 
 export default function TrustCheck() {
-  const records = loadAgents().map((a) => trustRecord(a, loadReport(a.id).runs, SITE));
+  const records = (() => { const ccd = loadCcd(); return loadAgents().map((a) => { const runs = loadReport(a.id).runs; return trustRecord(a, runs, SITE, ccdFacts(a.id, runs, ccd)); }); })();
   const best = CATEGORIES.map((c) => bestAnswer(c.id, records));
   const example = records.find((r) => r.agent.id === "cheap-first") ?? records[0];
   const sample = JSON.stringify(

@@ -14,6 +14,11 @@ import { CATEGORIES, categoryById, categoryOf, type CategoryId } from "./categor
 import { GRADE_MEANING, honestyCheck, honestyParts, disagreement } from "./grade";
 import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "./links";
 import type { AgentConfig, Grade, GradingRun } from "./types";
+// Type only: this file also runs in the browser (trust-check search), so no Node code.
+import type { CcdFacts } from "./concordium";
+
+const CCD_EXPLORER = "https://ccdexplorer.io/testnet/transaction/";
+const CCD_BADGE_CHECK = "https://agent-registry-mcp.concordium.com/v1/check-badge/";
 
 /** The Output verifier: checks an agent's work before the buyer pays it. */
 export const VERIFY_URL = "https://cheap-first.vercel.app/api/verify";
@@ -62,6 +67,16 @@ export interface TrustRecord {
   badge: string;
   /** How to get graded or regraded. */
   getGraded: { url: string; priceUsd: number };
+  /**
+   * Concordium: the agent's registry badge (who is behind it) and the on-chain
+   * record of this grade (so it can't be quietly changed). Missing when neither exists.
+   */
+  concordium?: {
+    badge?: string;
+    registryAgentId?: number;
+    badgeCheck?: string;
+    gradeOnChain?: { tx: string; explorer: string; reportHash: string; grade: string | null; score: number | null };
+  };
   source: "Agent Report Card";
 }
 
@@ -76,8 +91,18 @@ export function adviceFor(run: GradingRun | null): Advice {
   return "check";
 }
 
-export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string): TrustRecord {
+export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string, ccd?: CcdFacts): TrustRecord {
   const run = runs.at(-1) ?? null;
+  const anchor = ccd?.anchor ?? null;
+  const concordium =
+    agent.concordiumBadge || anchor
+      ? {
+          ...(agent.concordiumBadge
+            ? { badge: agent.concordiumBadge, registryAgentId: ccd?.tokenId, badgeCheck: CCD_BADGE_CHECK + agent.concordiumBadge }
+            : {}),
+          ...(anchor ? { gradeOnChain: { tx: anchor.tx, explorer: CCD_EXPLORER + anchor.tx, reportHash: anchor.reportHash, grade: anchor.grade, score: anchor.score } } : {}),
+        }
+      : undefined;
   const graded = Boolean(run && run.grade !== null);
   const advice = adviceFor(run);
   const honesty = run ? honestyCheck(run.tasks) : null;
@@ -108,6 +133,7 @@ export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string
     report: `${site}/agents/${agent.id}/`,
     badge: `${site}/badge/${agent.id}.svg`,
     getGraded: { url: GRADE_REQUEST_URL, priceUsd: graded ? REGRADE_PRICE_USD : GRADE_PRICE_USD },
+    ...(concordium ? { concordium } : {}),
     source: "Agent Report Card",
   };
 }
@@ -135,6 +161,9 @@ const host = (u: string) => {
 export function findTrust(query: string, all: TrustRecord[]): TrustRecord | null {
   const q = query.trim();
   if (!q) return null;
+  // A Concordium Agent Registry badge (base58 token address, e.g. JyP9YGLug2S48Zqp7H82e).
+  const byBadge = all.find((r) => r.concordium?.badge && r.concordium.badge === q.replace(/^.*\//, ""));
+  if (byBadge) return byBadge;
   const market = q.match(/openserv\.ai\/agents\/(\d+)/)?.[1] ?? (/^\d+$/.test(q) ? q : null);
   if (market) return all.find((r) => String(r.agent.marketplaceId) === market) ?? null;
   if (/^https?:\/\//i.test(q)) {

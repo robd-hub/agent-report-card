@@ -7,7 +7,28 @@
  *   - GET /api/lookup?agent=... and GET /api/agents on Vercel (grader.designimp.com)
  *   - static files at /lookup/<id>.json and /lookup/index.json (GitHub Pages too)
  *   - MCP tools lookup_agent_grade, search_graded_agents, how_to_get_graded
+ *
+ * Concordium: an agent can also be looked up by its Concordium Agent Registry
+ * badge, and every answer carries the on-chain record of the grade, so a
+ * caller learns who is behind the agent and that the grade wasn't changed later.
  */
+import {
+  anchorFor,
+  ARC_BADGE,
+  ARC_TOKEN_ID,
+  badgeCheckUrl,
+  CCD_ACCOUNT,
+  CCD_CHAIN_ID,
+  CCD_FREE_GRADES,
+  CCD_NETWORK,
+  explorerTx,
+  findBadge,
+  GRADE_PRICE_CCD,
+  lastAnchorFor,
+  REGRADE_PRICE_CCD,
+  reportHash,
+  type CcdData,
+} from "./concordium";
 import { categoryOf, categoryById, CATEGORIES, type CategoryId } from "./categories";
 import { disagreement, GRADE_MEANING, honestyCheck, taskScore } from "./grade";
 import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "./links";
@@ -74,6 +95,32 @@ export interface AgentIdentity {
   endpoint: string | null;
 }
 
+/** Who is behind the agent (Concordium registry) and the grade's on-chain record. */
+export interface ConcordiumInfo {
+  network: typeof CCD_NETWORK;
+  chainId: string;
+  /** The agent's Concordium Agent Registry badge (CIS-2 token address), when it has one. */
+  badge: string | null;
+  registryAgentId: number | null;
+  /** True when the registry entry was active and its agent card matched the on-chain hash when we last checked. */
+  badgeVerified: boolean | null;
+  badgeCheckedAt: string | null;
+  /** Concordium's own badge check, to confirm it live. */
+  badgeCheckUrl: string | null;
+  /** The data transaction that holds this grade on-chain. Null if this grade isn't written on-chain yet. */
+  gradeOnChain: {
+    tx: string;
+    explorerUrl: string;
+    /** SHA-256 of the grading run as published in data/results/<agent>.json. */
+    reportHash: string;
+    /** True when the published run still hashes to the value written on-chain. */
+    fingerprintMatches: boolean;
+    recordedAt: string;
+  } | null;
+  /** The grader's own registry entry. */
+  gradedBy: { registryAgentId: number; badge: string; badgeCheckUrl: string };
+}
+
 export interface GetGraded {
   /** Looking up a grade never charges. */
   freeToRead: true;
@@ -88,6 +135,16 @@ export interface GetGraded {
     /** A person can open the same request here. */
     issueUrl: string;
     note: string;
+  };
+  /** Paying in CCD instead, through the grade request. */
+  concordium: {
+    priceCcd: number;
+    regradeCcd: number;
+    network: string;
+    payTo: string;
+    howTo: string;
+    /** Agents with a valid Concordium registry badge. */
+    freeForBadges: string;
   };
   /** How to ask for the first grade at no charge. */
   freeFirstGrade: { offer: string; url: string };
@@ -128,6 +185,8 @@ export interface LookupResponse {
   badgeUrl: string | null;
   /** Same badge, generated on the Vercel deployment from the latest published grade. */
   liveBadgeUrl: string | null;
+  /** Concordium registry badge and the grade's on-chain record. Null when the agent has neither. */
+  concordium: ConcordiumInfo | null;
   query?: string;
   message?: string;
   getGraded: GetGraded;
@@ -158,6 +217,14 @@ export function howToGetGraded(): GetGraded {
       issueUrl: GRADE_REQUEST_URL,
       note:
         "Reading a grade is free. Ordering one is paid. POST this with no payment and the endpoint replies 402 with the x402 price. Pay that in USDC on Base and retry. A regrade of an agent that already has a grade is the lower price. A person can open the same request at issueUrl. GitHub Pages does not serve this paid endpoint.",
+    },
+    concordium: {
+      priceCcd: GRADE_PRICE_CCD,
+      regradeCcd: REGRADE_PRICE_CCD,
+      network: `Concordium ${CCD_NETWORK} (${CCD_CHAIN_ID})`,
+      payTo: CCD_ACCOUNT,
+      howTo: "Send the CCD to payTo, then open the grade request at issueUrl and paste the transaction hash or its CCDExplorer link in the payment field. The bot checks the transfer on-chain and grades the agent.",
+      freeForBadges: `The first ${CCD_FREE_GRADES} agents with a valid Concordium Agent Registry badge are graded free: write "free" in the payment field and add the badge. One per badge.`,
     },
     freeFirstGrade: {
       offer:
@@ -190,6 +257,9 @@ export function queryKeys(query: string): string[] {
   if (!q) return [];
   if (/^https?:\/\//i.test(q)) {
     const keys: string[] = [];
+    // A Concordium badge-check link names the badge.
+    const badge = findBadge(q);
+    if (badge) keys.push(`badge:${badge}`);
     const market = q.match(/agents?\/(\d+)/i)?.[1];
     if (market) keys.push(`market:${market}`);
     const ep = endpointKey(q);
@@ -197,7 +267,8 @@ export function queryKeys(query: string): string[] {
     return keys;
   }
   if (/^\d+$/.test(q)) return [`market:${q}`];
-  return [`id:${q.toLowerCase()}`, `name:${norm(q)}`];
+  const badge = findBadge(q);
+  return [...(badge ? [`badge:${badge}`] : []), `id:${q.toLowerCase()}`, `name:${norm(q)}`];
 }
 
 export function cleanQuery(q: string): string {
@@ -241,6 +312,7 @@ function empty(getGraded: GetGraded): LookupResponse {
     reportUrl: null,
     badgeUrl: null,
     liveBadgeUrl: null,
+    concordium: null,
     getGraded,
   };
 }
@@ -290,7 +362,30 @@ function taskLine(t: TaskResult, agent: AgentConfig): TaskSummary {
   return { id: t.taskId, kind, label: kindLabel(kind), score: score === null ? null : Math.round(score), judgesDisagree: disagreement(t) !== null };
 }
 
-export function lookupRecord(agent: AgentConfig, runs: GradingRun[], site: string, now = Date.now()): LookupResponse {
+/** The Concordium block for an agent's latest run. */
+export function concordiumInfo(agent: AgentConfig, run: GradingRun | null, ccd?: CcdData): ConcordiumInfo | null {
+  const anchor = ccd ? (anchorFor(agent.id, run, ccd) ?? lastAnchorFor(agent.id, run, ccd)) : null;
+  const badge = agent.concordiumBadge ?? null;
+  if (!badge && !anchor) return null;
+  const status = ccd?.badges[agent.id];
+  const known = status && status.badge === badge ? status : undefined;
+  return {
+    network: CCD_NETWORK,
+    chainId: CCD_CHAIN_ID,
+    badge,
+    registryAgentId: known?.tokenId ?? null,
+    badgeVerified: known ? known.verified : null,
+    badgeCheckedAt: known?.checkedAt ?? null,
+    badgeCheckUrl: badge ? badgeCheckUrl(badge) : null,
+    gradeOnChain:
+      anchor && run
+        ? { tx: anchor.tx, explorerUrl: explorerTx(anchor.tx), reportHash: anchor.reportHash, fingerprintMatches: reportHash(run) === anchor.reportHash, recordedAt: anchor.anchoredAt }
+        : null,
+    gradedBy: { registryAgentId: ARC_TOKEN_ID, badge: ARC_BADGE, badgeCheckUrl: badgeCheckUrl(ARC_BADGE) },
+  };
+}
+
+export function lookupRecord(agent: AgentConfig, runs: GradingRun[], site: string, now = Date.now(), ccd?: CcdData): LookupResponse {
   const root = site.replace(/\/$/, "");
   const run = runs.at(-1) ?? null;
   const category = categoryOf(agent);
@@ -311,6 +406,7 @@ export function lookupRecord(agent: AgentConfig, runs: GradingRun[], site: strin
     reportUrl: `${root}/agents/${agent.id}/`,
     badgeUrl: `${root}/badge/${agent.id}.svg`,
     liveBadgeUrl: `${LIVE_API}/api/badge?agent=${agent.id}`,
+    concordium: concordiumInfo(agent, run, ccd),
   };
   if (!run || run.grade === null) {
     const message = `${agent.name} has not been graded yet.`;
@@ -363,6 +459,7 @@ export function buildAliases(records: LookupResponse[]): Record<string, string[]
     if (!r.agent) continue;
     add(`id:${r.agent.id}`, r.agent.id);
     add(`name:${norm(r.agent.name)}`, r.agent.id);
+    if (r.concordium?.badge) add(`badge:${r.concordium.badge}`, r.agent.id);
     if (r.agent.marketplaceId !== null) add(`market:${r.agent.marketplaceId}`, r.agent.id);
     if (r.agent.endpoint) {
       const ep = endpointKey(r.agent.endpoint);
@@ -372,8 +469,8 @@ export function buildAliases(records: LookupResponse[]): Record<string, string[]
   return map;
 }
 
-export function lookupIndex(agents: AgentConfig[], runsOf: (id: string) => GradingRun[], site: string, now = Date.now()): LookupIndex {
-  const records = agents.map((a) => lookupRecord(a, runsOf(a.id), site, now));
+export function lookupIndex(agents: AgentConfig[], runsOf: (id: string) => GradingRun[], site: string, now = Date.now(), ccd?: CcdData): LookupIndex {
+  const records = agents.map((a) => lookupRecord(a, runsOf(a.id), site, now, ccd));
   return {
     version: 1,
     updated: new Date(now).toISOString(),
@@ -404,7 +501,7 @@ export function resolveQuery(query: string, records: LookupResponse[], aliases: 
 export function answerLookup(query: string, index: Pick<LookupIndex, "agents" | "aliases" | "howToGetGraded">): LookupResponse {
   const q = cleanQuery(query);
   if (!q) {
-    const message = "Pass agent as an id, a name, an OpenServ marketplace link, or the agent's own https address.";
+    const message = "Pass agent as an id, a name, an OpenServ marketplace link, the agent's own https address, or its Concordium Agent Registry badge.";
     return { ...empty(index.howToGetGraded), status: "not_graded", query: q, message, why: message };
   }
   const hit = resolveQuery(q, index.agents, index.aliases);

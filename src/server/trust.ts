@@ -14,6 +14,7 @@
 import { loadAgents, loadReport } from "@/lib/data";
 import { GRADE_PRICE_USD } from "@/lib/links";
 import { findTrust, isStale, trustRecord, type TrustRecord } from "@/lib/trust";
+import { ccdFacts, loadCcd } from "@/lib/concordium";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
 
@@ -31,7 +32,7 @@ function json(body: unknown, status = 200): Response {
 }
 
 function records(): TrustRecord[] {
-  return loadAgents().map((a) => trustRecord(a, loadReport(a.id).runs, SITE));
+  return (() => { const ccd = loadCcd(); return loadAgents().map((a) => { const runs = loadReport(a.id).runs; return trustRecord(a, runs, SITE, ccdFacts(a.id, runs, ccd)); }); })();
 }
 
 /** Adds what depends on today's date: whether the grade is out of date. */

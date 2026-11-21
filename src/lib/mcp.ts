@@ -15,13 +15,13 @@ export const MCP_TOOLS = [
   {
     name: "lookup_agent_grade",
     description:
-      "Look up an AI agent's Agent Report Card grade before hiring it. Free. Pass an id, a name, an OpenServ marketplace link or number, or the agent's own https address. Returns the grade, score, date graded, task count, per-task and per-type summary, the judges-disagree flag, a hire/caution/avoid recommendation (the rule is in the response), and the report and badge URLs. Not graded yet is a normal result and includes how to order a grade (paid POST /api/grade, and the free first grade).",
+      "Look up an AI agent's Agent Report Card grade before hiring it. Free. Pass an id, a name, an OpenServ marketplace link or number, the agent's own https address, or its Concordium Agent Registry badge. Returns the grade, score, date graded, task count, per-task and per-type summary, the judges-disagree flag, a hire/caution/avoid recommendation (the rule is in the response), the report and badge URLs, and a concordium block (the agent's registry badge, and the on-chain transaction holding this grade with a fingerprint check, so you can confirm the grade wasn't changed). Not graded yet is a normal result and includes how to order a grade (paid POST /api/grade, and the free first grade).",
     inputSchema: {
       type: "object",
       properties: {
         agent: {
           type: "string",
-          description: "Agent id, name, OpenServ marketplace link or number, or the agent's own https address",
+          description: "Agent id, name, OpenServ marketplace link or number, the agent's own https address, or a Concordium Agent Registry badge",
         },
       },
       required: ["agent"],
@@ -45,7 +45,7 @@ export const MCP_TOOLS = [
   {
     name: "how_to_get_graded",
     description:
-      "How to get an agent graded by Agent Report Card. Reading grades is free. Ordering a grade is paid (POST /api/grade, USDC on Base). Also describes the free first grade.",
+      "How to get an agent graded by Agent Report Card. Reading grades is free. Ordering a grade is paid (POST /api/grade with USDC on Base, or CCD on Concordium through the grade request). Also describes the free first grade and the free grade for agents with a Concordium registry badge.",
     inputSchema: { type: "object", properties: {} },
   },
 ] as const;
@@ -64,7 +64,7 @@ function textResult(payload: unknown, isError = false) {
 function callTool(name: string, args: Record<string, unknown>, index: LookupIndex): { ok: true; result: unknown } | { ok: false; message: string } {
   if (name === "lookup_agent_grade") {
     const agent = typeof args.agent === "string" ? args.agent : "";
-    if (!agent.trim()) return { ok: false, message: "Pass agent: an id, name, OpenServ marketplace link, or https address." };
+    if (!agent.trim()) return { ok: false, message: "Pass agent: an id, name, OpenServ marketplace link, https address, or Concordium badge." };
     return { ok: true, result: textResult(answerLookup(agent, index)) };
   }
   if (name === "search_graded_agents") {
@@ -102,7 +102,7 @@ export function handleMcp(message: unknown, index: LookupIndex): JsonRpc | null 
       capabilities: { tools: { listChanged: false } },
       serverInfo: MCP_SERVER,
       instructions:
-        "Agent Report Card grades AI agents A to F. Use lookup_agent_grade before hiring an agent. Reading grades is free. Ordering a grade is paid. The recommendation field is hire, caution, or avoid, and every lookup includes the rule.",
+        "Agent Report Card grades AI agents A to F. Use lookup_agent_grade before hiring or paying an agent; it also accepts a Concordium Agent Registry badge and returns the grade's on-chain record. Reading grades is free. Ordering a grade is paid. The recommendation field is hire, caution, or avoid, and every lookup includes the rule.",
     });
   }
   if (method === "ping") return reply({});

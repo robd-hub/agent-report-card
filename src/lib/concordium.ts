@@ -90,10 +90,32 @@ export function saveCcd(data: CcdData): void {
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2) + "\n");
 }
 
-/** The on-chain record for a run, if it has one. */
+/**
+ * The on-chain record for a run as it is published now. A record only counts
+ * while the published run still has the fingerprint written on-chain: if the
+ * run is edited later (say, extra fields are filled in), the old record no
+ * longer vouches for it, and `anchor` writes a new one.
+ */
 export function anchorFor(agentId: string, run: GradingRun | null, data = loadCcd()): CcdAnchor | null {
   if (!run) return null;
-  return data.anchors[agentId]?.find((a) => a.runDate === run.date) ?? null;
+  const hash = reportHash(run);
+  return (data.anchors[agentId] ?? []).filter((a) => a.runDate === run.date && a.reportHash === hash).at(-1) ?? null;
+}
+
+/** What the trust record needs from Concordium for one agent, worked out server-side. */
+export interface CcdFacts {
+  anchor: CcdAnchor | null;
+  tokenId?: number;
+}
+
+export function ccdFacts(agentId: string, runs: GradingRun[], data = loadCcd()): CcdFacts {
+  return { anchor: anchorFor(agentId, runs.at(-1) ?? null, data), tokenId: data.badges[agentId]?.tokenId };
+}
+
+/** The newest on-chain record for a run's date, even if the run has changed since. */
+export function lastAnchorFor(agentId: string, run: GradingRun | null, data = loadCcd()): CcdAnchor | null {
+  if (!run) return null;
+  return (data.anchors[agentId] ?? []).filter((a) => a.runDate === run.date).at(-1) ?? null;
 }
 
 /**

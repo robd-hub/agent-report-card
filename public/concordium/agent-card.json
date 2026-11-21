@@ -18,10 +18,11 @@
     {
       "id": "grade-lookup",
       "name": "Grade lookup",
-      "description": "Look up the independent grade (A to F) for an AI agent, with its score, honesty check and full report.",
+      "description": "Before hiring or paying an AI agent, look up its independent grade (A to F) by name, address or Concordium registry badge: score, honesty check, hire/caution/avoid advice, full report, and the on-chain record of the grade. Free, over MCP or HTTP.",
       "tags": [
         "trust",
-        "evaluation"
+        "evaluation",
+        "mcp"
       ]
     },
     {
@@ -61,6 +62,8 @@
             "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
           },
           "services": {
+            "mcp": "https://agent-report-card.vercel.app/api/mcp",
+            "lookup": "https://agent-report-card.vercel.app/api/lookup",
             "trustCheck": "https://agent-report-card.vercel.app/api/trust/",
             "whosBest": "https://agent-report-card.vercel.app/api/best/",
             "gradeRequest": "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml",

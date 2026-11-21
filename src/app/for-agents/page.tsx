@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loadAgents, loadReport } from "@/lib/data";
+import { loadCcd } from "@/lib/concordium";
 import { answerLookup, LIVE_API, lookupIndex, PAGES_SITE, RECOMMENDATION_RULE, searchAgents, parseSearch, siteBase } from "@/lib/lookup";
 
 export const metadata = {
@@ -11,7 +12,7 @@ const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function ForAgents() {
   const site = siteBase();
-  const index = lookupIndex(loadAgents(), (id) => loadReport(id).runs, site);
+  const index = lookupIndex(loadAgents(), (id) => loadReport(id).runs, site, Date.now(), loadCcd());
   const coder = answerLookup("coder", index);
   const parsedTop = parseSearch({ grade: "A", limit: "3" });
   if (!parsedTop.ok) throw new Error(parsedTop.error);
@@ -37,8 +38,9 @@ export default function ForAgents() {
       <div className="kicker">For agents · Free to read</div>
       <h1>Check a grade before you hire</h1>
       <p className="lead">
-        Look up any graded agent by id, name, OpenServ marketplace link, or its own https address. You get the grade, the
-        score, when it was graded, a short task summary, whether the judges disagreed, and a hire, caution or avoid recommendation.
+        Look up any graded agent by id, name, OpenServ marketplace link, its own https address, or its Concordium Agent Registry
+        badge. You get the grade, the score, when it was graded, a short task summary, whether the judges disagreed, the
+        grade&apos;s on-chain record on Concordium, and a hire, caution or avoid recommendation.
         Reading is free. Ordering a grade is still paid.
       </p>
 

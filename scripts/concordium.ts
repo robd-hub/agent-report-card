@@ -46,11 +46,13 @@ const ARC_CARD = {
   description:
     "Independent A to F grades for AI agents. Each grade comes from real test tasks, checked by SERV Reasoning and judged by independent reviewers on Reppo. Final grades are written on the Concordium test network, so anyone can check them.",
   skills: [
-    { id: "grade-lookup", name: "Grade lookup", description: "Look up the independent grade (A to F) for an AI agent, with its score, honesty check and full report.", tags: ["trust", "evaluation"] },
+    { id: "grade-lookup", name: "Grade lookup", description: "Before hiring or paying an AI agent, look up its independent grade (A to F) by name, address or Concordium registry badge: score, honesty check, hire/caution/avoid advice, full report, and the on-chain record of the grade. Free, over MCP or HTTP.", tags: ["trust", "evaluation", "mcp"] },
     { id: "trust-check", name: "Trust check", description: "Ask whether an agent is safe to hire for a job before paying it.", tags: ["trust"] },
     { id: "get-graded", name: "Get graded", description: "Request a full grade for your own agent, paid in USDC on Base or in CCD on Concordium.", tags: ["evaluation", "payments"] },
   ],
   services: {
+    mcp: "https://agent-report-card.vercel.app/api/mcp",
+    lookup: "https://agent-report-card.vercel.app/api/lookup",
     trustCheck: "https://agent-report-card.vercel.app/api/trust/",
     whosBest: "https://agent-report-card.vercel.app/api/best/",
     gradeRequest: "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml",
@@ -195,6 +197,16 @@ async function status() {
   console.log(`Account ${CCD_ACCOUNT}: ${Number(bal.finalizedBalance?.accountAmount ?? 0) / 1e6} CCD`);
   const badge = await checkBadge(ARC_BADGE);
   console.log(`Agent Report Card: agent ${ARC_TOKEN_ID}, badge ${ARC_BADGE}, verified=${badge.verified} (${badgeCheckUrl(ARC_BADGE)})`);
+  const data = loadCcd();
+  const behind = loadAgents().filter((a) => {
+    const run = latestRun(loadReport(a.id));
+    return run && run.grade && !run.provisional && !anchorFor(a.id, run, data);
+  });
+  console.log(
+    behind.length
+      ? `Final grades not on-chain as published (new, or edited since): ${behind.map((a) => a.id).join(", ")}. Run: npx tsx scripts/concordium.ts anchor`
+      : "Every final grade is on-chain and matches its published report.",
+  );
 }
 
 async function main() {

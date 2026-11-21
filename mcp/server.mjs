@@ -70,6 +70,8 @@ function queryKeys(query) {
   if (!q) return [];
   if (/^https?:\/\//i.test(q)) {
     const keys = [];
+    const badge = findBadge(q);
+    if (badge) keys.push(`badge:${badge}`);
     const market = q.match(/agents?\/(\d+)/i)?.[1];
     if (market) keys.push(`market:${market}`);
     const ep = endpointKey(q);
@@ -77,7 +79,14 @@ function queryKeys(query) {
     return keys;
   }
   if (/^\d+$/.test(q)) return [`market:${q}`];
-  return [`id:${q.toLowerCase()}`, `name:${norm(q)}`];
+  const badge = findBadge(q);
+  return [...(badge ? [`badge:${badge}`] : []), `id:${q.toLowerCase()}`, `name:${norm(q)}`];
+}
+
+/** Same as findBadge() in src/lib/concordium.ts: a Concordium registry badge (base58 token address). */
+function findBadge(text) {
+  const m = text.match(/(?:badge-check|check-badge|cis-2:)\/?([1-9A-HJ-NP-Za-km-z]{12,40})/) ?? text.trim().match(/^([1-9A-HJ-NP-Za-km-z]{12,40})$/);
+  return m ? m[1] : null;
 }
 
 function resolveQuery(query, index) {
