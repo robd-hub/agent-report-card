@@ -30,8 +30,11 @@ import type { AgentConfig, TaskKind, TaskResult } from "./types";
 export const LITE_VERSION = "lite-1";
 /** The most SERV calls one lite run may make. */
 export const LITE_MAX_SERV_CALLS = 4;
-/** The most tokens one SERV reply may use in a lite run. */
-export const LITE_MAX_TOKENS = 1000;
+/**
+ * The most tokens one SERV reply may use in a lite run. SERV's model reasons before it answers and the
+ * reasoning counts towards this cap, so too low a cap leaves an empty reply (1,000 did, on 22 Nov 2026).
+ */
+export const LITE_MAX_TOKENS = 4000;
 /** How long the agent may take to answer one lite task. */
 export const LITE_AGENT_TIMEOUT_MS = 20_000;
 /** Agent answers are cut to this many characters before they are judged. */
@@ -232,6 +235,7 @@ function estimateTokens(text: string): number {
 export const servLiteChat: LiteChat = async (system, user) => {
   let usage = { inputTokens: 0, outputTokens: 0 };
   const text = await servChat(system, user, undefined, { maxTokens: LITE_MAX_TOKENS, onUsage: (u) => (usage = u) });
+  if (!text.trim()) throw new Error("SERV's reply was empty (it may have run out of tokens)");
   return {
     text,
     inputTokens: usage.inputTokens || estimateTokens(system + user),
