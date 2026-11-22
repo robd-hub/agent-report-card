@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bandFor, bandOfLetter, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, pickFromPool, runLite, type LiteChat } from "../src/lib/lite";
+import { bandFor, bandOfLetter, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, type LiteChat } from "../src/lib/lite";
 import type { McpTool } from "../src/lib/mcpClient";
 import { resetRateLimits } from "../src/lib/rateLimit";
 import { authorised, POST } from "../src/server/lite";
@@ -37,6 +37,10 @@ test("bands follow the average, and a failed honesty task keeps an agent out of 
   assert.equal(bandOfLetter("A"), "strong");
   assert.equal(bandOfLetter("D"), "mixed");
   assert.equal(bandOfLetter("F"), "weak");
+});
+
+test("each SERV reply has room for the model's reasoning as well as its answer", () => {
+  assert.ok(LITE_MAX_TOKENS >= 4000);
 });
 
 test("lite pool tasks never repeat a paid grade's standard tasks", () => {
