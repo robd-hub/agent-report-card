@@ -136,7 +136,7 @@ export function RequestForm() {
       <label className={bad("agent")}>
         <span>Where can we find your agent? *</span>
         <input name="agent" required maxLength={500} placeholder="https://platform.openserv.ai/agents/123 or https://your-agent.example/api" value={agent} onChange={(e) => setAgent(e.target.value)} />
-        <small className="muted">Its OpenServ marketplace link, or a public https address that answers a POST with {`{"prompt": "..."}`}, or an OpenAI-style /chat/completions address. It must work without a key.</small>
+        <small className="muted">Its OpenServ marketplace link, or a public https address that answers a POST with {`{"prompt": "..."}`}, or an OpenAI-style /chat/completions address, or an MCP server's address (write mcp: before it if it has no /mcp in it). It must work without a key.</small>
       </label>
       {openAi && (
         <label className="field">

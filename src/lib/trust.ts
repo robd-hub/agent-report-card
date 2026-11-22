@@ -116,7 +116,7 @@ export function trustRecord(agent: AgentConfig, runs: GradingRun[], site: string
   return {
     version: 1,
     // A shared model API (OpenAI-style) isn't one agent's own address, so it isn't used to match.
-    agent: { id: agent.id, name: agent.name, category: categoryOf(agent), marketplaceId: agent.marketplaceId, endpoint: agent.adapter === "http-json" ? agent.endpoint : undefined },
+    agent: { id: agent.id, name: agent.name, category: categoryOf(agent), marketplaceId: agent.marketplaceId, endpoint: agent.adapter === "http-json" || agent.adapter === "mcp" ? agent.endpoint : undefined },
     graded,
     grade: run?.grade ?? null,
     score: run?.score ?? null,

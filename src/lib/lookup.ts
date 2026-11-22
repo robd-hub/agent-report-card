@@ -396,7 +396,7 @@ export function lookupRecord(agent: AgentConfig, runs: GradingRun[], site: strin
     category,
     marketplaceId: agent.marketplaceId ?? null,
     marketplaceUrl: agent.marketplaceId ? `https://www.openserv.ai/agents/${agent.marketplaceId}` : null,
-    endpoint: agent.adapter === "http-json" ? agent.endpoint ?? null : null,
+    endpoint: agent.adapter === "http-json" || agent.adapter === "mcp" ? agent.endpoint ?? null : null,
   };
   const base = empty(howToGetGraded());
   const links = {

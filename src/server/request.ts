@@ -21,6 +21,7 @@ import { loadAgents } from "@/lib/data";
 import { issueBody } from "@/lib/issueBody";
 import { GRADE_PRICE_USD, REGRADE_PRICE_USD } from "@/lib/links";
 import { checkPayment, findTxHash, isCardPayment } from "@/lib/payment";
+import { probeMcp } from "@/lib/mcpClient";
 import { findEndpoint, findMarketplaceId } from "@/lib/requests";
 import { findRequest } from "./card";
 import { json, options, rateGate } from "./http";
@@ -51,7 +52,7 @@ export async function POST(request: Request): Promise<Response> {
   const endpoint = marketplaceId ? null : findEndpoint(agentLink, model);
   if (!marketplaceId && !endpoint) {
     return json(
-      { status: "invalid", field: "agent", error: "Use your agent's OpenServ marketplace link, or a public https address (OpenAI-style /chat/completions addresses also need the model name)." },
+      { status: "invalid", field: "agent", error: "Use your agent's OpenServ marketplace link, or a public https address (OpenAI-style /chat/completions addresses also need the model name; for an MCP server, use its address, or write mcp: before it)." },
       400,
       NO_STORE,
     );
@@ -61,7 +62,16 @@ export async function POST(request: Request): Promise<Response> {
   const price = known ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
   // The wallet button asks first, so the buyer only pays once the form is
   // right, and pays the right price ($5 for an agent we've already graded).
-  if (body.check === true) return json({ status: "ok", priceUsd: price, regrade: Boolean(known) }, 200, NO_STORE);
+  // An MCP server is also checked: it must answer and list a read-only tool,
+  // so nobody pays for a test that can't run.
+  if (body.check === true) {
+    if (endpoint?.adapter === "mcp") {
+      const probe = await probeMcp(endpoint.endpoint);
+      if (!probe.ok) return json({ status: "invalid", field: "agent", error: probe.reason }, 400, NO_STORE);
+      return json({ status: "ok", priceUsd: price, regrade: Boolean(known), agentType: "mcp", mcp: { name: probe.name ?? null, tools: probe.tools?.length ?? 0, usableTools: probe.usable ?? 0 } }, 200, NO_STORE);
+    }
+    return json({ status: "ok", priceUsd: price, regrade: Boolean(known), agentType: endpoint?.adapter ?? "openserv-marketplace" }, 200, NO_STORE);
+  }
 
   const tx = findTxHash(paymentText);
   if (!tx) return json({ status: "invalid", field: "payment", error: "Paste the Basescan link or the transaction hash (it starts with 0x) for your USDC payment." }, 400, NO_STORE);

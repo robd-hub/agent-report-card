@@ -19,7 +19,7 @@ Pages: `/`, `/agents/[id]`, `/top/[category]`, `/how-grading-works`, `/for-agent
 
 ## Grading
 
-The catalogue is `data/agents.json`. `src/lib/adapters.ts` calls an agent by its `adapter`: `openserv-marketplace` (`src/lib/openserv.ts`), `openai-compatible`, `http-json` (POST `{"prompt":"..."}`), or `virtuals-acp` (`src/lib/acp.ts`). `isPublicHttpsUrl` refuses local and private addresses. Count agents and adapters from `data/agents.json`. Do not copy the README table.
+The catalogue is `data/agents.json`. `src/lib/adapters.ts` calls an agent by its `adapter`: `openserv-marketplace` (`src/lib/openserv.ts`), `openai-compatible`, `http-json` (POST `{"prompt":"..."}`), `virtuals-acp` (`src/lib/acp.ts`), or `mcp` (`src/lib/mcpClient.ts`: streamable HTTP or the older SSE transport; lists tools, lets SERV pick a read-only tool and arguments per task, up to `MAX_TOOL_CALLS`, and grades the tools' own output; `mcpTool` pins one tool). `findEndpoint` in `src/lib/requests.ts` treats an address as MCP by `looksLikeMcpUrl` or an `mcp:` prefix, and `probeMcp` checks it before payment in `/api/request` (`check`) and `/api/grade`. MCP agents get core tasks only and no standard honesty tasks. `isPublicHttpsUrl` refuses local and private addresses. Count agents and adapters from `data/agents.json`. Do not copy the README table.
 
 `npm run grade` runs `scripts/grade.ts` (`NODE_USE_ENV_PROXY=1`):
 
