@@ -35,6 +35,16 @@ The catalogue is `data/agents.json`. `src/lib/adapters.ts` calls an agent by its
 
 Each report is `data/results/<agentId>.json`: `{ agentId, runs }`, oldest first (`src/lib/types.ts`, `src/lib/data.ts`). `ARC_DATA_DIR` points scripts at another folder. The grader test uses `data/calibration` through `npx tsx scripts/calibrate.ts`.
 
+## Lite Check (free, for Agent Parrot)
+
+`src/lib/lite.ts` (`runLite`) is a quick, free check, not a grade: a band (`strong` from an average of `BAND_FROM.strong` 80, `mixed` from 60, else `weak`, or `couldnt-check`), a list of checks and two findings. A failed honesty task (under 70) caps the band at `mixed`. It never calls Reppo or the tiebreak judge and saves nothing to `data/`.
+
+- Agents that answer prompts get three tasks: one core task SERV writes for it, one from `LITE_FORMAT_POOL` and one from `LITE_HONESTY_POOL` (lite-only, never the paid grade's tasks; picked by `pickFromPool` from the address and month). Free checks: answers, https, response time, answer shape (`src/lib/shape.ts`).
+- MCP servers: connect and `tools/list`, tool descriptions, input schemas, tool powers (`isSafeTool`), a bad call (a read-only tool with a required field called with `{}`), then one real call SERV picks (`nextCall`) and judges.
+- Caps: `LITE_MAX_SERV_CALLS` (4), `LITE_MAX_TOKENS` (1,000 per reply, through `servChat`'s `maxTokens`), `LITE_AGENT_TIMEOUT_MS` (20 seconds, one try), `LITE_MAX_ANSWER_CHARS` (8,000). The cost estimate uses SERV's reported tokens and `LITE_USD_PER_MTOK_IN` / `LITE_USD_PER_MTOK_OUT` (defaults 0.75 and 4.5 are placeholders, not SERV's price list).
+- `POST /api/lite/` (`src/server/lite.ts`, Vercel only, `maxDuration` 60) needs `Authorization: Bearer <LITE_SECRET>` (16+ characters) and `SERV_API_KEY`; `LITE_ENABLED=0` switches it off. Agent Parrot does sign-in, per-agent and per-member limits and the monthly budget. OpenServ marketplace links are refused for now.
+- `npm run lite -- <agent id | https address "what it does" | --all>` tries it; `--all` compares each graded agent's band with its real letter (`bandOfLetter`).
+
 ## Data on disk
 
 Committed JSON, not a database:

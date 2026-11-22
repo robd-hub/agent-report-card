@@ -17,7 +17,8 @@
     "test": "tsx --test tests/*.test.ts",
     "check:slash": "node scripts/check-trailing-slash.mjs",
     "prebuild": "tsx scripts/prepare-server.ts && tsx scripts/badges.ts",
-    "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts"
+    "openserv": "NODE_USE_ENV_PROXY=1 tsx scripts/openserv-listing.ts",
+    "lite": "NODE_USE_ENV_PROXY=1 tsx scripts/lite.ts"
   },
   "dependencies": {
     "@account-kit/infra": "^4.88.5",

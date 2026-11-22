@@ -6,7 +6,20 @@ export function servConfigured(): boolean {
   return Boolean(process.env.SERV_API_KEY);
 }
 
-export async function servChat(system: string, user: string, model = process.env.SERV_MODEL || "gpt-5.4-mini"): Promise<string> {
+/** Tokens one SERV call used, as SERV reports them (0 when it doesn't). */
+export interface ServUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
+export interface ServChatOptions {
+  /** The most tokens the reply may use. Defaults to 8,000. */
+  maxTokens?: number;
+  /** Told how many tokens the call used. */
+  onUsage?: (usage: ServUsage) => void;
+}
+
+export async function servChat(system: string, user: string, model = process.env.SERV_MODEL || "gpt-5.4-mini", opts: ServChatOptions = {}): Promise<string> {
   const key = process.env.SERV_API_KEY;
   if (!key) throw new Error("SERV_API_KEY is not set");
   const request = () =>
@@ -15,7 +28,7 @@ export async function servChat(system: string, user: string, model = process.env
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model,
-        max_completion_tokens: 8000,
+        max_completion_tokens: opts.maxTokens ?? 8000,
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -29,7 +42,8 @@ export async function servChat(system: string, user: string, model = process.env
     res = await request();
   }
   if (!res.ok) throw new Error(`SERV Reasoning returned ${res.status}: ${await res.text()}`);
-  const body = (await res.json()) as { choices: { message: { content: string } }[] };
+  const body = (await res.json()) as { choices: { message: { content: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+  opts.onUsage?.({ inputTokens: Number(body.usage?.prompt_tokens) || 0, outputTokens: Number(body.usage?.completion_tokens) || 0 });
   return body.choices[0]?.message.content ?? "";
 }
 
