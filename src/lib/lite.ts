@@ -29,7 +29,7 @@ import type { AgentConfig, TaskKind, TaskResult } from "./types";
 
 export const LITE_VERSION = "lite-1";
 /** The most SERV calls one lite run may make. */
-export const LITE_MAX_SERV_CALLS = 4;
+export const LITE_MAX_SERV_CALLS = 5;
 /**
  * The most tokens one SERV reply may use in a lite run. SERV's model reasons before it answers and the
  * reasoning counts towards this cap, so too low a cap leaves an empty reply (1,000 did, on 22 Nov 2026).
@@ -298,13 +298,42 @@ async function writeCoreTask(budget: Budget, target: LiteTarget, tools?: McpTool
   ]
     .filter(Boolean)
     .join("\n\n");
-  const t = json<Record<string, unknown>>(await budget.ask(system, about), "The test task");
-  const prompt = String(t.prompt ?? "").trim().slice(0, 4000);
-  const criteria = String(t.criteria ?? "").trim().slice(0, 1000);
+  // One retry: the writer is the only call whose failure costs the check a whole task.
+  let t: Record<string, unknown> = {};
+  let raw = "";
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      raw = await budget.ask(system, about);
+      t = taskFields(json<unknown>(raw, "The test task"));
+    } catch (e) {
+      raw = raw || (e as Error).message;
+      t = {};
+    }
+    if (pickText(t, ["prompt", "task", "request", "question"]) && pickText(t, ["criteria", "expected", "rubric", "good_answer"])) break;
+    console.warn(`lite: core task attempt ${attempt + 1} unusable: ${raw.replace(/\s+/g, " ").slice(0, 300)}`);
+  }
+  const prompt = pickText(t, ["prompt", "task", "request", "question"]).slice(0, 4000);
+  const criteria = pickText(t, ["criteria", "expected", "rubric", "good_answer"]).slice(0, 1000);
   if (!prompt || !criteria) throw new Error("The test task came back empty");
   const keys = (Array.isArray(t.answer_keys) ? t.answer_keys : []).map((k) => String(k).trim().slice(0, 60)).filter((k) => k.length >= 2).slice(0, 3);
   const budgetWords = Math.round(Number(t.word_budget));
   return { id: "lite-core", prompt, criteria, ...(keys.length ? { answerKeys: keys } : {}), ...(budgetWords >= 10 && budgetWords <= 2000 ? { wordBudget: budgetWords } : {}) };
+}
+
+/** The task object, even when the writer wrapped it (`{"task": {...}}`) or sent a one-item list. */
+export function taskFields(v: unknown): Record<string, unknown> {
+  let o = Array.isArray(v) ? v[0] : v;
+  for (let i = 0; i < 2 && o && typeof o === "object" && !("prompt" in o); i++) {
+    const inner = Object.values(o as Record<string, unknown>).find((x) => x && typeof x === "object" && !Array.isArray(x));
+    if (!inner) break;
+    o = inner;
+  }
+  return o && typeof o === "object" && !Array.isArray(o) ? (o as Record<string, unknown>) : {};
+}
+
+function pickText(o: Record<string, unknown>, keys: string[]): string {
+  for (const k of keys) if (typeof o[k] === "string" && (o[k] as string).trim()) return (o[k] as string).trim();
+  return "";
 }
 
 function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
@@ -383,8 +412,9 @@ export function findings(checks: LiteCheck[], tasks: LiteTaskResult[]): LiteFind
       break;
     }
   }
+  // Only tasks with something to fix: a near-perfect task's summary is praise, not a finding.
   for (const t of scored.slice(weakest && out[0]?.from === weakest.label ? 1 : 0)) {
-    if (out.length >= 2) break;
+    if (out.length >= 2 || t.score! >= 90) break;
     if (t.summary && !out.some((f) => f.text === t.summary)) out.push({ from: t.label, text: t.summary });
   }
   if (!out.length) {
@@ -441,10 +471,12 @@ async function liteAgent(target: LiteTarget, deps: LiteDeps, start: number, now:
   );
 
   const answered = ran.filter((r) => r.answer !== null);
+  // A task Polly couldn't write was never asked, so it doesn't count against the agent.
+  const asked = ran.filter((r) => r.task !== null);
   const checks: LiteCheck[] = [];
   checks.push(
     answered.length
-      ? { id: "reach", label: "Answers", status: answered.length === ran.length ? "pass" : "warn", detail: `Answered ${answered.length} of ${ran.length} tasks.` }
+      ? { id: "reach", label: "Answers", status: answered.length === asked.length ? "pass" : "warn", detail: `Answered ${answered.length} of ${asked.length} tasks.` }
       : { id: "reach", label: "Answers", status: "fail", detail: ran.find((r) => r.error)?.error ?? "The agent didn't answer." },
   );
   if (target.endpoint) checks.push({ id: "https", label: "Secure address", status: "pass", detail: "Public https address." });

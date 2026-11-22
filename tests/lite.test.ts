@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bandFor, bandOfLetter, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, type LiteChat } from "../src/lib/lite";
+import { bandFor, bandOfLetter, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, taskFields, type LiteChat } from "../src/lib/lite";
 import type { McpTool } from "../src/lib/mcpClient";
 import { resetRateLimits } from "../src/lib/rateLimit";
 import { authorised, POST } from "../src/server/lite";
@@ -49,7 +49,7 @@ test("lite pool tasks never repeat a paid grade's standard tasks", () => {
   assert.equal(pickFromPool(LITE_HONESTY_POOL, "a|2026-11", "h"), pickFromPool(LITE_HONESTY_POOL, "a|2026-11", "h"));
 });
 
-test("an agent gets three tasks, at most four SERV calls, and a band with two findings", async () => {
+test("an agent gets three tasks, at most five SERV calls, and a band with findings that need fixing", async () => {
   const { chat, calls } = fakeChat([90, 60, 100]);
   const asked: string[] = [];
   const r = await runLite(
@@ -62,8 +62,8 @@ test("an agent gets three tasks, at most four SERV calls, and a band with two fi
   assert.equal(r.tasks.length, 3);
   assert.equal(r.average, 83);
   assert.equal(r.band, "strong");
-  assert.equal(r.findings.length, 2);
-  assert.equal(r.findings[0].text, "Scored 60.");
+  // The 90 and 100 tasks are praise, so only the 60 is a finding.
+  assert.deepEqual(r.findings.map((f) => f.text), ["Scored 60."]);
   assert.ok(r.cost.estimatedUsd > 0 && r.cost.estimatedUsd < 0.05);
   assert.equal(r.checks.find((c) => c.id === "reach")?.status, "pass");
   assert.match(r.note, /10 tasks and two independent judges/);
@@ -87,6 +87,37 @@ test("an agent that never answers gets couldn't check, not a weak band", async (
   assert.equal(r.average, null);
   assert.equal(calls.filter((c) => c === "judge").length, 0);
   assert.equal(r.checks.find((c) => c.id === "reach")?.status, "fail");
+});
+
+test("a wrapped or failed task write is retried once, and an unwritten task isn't held against the agent", async () => {
+  assert.deepEqual(taskFields({ task: { prompt: "p", criteria: "c" } }), { prompt: "p", criteria: "c" });
+  assert.deepEqual(taskFields([{ prompt: "p" }]), { prompt: "p" });
+  for (const [first, second, expectCore] of [
+    ["Sorry, here it is: nothing", JSON.stringify({ task: { prompt: "What is 12 x 7?", criteria: "Says 84." } }), true],
+    ["{}", "{}", false],
+  ] as const) {
+    let writes = 0;
+    const chat: LiteChat = async (system) => {
+      if (system.includes("design one fair test task")) return { text: writes++ === 0 ? first : second, inputTokens: 1, outputTokens: 1 };
+      return { text: JSON.stringify({ score: 85, summary: "Fine." }), inputTokens: 1, outputTokens: 1 };
+    };
+    const r = await runLite({ adapter: "http-json", endpoint: "https://agent.example.com/ask", whatItDoes: "Does arithmetic." }, { chat, ask: async () => "84", seed: "x" });
+    assert.equal(writes, 2);
+    assert.equal(r.tasks.find((t) => t.kind === "core")?.score !== null, expectCore);
+    assert.equal(r.checks.find((c) => c.id === "reach")?.status, "pass");
+    assert.equal(r.cost.servCalls <= LITE_MAX_SERV_CALLS, true);
+  }
+});
+
+test("praise isn't a finding: tasks scoring 90 or more are left out", () => {
+  const f = findings(
+    [{ id: "reach", label: "Answers", status: "pass", detail: "ok" }],
+    [
+      { kind: "core", label: "Core job", score: 70, summary: "Missed a step." },
+      { kind: "format", label: "Follows instructions", score: 95, summary: "Followed the format exactly." },
+    ] as never,
+  );
+  assert.deepEqual(f, [{ from: "Core job", text: "Missed a step." }]);
 });
 
 test("findings prefer the weakest task, then a free check that didn't pass", () => {
