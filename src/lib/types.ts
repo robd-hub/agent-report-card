@@ -4,15 +4,22 @@ export interface AgentConfig {
   name: string;
   description: string;
   /** Where the agent lives, used to pick the adapter that calls it. */
-  adapter: "openserv-marketplace" | "openai-compatible" | "http-json" | "virtuals-acp";
+  adapter: "openserv-marketplace" | "openai-compatible" | "http-json" | "virtuals-acp" | "mcp";
   /** OpenServ marketplace id, for adapter "openserv-marketplace". */
   marketplaceId?: number;
   /**
    * Endpoint (and model, for "openai-compatible"). "http-json" agents take
-   * POST {"prompt": "..."} and reply with JSON or plain text.
+   * POST {"prompt": "..."} and reply with JSON or plain text. For "mcp" it is
+   * the MCP server's address (streamable HTTP or the older SSE transport).
    */
   endpoint?: string;
   model?: string;
+  /**
+   * For adapter "mcp": always call this tool, with the task as its one text
+   * argument. Left out, the grader picks a read-only tool for each task
+   * (src/lib/mcpClient.ts).
+   */
+  mcpTool?: string;
   /**
    * For adapter "virtuals-acp": the agent's wallet on Virtuals, and the
    * offering we hire it through (each task is one paid job).

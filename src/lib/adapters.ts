@@ -17,6 +17,8 @@ export async function runAgent(agent: AgentConfig, prompt: string): Promise<Agen
       return runHttpJson(agent, prompt);
     case "virtuals-acp":
       return runVirtualsAcp(agent, prompt);
+    case "mcp":
+      return runMcp(agent, prompt);
   }
 }
 
@@ -57,6 +59,17 @@ async function runVirtualsAcp(agent: AgentConfig, prompt: string): Promise<Agent
   const answer = answerFrom(deliverable) || deliverable;
   if (!answer.trim()) throw new Error(`Agent ${agent.id} delivered nothing we could read`);
   return { answer, meta: metaFrom(deliverable) };
+}
+
+/**
+ * An MCP server: call its read-only tools for the task and grade what they
+ * return. Loaded only when needed.
+ */
+async function runMcp(agent: AgentConfig, prompt: string): Promise<AgentReply> {
+  const { runMcpTask } = await import("./mcpClient");
+  const answer = await runMcpTask(agent, prompt, AbortSignal.timeout(ENDPOINT_TIMEOUT_MS));
+  if (!answer.trim()) throw new Error(`Agent ${agent.id} returned no answer we could read`);
+  return { answer };
 }
 
 /** How long an agent's own server may take to answer one task. */

@@ -20,7 +20,7 @@ body:
     id: agent-link
     attributes:
       label: Where can we find it?
-      description: 'The agent''s OpenServ marketplace link (or its agent number), or a public https address for your agent. That address should take a POST with {"prompt": "..."} and reply with the answer (JSON or plain text), or be an OpenAI-style /chat/completions address. It must work without a key. Graded automatically, usually within half an hour.'
+      description: 'The agent''s OpenServ marketplace link (or its agent number), or a public https address for your agent. That address should take a POST with {"prompt": "..."} and reply with the answer (JSON or plain text), or be an OpenAI-style /chat/completions address. MCP servers work too: give the server's address (write mcp: before it if the address has no /mcp in it); we call its read-only tools. It must work without a key. Graded automatically, usually within half an hour.'
       placeholder: https://
     validations:
       required: true

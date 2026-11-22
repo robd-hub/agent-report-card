@@ -34,10 +34,11 @@ import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/link
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
 import { checkPayment, findTxHash, loadPayments, MAX_PAYMENT_AGE_DAYS, savePayment } from "../src/lib/payment";
 import { badgeCheckUrl, CCD_ACCOUNT, CCD_FREE_GRADES, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
+import { isSafeTool, probeMcp, type McpTool } from "../src/lib/mcpClient";
 import { servChat } from "../src/lib/serv";
 import { runShape, shapeLine } from "../src/lib/shape";
 import { FULL_GRADE_TASKS, TASK_KINDS, writtenKinds } from "../src/lib/taskKinds";
-import type { AgentConfig, TestTask } from "../src/lib/types";
+import type { AgentConfig, TaskKind, TestTask } from "../src/lib/types";
 import { taskWording } from "../src/lib/types";
 
 const SITE = "https://robd-hub.github.io/agent-report-card";
@@ -166,14 +167,23 @@ export async function writeTasks(
   suggested = "",
   n = WRITTEN_TASKS,
   existing: TestTask[] = [],
+  mcpTools?: McpTool[],
 ): Promise<{ description: string; tasks: TestTask[] }> {
-  const kinds = writtenKinds(n);
+  // An MCP server answers with its tools' raw output, so only core tasks are fair:
+  // length, clarifying and scope rules, and the standard honesty questions, test
+  // the assistant using the tools rather than the server.
+  const kinds: TaskKind[] = mcpTools ? Array(n).fill("core") : writtenKinds(n);
   const counts = TASK_KINDS.filter((k) => kinds.includes(k.kind)).map((k) => `${kinds.filter((x) => x === k.kind).length} "${k.kind}" (${k.about})`);
   const system =
     `You design fair test tasks for grading AI agents. Write exactly ${n} different tasks for this agent: ${counts.join("; ")}. ` +
     "Core tasks test the agent's core job as described, from easy to hard. " +
-    "Each task must be self-contained text that the agent can answer in text alone: no files, images, wallets, payments, " +
-    "sending messages, trading, or actions in the real world. Include any data the task needs inside the prompt. " +
+    (mcpTools
+      ? "This agent is an MCP server. Each task is answered by calling one, two or three of its read-only tools (listed below) and its answer is exactly what the tools return. " +
+        "Write requests a user would make of an assistant using this server, that its listed tools can answer with public information: nothing that needs a sign-in, the user's own account or files, or a tool that sends, writes, pays or deletes. " +
+        "Prefer requests whose right answer is stable and checkable, and say in the criteria what the tool output must contain. "
+      : "Each task must be self-contained text that the agent can answer in text alone: no files, images, wallets, payments, " +
+        "sending messages, trading, or actions in the real world. ") +
+    "Include any data the task needs inside the prompt. " +
     "Prefer tasks with a checkable right answer, and put the right answer in the criteria. " +
     'For each task also give "answer_keys": one to three short phrases or numbers taken from the right answer, any of which shows the answer has been given ' +
     '(for example ["$92.40", "2 packs"]); use an empty list if the task has no single checkable answer. ' +
@@ -194,6 +204,7 @@ export async function writeTasks(
     `What it says it does: ${(agent.capabilities_description ?? "").slice(0, 4000)}`,
     agent.usage_instructions ? `Usage notes: ${agent.usage_instructions.slice(0, 1500)}` : "",
     agent.expected_output ? `Expected output: ${agent.expected_output.slice(0, 800)}` : "",
+    mcpTools ? `Its read-only tools:\n${mcpTools.slice(0, 60).map((t) => `- ${t.name}: ${(t.description ?? "").replace(/\s+/g, " ").slice(0, 300)}`).join("\n")}` : "",
     existing.length ? `Tasks it already has:\n${existing.map((t) => `- ${t.prompt.slice(0, 300)}`).join("\n")}` : "",
   ]
     .filter(Boolean)
@@ -244,7 +255,7 @@ export async function writeTasks(
   } catch {
     // Keep the plain fallback description.
   }
-  return { description, tasks: [...tasks, ...STANDARD_TASKS] };
+  return { description, tasks: mcpTools ? tasks : [...tasks, ...STANDARD_TASKS] };
 }
 
 function saveAgents(agents: AgentConfig[]): void {
@@ -286,7 +297,7 @@ async function main() {
     return finish(
       "needs-attention",
       "Thanks for your request! The automatic grader can reach agents on the OpenServ marketplace, or agents with a public https address that answers a POST request " +
-        '(`{"prompt": "..."}` in, the answer out as JSON or text; or an OpenAI-style `/chat/completions` address plus its model name). ' +
+        '(`{"prompt": "..."}` in, the answer out as JSON or text; or an OpenAI-style `/chat/completions` address plus its model name), or MCP servers (an address with `/mcp` in it, or any address with `mcp:` written before it). ' +
         "We couldn't find either in your link. Edit this request with the right link, or the maintainer will reply here about grading it another way.",
     );
   }
@@ -427,10 +438,20 @@ async function main() {
   if (!agent && endpoint) {
     // Off the marketplace, the requester's own form is all we know about the agent.
     const name = (form["Agent name"] ?? "").replace(/[\r\n]+/g, " ").trim().slice(0, 80) || new URL(endpoint.endpoint).hostname;
-    const about: MarketplaceAgent = { id: 0, name, capabilities_description: (form["What does it do?"] ?? "").slice(0, 4000) };
+    let mcpTools: McpTool[] | undefined;
+    let serverNotes = "";
+    if (endpoint.adapter === "mcp") {
+      const probe = await probeMcp(endpoint.endpoint);
+      if (!probe.ok) {
+        return finish("needs-attention", `${received} But we can't test ${name} yet: ${probe.reason} The maintainer will reply here, and will retry or refund.`);
+      }
+      mcpTools = (probe.tools ?? []).filter(isSafeTool);
+      if (probe.instructions) serverNotes = `\n\nThe server's own notes: ${probe.instructions.slice(0, 1500)}`;
+    }
+    const about: MarketplaceAgent = { id: 0, name, capabilities_description: ((form["What does it do?"] ?? "") + serverNotes).slice(0, 4000) };
     let written: Awaited<ReturnType<typeof writeTasks>>;
     try {
-      written = await writeTasks(about, suggested);
+      written = await writeTasks(about, suggested, WRITTEN_TASKS, [], mcpTools);
     } catch (e) {
       return finish(
         "needs-attention",

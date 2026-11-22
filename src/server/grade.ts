@@ -17,6 +17,8 @@
  * "Issues: read and write". Without it the endpoint says it's unavailable
  * before asking for any payment.
  */
+import { rateGate } from "./http";
+import { probeMcp } from "@/lib/mcpClient";
 import { findEndpoint, findMarketplaceId } from "@/lib/requests";
 import { issueBody } from "@/lib/issueBody";
 
@@ -105,9 +107,16 @@ export async function POST(request: Request): Promise<Response> {
     return challenge(resource, `Payment required: $${GRADE_PRICE_USD} in USDC on Base per grade ($${REGRADE_PRICE_USD} for an agent already graded). Send {"agent": "<marketplace link or https address>"}.`, o, requirements(resource, o));
   }
   if (!marketplaceId && !endpoint) {
-    return json({ error: "`agent` must be an OpenServ marketplace link or number, or a public https address (OpenAI-style /chat/completions addresses also need `model`)." }, 400);
+    return json({ error: "`agent` must be an OpenServ marketplace link or number, or a public https address (OpenAI-style /chat/completions addresses also need `model`; for an MCP server, use its address, or write mcp: before it)." }, 400);
   }
   if (!marketplaceId && whatItDoes.length < 10) return json({ error: "For agents off the marketplace, describe what it does in `whatItDoes`." }, 400);
+  // Check an MCP server answers and lists a read-only tool before taking any money.
+  if (endpoint?.adapter === "mcp") {
+    const gate = rateGate(request, "mcp-probe", 20);
+    if (!gate.ok) return gate.response;
+    const probe = await probeMcp(endpoint.endpoint);
+    if (!probe.ok) return json({ error: probe.reason }, 400);
+  }
 
   const known = loadAgents().find((a) => (marketplaceId ? a.marketplaceId === marketplaceId : a.endpoint === endpoint!.endpoint));
   const price = known ? REGRADE_PRICE_USD : GRADE_PRICE_USD;
