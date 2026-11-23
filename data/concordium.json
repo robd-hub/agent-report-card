@@ -27,6 +27,15 @@
         "badge": "JyP9YGLug2S48Zqp7H82e",
         "tx": "4c32c12db64e7b87990db5151c1d5d50fd498bf657652278e20bb167f101fa9f",
         "anchoredAt": "2026-11-21T07:25:28.859Z"
+      },
+      {
+        "runDate": "2026-11-23T08:34:14.376Z",
+        "grade": "A",
+        "score": 100,
+        "reportHash": "0551fae1b34ceca15bf5b4399e31867ee65ca20c1f083c25667d9ed310223d78",
+        "badge": "JyP9YGLug2S48Zqp7H82e",
+        "tx": "6d77221e48815874aa37973bb81775fa9b1903035098851e12bf5d11c8a67530",
+        "anchoredAt": "2026-11-23T08:37:29.582Z"
       }
     ],
     "serv-baseline": [
@@ -63,6 +72,14 @@
         "reportHash": "d0445d56913cfc7ad477f0d1fc0d8526d58bfab7df37d05159a173a25a1fd308",
         "tx": "19a41a822bd5036f8a75820dc8268055c96ad6f0ca61a35d91b4a3d96a7ea810",
         "anchoredAt": "2026-11-21T07:20:59.320Z"
+      },
+      {
+        "runDate": "2026-11-04T12:38:59.590Z",
+        "grade": "F",
+        "score": 39,
+        "reportHash": "a8bf146eec6986804e28a83f31670c64c4214232c0f130a31bb23a7cc5e3d89d",
+        "tx": "568b209b60e7b7b159bfa30cb95269978e5ddf5f8b0374264b52437267b4d6c2",
+        "anchoredAt": "2026-11-23T08:36:01.481Z"
       }
     ],
     "research-agent": [
@@ -81,6 +98,14 @@
         "reportHash": "35ba3fdaad6f8b6ed47b7694d81fdf428606c857322ce949ca8bff4971869f10",
         "tx": "0350a00cecc02615d35843d133a030d9f51ad9513b4b8e6a41573683828bed2a",
         "anchoredAt": "2026-11-21T07:21:09.055Z"
+      },
+      {
+        "runDate": "2026-11-04T14:28:15.647Z",
+        "grade": "F",
+        "score": 58,
+        "reportHash": "3d543fd1548c2298a4297276762362a1f77cef7cf6e6f92a292e610351f92c78",
+        "tx": "26b3a42f979528215d9449c90b7d428c48c3f835d19d5dae8edd62c55e366a3f",
+        "anchoredAt": "2026-11-23T08:36:07.064Z"
       }
     ],
     "perplexity-research-assistant": [
@@ -99,6 +124,14 @@
         "reportHash": "6233c1a88dfcf5bd77661c499a5bdfe5e50fd4a97ee1cbea54222f68489dd7af",
         "tx": "2ee7a64bcf093e21bb0dd6afdeb4e4e8a5c66c773eff27da37218ed2f196e2de",
         "anchoredAt": "2026-11-21T07:21:18.736Z"
+      },
+      {
+        "runDate": "2026-11-04T14:30:33.061Z",
+        "grade": "D",
+        "score": 66,
+        "reportHash": "8844b5c9d79eaeca195414d1665440ab46b877163c1397edcefd336ff063948f",
+        "tx": "29029d03e0ce7ea7e66d6a10bc3c43e28d724a5b7c6061c77e2bee9c6a73747a",
+        "anchoredAt": "2026-11-23T08:36:17.221Z"
       }
     ],
     "essay-writer": [
@@ -117,6 +150,14 @@
         "reportHash": "64fc9f0e240783d54e4a15ed71685787dc300f7f27e189fc4804bf06d3c6304f",
         "tx": "7814f268db3d6a98c3fa56cf5adb33c26c92d9e0a505664c9f73f02405abe829",
         "anchoredAt": "2026-11-21T07:21:28.498Z"
+      },
+      {
+        "runDate": "2026-11-04T14:41:28.977Z",
+        "grade": "D",
+        "score": 60,
+        "reportHash": "a9d5f2553f4971e71229c03159aa94fe69452021ef69186130c90e97f4d421bb",
+        "tx": "4685ff319b6224a7cd71c7b23f69625e3c21ea9b21f1c6b47a7eb92daeb9d6e0",
+        "anchoredAt": "2026-11-23T08:36:27.257Z"
       }
     ],
     "copywriter": [
@@ -153,6 +194,14 @@
         "reportHash": "b3aa85b4669f42d140911060a50318a180e0d40e94a0d4333c38c6ddfc9e489f",
         "tx": "59d7ccf1ed7eaa18c0e5888bbc4d5946a1675af6ab8e838e6bb8559687ca22da",
         "anchoredAt": "2026-11-21T07:21:48.058Z"
+      },
+      {
+        "runDate": "2026-11-09T18:55:22.265Z",
+        "grade": "F",
+        "score": 38,
+        "reportHash": "af7ca2c56ac068f130f0fd3fca49dc97fc59af4d717dce2943af2685348888cf",
+        "tx": "c2853defdf13eb57e58426d4b20c2eae88d73f87f769dab89f5fb0aa3d6ec57c",
+        "anchoredAt": "2026-11-23T08:36:37.233Z"
       }
     ],
     "smart-contract-commentator": [
@@ -225,6 +274,14 @@
         "reportHash": "7ec9e57221eb31cf5dc87d678295c70651b994fa06f174d37c7f8a116df257fc",
         "tx": "6a665b65733266a155c411e32e85ae4acc596dd834d83cb153740ff590afb873",
         "anchoredAt": "2026-11-21T07:22:22.313Z"
+      },
+      {
+        "runDate": "2026-11-04T19:02:26.762Z",
+        "grade": "F",
+        "score": 34,
+        "reportHash": "cb33b4475323d5436ab5013a3cd2ce37a3cebce268e43867f0877156c5450ee4",
+        "tx": "3e5d17fa03f2010bb92187b61e4a0b4d0aebfcebd87ae50930f7809d30649f21",
+        "anchoredAt": "2026-11-23T08:36:47.457Z"
       }
     ],
     "code-quality-inspector": [
@@ -333,6 +390,14 @@
         "reportHash": "e3bca5649428e4d54e0c50c4a25c298f7c49ee4a459fd82d0a1aab26670cb8d6",
         "tx": "3ea33a6ac96df2e6daadc5e4ce7a955f86a1a40bbc7b6552c19fa5e3ac70f494",
         "anchoredAt": "2026-11-21T07:23:06.015Z"
+      },
+      {
+        "runDate": "2026-11-09T19:03:24.341Z",
+        "grade": "F",
+        "score": 56,
+        "reportHash": "2b0d82d1a8eb4d77e7bec19727f6ca073b79d53a42132d8cff5ce444924f4f60",
+        "tx": "85f40a4d28a8d36565903b8adf2f1e1348cffb519bf8a9a5fd304d2c4b51b786",
+        "anchoredAt": "2026-11-23T08:36:53.048Z"
       }
     ],
     "otc-term-sheet-writer": [
@@ -351,6 +416,14 @@
         "reportHash": "583516c258b1acfcf988222a7f44200f9938d9cdcef3f32a850289a5484dae05",
         "tx": "530268812d3ec758784d94b7ee814c29d21f82d0264360f4f889acb1611a76b4",
         "anchoredAt": "2026-11-21T07:23:11.204Z"
+      },
+      {
+        "runDate": "2026-11-09T21:47:01.328Z",
+        "grade": "F",
+        "score": 41,
+        "reportHash": "c6d786598a9c670181eb654be8efe3b78091359e0f8b3a68c90a9f138277cca0",
+        "tx": "4e585b8f9c581b240e11ca19ad438c7899dc9f031b3b0c5f0c9194de9a1cafe2",
+        "anchoredAt": "2026-11-23T08:37:02.910Z"
       }
     ],
     "token-utility-ideator": [
@@ -369,6 +442,14 @@
         "reportHash": "bf128072ea77b0c1cf198d2f76ddf4bc22bd4c6ccaccdeaee04412f45ce2389d",
         "tx": "338e5124473cd4756967b7cd6671843c76145575659d49e39ad3698e785aec77",
         "anchoredAt": "2026-11-21T07:23:20.908Z"
+      },
+      {
+        "runDate": "2026-11-09T19:17:43.273Z",
+        "grade": "F",
+        "score": 17,
+        "reportHash": "4990e1927fa7c752d07d91790e8b8ebfafeda1762fce52f4b91c853bf801edcb",
+        "tx": "ecb6aa704031c151ec77238365e4db1168638688060c09410e6a4492b8717c66",
+        "anchoredAt": "2026-11-23T08:37:13.049Z"
       }
     ],
     "researcher-mini": [
@@ -585,6 +666,14 @@
         "reportHash": "bd479a0c97c1794dcb41aceefff7a77cb3721689f729544669181746ce149c0f",
         "tx": "ddbedd070cedf8b937e42fc4f9cfc2a6f2b2602ced3e242ec43955908ab7f77c",
         "anchoredAt": "2026-11-21T07:25:08.370Z"
+      },
+      {
+        "runDate": "2026-11-11T07:05:17.701Z",
+        "grade": "C",
+        "score": 73,
+        "reportHash": "12ce5cb5554998d9edb3faed4966e594db035835b3167a4764cdd726baf8ea33",
+        "tx": "c4f08fed951f1119168ce0ff2b6bdf6d45c3f8c7e585e5eb1e0f945c5218c709",
+        "anchoredAt": "2026-11-23T08:37:23.098Z"
       }
     ],
     "twitter-scraping-agent": [
@@ -612,7 +701,7 @@
       "tokenId": 1256,
       "verified": true,
       "owner": "3ZdJsmDtyeXqzsd29MNkF7NcGdDk7ZLPXS8uJfu8WgEGdLXY68",
-      "checkedAt": "2026-11-21T07:25:18.126Z"
+      "checkedAt": "2026-11-23T08:37:23.099Z"
     }
   }
 }
