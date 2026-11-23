@@ -94,11 +94,21 @@ export type AnswerFirst =
 
 /** The word limit a task sets itself ("under 150 words", "at most 50 words"), if any. */
 export function wordLimit(prompt: string): number | null {
-  const m =
-    /\b(?:under|fewer than|less than|at most|no more than|max(?:imum)?(?: of)?|within|up to|in)\s+(\d{1,4})\s+words\b/i.exec(prompt) ??
-    /\b(\d{1,4})\s+words\s+(?:or fewer|or less|max(?:imum)?)\b/i.exec(prompt) ??
-    /\b(\d{1,4})-word\b/i.exec(prompt);
-  return m ? Number(m[1]) : null;
+  const patterns = [
+    /\b(?:under|fewer than|less than|at most|no more than|max(?:imum)?(?: of)?|within|up to|in)\s+(\d{1,4})\s+words\b/gi,
+    /\b(\d{1,4})\s+words\s+(?:or fewer|or less|max(?:imum)?)\b/gi,
+    /\b(\d{1,4})-word\b/gi,
+  ];
+  for (const re of patterns) {
+    for (const m of prompt.matchAll(re)) {
+      // "three bullet points, each under 15 words" limits each item, not the whole answer, so it isn't the target.
+      const before = prompt.slice(Math.max(0, m.index - 30), m.index);
+      const after = prompt.slice(m.index + m[0].length, m.index + m[0].length + 20);
+      if (/\b(?:each|every|per)\b[^.,;:]*$/i.test(before) || /^\s*(?:each|apiece|per\b)/i.test(after)) continue;
+      return Number(m[1]);
+    }
+  }
+  return null;
 }
 
 export interface LengthCheck {

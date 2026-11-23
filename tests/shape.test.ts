@@ -48,6 +48,12 @@ test("length uses the task's own word limit when it sets one", () => {
   assert.equal(wordLimit("In under 150 words, explain proof of stake."), 150);
   assert.equal(wordLimit("Write a 50-word summary."), 50);
   assert.equal(wordLimit("Explain proof of stake."), null);
+  // A limit on each item is not a limit on the whole answer.
+  assert.equal(wordLimit("In exactly three bullet points, each under 15 words, say what kinds of request you handle best."), null);
+  assert.equal(wordLimit("Give a numbered list of exactly two things. Each item at most 12 words. No other text."), null);
+  assert.equal(wordLimit("List three tips of at most 10 words each."), null);
+  assert.equal(wordLimit("Give five bullets, each under 12 words, in under 80 words total."), 80);
+  assert.equal(wordLimit("Describe what you do in one sentence of at most 25 words."), 25);
   const long = Array(160).fill("word").join(" ");
   const s = taskShape(base(long, { prompt: "In under 150 words, explain it." }));
   assert.equal(s?.length?.source, "limit");
