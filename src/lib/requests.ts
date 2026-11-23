@@ -1,5 +1,6 @@
 /** Reads where to find an agent from a grade request. Shared by the grading bot and the pay-by-API endpoint. */
 import { isPublicHttpsUrl } from "./adapters";
+import type { AgentConfig } from "./types";
 
 /** Finds an OpenServ marketplace agent id in a link like .../agents/833, or a bare number. */
 export function findMarketplaceId(text: string): number | null {
@@ -51,3 +52,33 @@ export function findEndpoint(text: string, model: string): FoundEndpoint | null 
   return { endpoint: clean.toString(), adapter: "http-json" };
 }
 
+
+/**
+ * When the address given is a graded agent's home page (the bare site, no path),
+ * swap in the address we grade that agent on. Someone checking Cheap First will
+ * usually paste https://cheap-first.vercel.app/, but the agent answers at
+ * /api/ask, and the home page refuses a POST with 405. Matched by host only,
+ * and only when exactly one graded agent lives on that host.
+ */
+export function knownEndpointFor(found: FoundEndpoint, agents: AgentConfig[]): FoundEndpoint {
+  if (found.adapter !== "http-json") return found;
+  let given: URL;
+  try {
+    given = new URL(found.endpoint);
+  } catch {
+    return found;
+  }
+  if (given.pathname.replace(/\/+$/, "") !== "" || given.search) return found;
+  const host = given.hostname.toLowerCase();
+  const onHost = agents.filter((a) => {
+    if (!a.endpoint || !["http-json", "openai-compatible", "mcp"].includes(a.adapter)) return false;
+    try {
+      return new URL(a.endpoint).hostname.toLowerCase() === host;
+    } catch {
+      return false;
+    }
+  });
+  if (onHost.length !== 1) return found;
+  const a = onHost[0];
+  return { endpoint: a.endpoint!, adapter: a.adapter as FoundEndpoint["adapter"], ...(a.model ? { model: a.model } : {}) };
+}

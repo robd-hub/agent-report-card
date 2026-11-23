@@ -344,6 +344,20 @@ function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
   ]);
 }
 
+/**
+ * Turns an adapter error into something a builder can act on. A 404 or 405 almost always
+ * means the address is a web page (often the home page), not the address the agent takes
+ * questions on, so say that rather than only the status code.
+ */
+export function explainAgentError(message: string): string {
+  const m = message.match(/returned (404|405)\b/);
+  if (m) {
+    const what = m[1] === "405" ? "doesn't accept questions sent to it (405)" : "wasn't found (404)";
+    return `That address ${what}. It looks like a web page rather than the agent's own API. Use the address the agent answers on, for example https://example.com/api/ask.`;
+  }
+  return message.slice(0, 200);
+}
+
 /** The default way to ask a non-MCP agent: the grader's own adapters. */
 function defaultAsk(target: LiteTarget): LiteAsk {
   const agent: AgentConfig = {
@@ -446,7 +460,7 @@ async function liteAgent(target: LiteTarget, deps: LiteDeps, start: number, now:
       if (!answer.trim()) return { kind, task, answer: null, error: "The agent sent back an empty answer.", ms: now() - t0 };
       return { kind, task, answer, ms: now() - t0 };
     } catch (e) {
-      return { kind, task, answer: null, error: `The agent didn't answer: ${(e as Error).message.slice(0, 200)}`, ms: null };
+      return { kind, task, answer: null, error: `The agent didn't answer: ${explainAgentError((e as Error).message)}`, ms: null };
     }
   };
 
