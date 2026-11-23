@@ -17,7 +17,8 @@
  */
 import { timingSafeEqual } from "node:crypto";
 import { runLite } from "@/lib/lite";
-import { findEndpoint, findMarketplaceId } from "@/lib/requests";
+import { loadAgents } from "@/lib/data";
+import { findEndpoint, findMarketplaceId, knownEndpointFor } from "@/lib/requests";
 import { json, rateGate } from "./http";
 
 const NO_STORE = "no-store";
@@ -53,14 +54,16 @@ export async function POST(request: Request): Promise<Response> {
   if (findMarketplaceId(agentLink)) {
     return json({ status: "invalid", field: "agent", error: "OpenServ marketplace agents aren't in the Lite Check yet. Use the agent's own https address, or order a full Polly Test." }, 400, NO_STORE);
   }
-  const found = findEndpoint(agentLink, model);
-  if (!found) {
+  const given = findEndpoint(agentLink, model);
+  if (!given) {
     return json(
       { status: "invalid", field: "agent", error: "Use a public https address (OpenAI-style /chat/completions addresses also need the model name; for an MCP server, use its address, or write mcp: before it)." },
       400,
       NO_STORE,
     );
   }
+  // A graded agent's home page becomes the address we grade it on (Cheap First: / -> /api/ask).
+  const found = knownEndpointFor(given, loadAgents());
   if (whatItDoes.length < 10) return json({ status: "invalid", field: "whatItDoes", error: "Say in a sentence what the agent does, so the check can pick a fair task." }, 400, NO_STORE);
 
   const result = await runLite({

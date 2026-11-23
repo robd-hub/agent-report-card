@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bandFor, bandOfLetter, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, taskFields, type LiteChat } from "../src/lib/lite";
+import { bandFor, bandOfLetter, explainAgentError, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, taskFields, type LiteChat } from "../src/lib/lite";
 import type { McpTool } from "../src/lib/mcpClient";
+import { loadAgents } from "../src/lib/data";
+import { findEndpoint, knownEndpointFor } from "../src/lib/requests";
+import type { AgentConfig } from "../src/lib/types";
 import { resetRateLimits } from "../src/lib/rateLimit";
 import { authorised, POST } from "../src/server/lite";
 import { STANDARD_TASKS } from "../scripts/auto-grade";
@@ -232,4 +235,27 @@ test("POST /api/lite is off without its secret, and refuses callers without it",
   } finally {
     process.env = env;
   }
+});
+
+test("a graded agent's home page is swapped for the address we grade it on", () => {
+  const agents = [
+    { id: "cheap-first", name: "Cheap First", description: "", adapter: "http-json", endpoint: "https://cheap-first.vercel.app/api/ask", tasks: [] },
+    { id: "a", name: "A", description: "", adapter: "http-json", endpoint: "https://shared.example.com/a", tasks: [] },
+    { id: "b", name: "B", description: "", adapter: "http-json", endpoint: "https://shared.example.com/b", tasks: [] },
+  ] as unknown as AgentConfig[];
+  const home = findEndpoint("https://cheap-first.vercel.app/", "")!;
+  assert.deepEqual(knownEndpointFor(home, agents), { endpoint: "https://cheap-first.vercel.app/api/ask", adapter: "http-json" });
+  assert.equal(knownEndpointFor(findEndpoint("https://Cheap-First.vercel.app", "")!, agents).endpoint, "https://cheap-first.vercel.app/api/ask");
+  // A real path is left alone, and so is a host with more than one graded agent.
+  assert.equal(knownEndpointFor(findEndpoint("https://cheap-first.vercel.app/api/other", "")!, agents).endpoint, "https://cheap-first.vercel.app/api/other");
+  assert.equal(knownEndpointFor(findEndpoint("https://shared.example.com/", "")!, agents).endpoint, "https://shared.example.com/");
+  assert.equal(knownEndpointFor(findEndpoint("https://unknown.example.com/", "")!, agents).endpoint, "https://unknown.example.com/");
+  // The real catalogue maps Cheap First's home page too.
+  assert.equal(knownEndpointFor(home, loadAgents()).endpoint, "https://cheap-first.vercel.app/api/ask");
+});
+
+test("a 404 or 405 from the agent is explained as a web page, not the agent's API", () => {
+  assert.match(explainAgentError("Agent lite-check returned 405"), /web page rather than the agent's own API/);
+  assert.match(explainAgentError("Agent lite-check returned 404"), /wasn't found \(404\)/);
+  assert.equal(explainAgentError("Agent lite-check returned 500"), "Agent lite-check returned 500");
 });
