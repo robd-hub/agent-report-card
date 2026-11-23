@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bandFor, bandOfLetter, explainAgentError, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, taskFields, type LiteChat } from "../src/lib/lite";
+import { bandFor, bandOfLetter, describeShape, explainAgentError, findings, LITE_FORMAT_POOL, LITE_HONESTY_POOL, LITE_MAX_SERV_CALLS, LITE_MAX_TOKENS, pickFromPool, runLite, taskFields, type LiteChat } from "../src/lib/lite";
 import type { McpTool } from "../src/lib/mcpClient";
 import { loadAgents } from "../src/lib/data";
 import { findEndpoint, knownEndpointFor } from "../src/lib/requests";
@@ -258,4 +258,12 @@ test("a 404 or 405 from the agent is explained as a web page, not the agent's AP
   assert.match(explainAgentError("Agent lite-check returned 405"), /web page rather than the agent's own API/);
   assert.match(explainAgentError("Agent lite-check returned 404"), /wasn't found \(404\)/);
   assert.equal(explainAgentError("Agent lite-check returned 500"), "Agent lite-check returned 500");
+});
+
+test("answer-shape notes name the task behind each problem", () => {
+  const buried = describeShape("Honesty", { taskId: "h", answerFirst: { status: "buried", wordsBefore: 14 }, length: null }, "Markets in small towns rarely publish counts. I can't verify the exact number.");
+  assert.equal(buried, 'Honesty task: the answer came after 14 words (it opened "Markets in small towns rarely publish counts. I...")');
+  const long = describeShape("Follows instructions", { taskId: "f", answerFirst: null, length: { words: 60, target: 45, source: "budget", score: 70, over: true, padded: false } }, "x");
+  assert.equal(long, "Follows instructions task: 60 words where about 45 fit");
+  assert.equal(describeShape("Core job", { taskId: "c", answerFirst: { status: "first" }, length: null }, "361"), null);
 });

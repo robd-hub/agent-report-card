@@ -358,6 +358,20 @@ export function explainAgentError(message: string): string {
   return message.slice(0, 200);
 }
 
+/**
+ * One task's answer-shape problem in a sentence that names the task, e.g.
+ * 'Honesty task: the answer came after 14 words (it opened "Great question, markets like...")'.
+ * Null when there's nothing to fix.
+ */
+export function describeShape(label: string, s: TaskShape, answer: string): string | null {
+  const parts: string[] = [];
+  const quote = (t: string) => `"${t.split(/\s+/).slice(0, 8).join(" ")}${t.split(/\s+/).length > 8 ? "..." : ""}"`;
+  if (s.answerFirst?.status === "slow-start") parts.push(`opened with ${quote(s.answerFirst.opener)} before the answer`);
+  if (s.answerFirst?.status === "buried") parts.push(`the answer came after ${s.answerFirst.wordsBefore} words (it opened ${quote(answer.replace(/[#*_`>]/g, "").trim())})`);
+  if (s.length?.over) parts.push(`${s.length.words} words where about ${s.length.target} fit${s.length.padded ? ", at least twice as long as needed" : ""}`);
+  return parts.length ? `${label} task: ${parts.join(", and ")}` : null;
+}
+
 /** The default way to ask a non-MCP agent: the grader's own adapters. */
 function defaultAsk(target: LiteTarget): LiteAsk {
   const agent: AgentConfig = {
@@ -494,30 +508,28 @@ async function liteAgent(target: LiteTarget, deps: LiteDeps, start: number, now:
       : { id: "reach", label: "Answers", status: "fail", detail: ran.find((r) => r.error)?.error ?? "The agent didn't answer." },
   );
   if (target.endpoint) checks.push({ id: "https", label: "Secure address", status: "pass", detail: "Public https address." });
-  const times = answered.map((r) => r.ms).filter((m): m is number => m !== null).sort((a, b) => a - b);
-  if (times.length) {
-    const slowest = times[times.length - 1];
+  const timed = answered.filter((r): r is Ran & { ms: number } => r.ms !== null).sort((a, b) => a.ms - b.ms);
+  if (timed.length) {
+    const slowest = timed[timed.length - 1];
+    const which = timed.length > 1 ? ` (${KIND_LABEL[slowest.kind].toLowerCase()} task)` : "";
     checks.push({
       id: "speed",
       label: "Response time",
-      status: slowest <= 10_000 ? "pass" : "warn",
-      detail: `Slowest answer took ${(slowest / 1000).toFixed(1)} seconds${slowest > 10_000 ? ", which is slow for most uses." : "."}`,
+      status: slowest.ms <= 10_000 ? "pass" : "warn",
+      detail: `Slowest answer took ${(slowest.ms / 1000).toFixed(1)} seconds${which}${slowest.ms > 10_000 ? ", which is slow for most uses." : "."}`,
     });
   }
-  const shapes = answered.map((r) => shapeOf(r.task!, r.answer!)).filter((s): s is TaskShape => s !== null);
-  if (shapes.length) {
-    const slow = shapes.filter((s) => s.answerFirst?.status === "slow-start" || s.answerFirst?.status === "buried").length;
-    const padded = shapes.filter((s) => s.length?.padded).length;
-    const over = shapes.filter((s) => s.length?.over).length;
-    const problems = [
-      slow ? `the answer wasn't first on ${slow} of ${shapes.length}` : "",
-      padded ? `${padded} ${padded === 1 ? "answer was" : "answers were"} at least twice as long as needed` : over ? `${over} ${over === 1 ? "answer ran" : "answers ran"} over length` : "",
-    ].filter(Boolean);
+  const shaped = answered.map((r) => ({ r, s: shapeOf(r.task!, r.answer!) })).filter((x): x is { r: Ran; s: TaskShape } => x.s !== null);
+  if (shaped.length) {
+    // Name the task behind each problem, so a builder knows which answer to look at.
+    const problems = shaped
+      .map(({ r, s }) => describeShape(KIND_LABEL[r.kind], s, r.answer!))
+      .filter((p): p is string => p !== null);
     checks.push({
       id: "shape",
       label: "Answer shape",
       status: problems.length ? "warn" : "pass",
-      detail: problems.length ? `${problems.join(", and ").replace(/^./, (c) => c.toUpperCase())}. Put the direct answer in the first sentence and keep to the length asked.` : "Answers came first and kept to a sensible length.",
+      detail: problems.length ? `${problems.join("; ")}. Put the direct answer in the first sentence and keep to the length asked.`.slice(0, 390) : "Answers came first and kept to a sensible length.",
     });
   }
 
