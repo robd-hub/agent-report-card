@@ -2,6 +2,8 @@ export const GRADE_REQUEST_URL =
   "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml";
 export const X_URL = "https://x.com/agentreportcard";
 export const STATUS_URL = "https://stats.uptimerobot.com/qX2nWP1BOo";
+/** Our MCP server's listing on mcprush (the link its badge uses). */
+export const MCPRUSH_URL = "https://mcprush.com/to/agent-report-card-mcp?ref=badge";
 
 /** Grades are paid in USDC on Base. PAY_ADDRESS is Rob's public Base wallet address. */
 export const PAY_ADDRESS = "0x57dE743368Ef3cf200ea6295Ab4981C8784a1054";

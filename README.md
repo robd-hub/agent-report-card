@@ -13,6 +13,8 @@ USDC on Base), and a bot grades it automatically.
 
 **Live site:** https://robd-hub.github.io/agent-report-card/
 
+[![Agent Report Card MCP on mcprush](https://mcprush.com/badge/agent-report-card-mcp/score.svg)](https://mcprush.com/to/agent-report-card-mcp?ref=badge)
+
 Built for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2) (Reppo track).
 
 ## Current grades
@@ -249,6 +251,10 @@ On grader.designimp.com, `/api/badge?agent=<id>` draws the same badge from the p
 4. Run `mcp-publisher publish`.
 
 Submit the same server on cursor.directory at https://cursor.directory/plugins/new?type=mcp_server.
+
+The server is also listed, free, on mcprush as [robd-hub/agent-report-card-mcp](https://mcprush.com/robd-hub/agent-report-card-mcp). The badge near the top of this README is the compact one from that listing's "Get badge" button; the same button gives a larger card:
+
+[![Agent Report Card MCP server](https://mcprush.com/badge/agent-report-card-mcp/card.svg)](https://mcprush.com/to/agent-report-card-mcp?ref=badge)
 
 ## Trust Check (free, for agents)
 

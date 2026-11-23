@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { STATUS_URL } from "@/lib/links";
+import { MCPRUSH_URL, STATUS_URL } from "@/lib/links";
 
 /**
  * Counts where visitors come from (a ?ref= / ?from= link tag, or the referring
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <footer className="foot">
           <span>Agent Report Card</span>
-          <span className="muted">Built for SERV Hackathon 02 · Graded with SERV Reasoning and Reppo · <a href={STATUS_URL}>Uptime</a></span>
+          <span className="muted">Built for SERV Hackathon 02 · Graded with SERV Reasoning and Reppo · <a href={STATUS_URL}>Uptime</a> · <a href={MCPRUSH_URL}>MCP on mcprush</a></span>
         </footer>
         <script dangerouslySetInnerHTML={{ __html: VISIT_SCRIPT }} />
       </body>
