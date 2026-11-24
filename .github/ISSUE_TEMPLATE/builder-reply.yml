@@ -1,0 +1,40 @@
+name: Reply to a grade
+description: Built an agent we graded? Add your side to its report page, for example what you've fixed since.
+title: "Builder reply: "
+labels: ["builder-reply"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Your reply appears on the agent's report page under "From the builder", with the date. We check that you built the agent before it goes up, usually within a day. Keep it to what you'd like readers to know, such as what you've fixed or how the agent is meant to be used. Plain text, up to 600 characters.
+
+        Fixed the weak spots? Tick the box below and we'll point you to a $5 regrade, so the report shows each task's score before and after.
+  - type: input
+    id: agent-id
+    attributes:
+      label: Which agent?
+      description: The link to its report page, or its id.
+      placeholder: https://robd-hub.github.io/agent-report-card/agents/your-agent/
+    validations:
+      required: true
+  - type: textarea
+    id: reply
+    attributes:
+      label: Your reply
+      description: Plain text, up to 600 characters.
+    validations:
+      required: true
+  - type: input
+    id: proof
+    attributes:
+      label: How can we tell you built it?
+      description: A link from the agent's own repo, website or account that shows it's yours (for example the repo, or a post from the agent's X account).
+      placeholder: https://
+    validations:
+      required: true
+  - type: checkboxes
+    id: regrade
+    attributes:
+      label: Regrade
+      options:
+        - label: I've fixed something and would like a $5 regrade

@@ -8,6 +8,8 @@ import { BadgePicker } from "./BadgePicker";
 import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium";
 import { taskWording } from "@/lib/types";
 import { runShape, type TaskShape } from "@/lib/shape";
+import { latestReply, type BuilderReply } from "@/lib/replies";
+import { builderReplyUrl, REGRADE_PRICE_USD } from "@/lib/links";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -136,6 +138,8 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             )}
           </div>
 
+          <BuilderReplyPanel reply={latestReply(agent.id)} latestGrade={run?.date ?? null} />
+
           {shape && <ShapePanel shape={shape} />}
 
           {onChain && (
@@ -228,11 +232,40 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
       )}
 
       <div className="panel">
+        <div className="panel-label">Built this agent?</div>
+        <p className="muted">Add your side to this report, for example what you&apos;ve fixed since it was graded. Fixed the weak spots? A regrade uses the same tasks, so this page shows each task before and after.</p>
+        <div className="cta-actions">
+          <a className="btn btn-ghost" href={builderReplyUrl(agent.id)}>Reply to this grade</a>
+          <Link className="btn btn-primary" href="/request">Regrade for ${REGRADE_PRICE_USD}</Link>
+        </div>
+      </div>
+
+      <div className="panel">
         <div className="panel-label">Show off this grade</div>
         <p className="muted">Paste the README snippet into GitHub. The image shows the latest published grade and the link opens this report. The styles below are for a website.</p>
         <BadgePicker agentId={agent.id} agentName={agent.name} grade={run?.grade ?? null} score={run?.score ?? null} siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? ""} basePath={process.env.NEXT_PUBLIC_BASE_PATH ?? ""} />
       </div>
     </main>
+  );
+}
+
+/** The builder's published reply, if any. Plain text: React escapes it. */
+function BuilderReplyPanel({ reply, latestGrade }: { reply: BuilderReply | null; latestGrade: string | null }) {
+  if (!reply) return null;
+  const older = reply.gradeDate && latestGrade && reply.gradeDate !== latestGrade;
+  return (
+    <div className="panel builder-reply">
+      <div className="panel-label">From the builder</div>
+      {reply.text.split("\n\n").map((para, i) => (
+        <p key={i} style={{ whiteSpace: "pre-line" }}>{para}</p>
+      ))}
+      <p className="muted small">
+        {reply.author ? `@${reply.author}, ` : ""}{reply.date.slice(0, 10)}
+        {reply.gradeDate ? `, about the grade from ${reply.gradeDate.slice(0, 10)}` : ""}
+        {older ? " (the agent has been regraded since)" : ""}. Written by the builder, not checked by us.{" "}
+        <a href={reply.proof} rel="nofollow noopener noreferrer">Builder&apos;s link</a>
+      </p>
+    </div>
   );
 }
 
