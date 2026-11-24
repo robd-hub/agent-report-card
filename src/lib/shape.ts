@@ -57,6 +57,19 @@ export function opening(text: string): string {
   return sentence.split(/\s+/).slice(0, OPENING_WORDS).join(" ");
 }
 
+/**
+ * A labelled closing line ("Answer: ...", "Final answer: ...") counts like a first line.
+ * For sums, working first and then one clearly marked answer line keeps the answer
+ * easy to check, and our test on 24 calculation tasks (24 November 2026) found
+ * answer-first made a small model state the total before working it out: 17 of 24
+ * right against 23 to 24 for work-first with an Answer: line.
+ */
+export function answerLine(text: string): string {
+  const lines = text.split(/\r?\n/).map((l) => normalise(l).trim()).filter(Boolean);
+  const last = [...lines].reverse().find((l) => /^(final\s+)?answer\s*:/i.test(l));
+  return last ? last.replace(/^(final\s+)?answer\s*:\s*/i, "") : "";
+}
+
 /** Where a key first appears in the text, as a count of words before it, or -1. */
 function findKey(text: string, key: string): number {
   const k = normalise(key).trim();
@@ -155,7 +168,7 @@ export function taskShape(t: TaskResult, agent?: Pick<AgentConfig, "tasks">): Ta
   const open = opening(text);
   if (f.answerKeys?.length) {
     const body = normalise(text);
-    if (f.answerKeys.some((k) => findKey(open, k) >= 0)) answerFirst = { status: "first" };
+    if (f.answerKeys.some((k) => findKey(open, k) >= 0 || findKey(answerLine(text), k) >= 0)) answerFirst = { status: "first" };
     else {
       const positions = f.answerKeys.map((k) => findKey(body, k)).filter((p) => p >= 0);
       answerFirst = positions.length ? { status: "buried", wordsBefore: Math.min(...positions) } : { status: "not-found" };
@@ -190,7 +203,7 @@ export interface RunShape {
 
 export const FIXES = {
   answerFirst:
-    'Put the answer first. Add a line like "Start with the direct answer in one sentence. Everything after it is support." to your system prompt.',
+    'Make the answer easy to find. For questions with a sum in them, have the model show its working in a line or two and finish with one line starting "Answer:"; leading with the total makes models state it before working it out. For everything else, start with the direct answer in one sentence and make everything after it support. Either way, add "Use only the figures given in the request" to stop it filling gaps with numbers from elsewhere.',
   length:
     "Set a length target. Tell the model how long a good answer is for this kind of request, and check the word count before you send it.",
   context:

@@ -26,6 +26,12 @@ test("an answer that leads with the key is answer first", () => {
   // LaTeX and thousands commas don't hide a number.
   assert.deepEqual(taskShape(base("Total: \\(\\boxed{\\$92.40}\\)"))?.answerFirst, { status: "first" });
   assert.deepEqual(taskShape(base("Answer: 1,250 units.", { answerKeys: ["1250"] }))?.answerFirst, { status: "first" });
+  // Working first, then a labelled answer line, counts as answer first.
+  assert.deepEqual(
+    taskShape(base("Packs: 2 x $36 = $72. Singles: 6 x $3.40 = $20.40.\nAnswer: $92.40."))?.answerFirst,
+    { status: "first" },
+  );
+  assert.deepEqual(taskShape(base("Working: 72 + 20.40.\n\n**Final answer:** $92.40"))?.answerFirst, { status: "first" });
 });
 
 test("an answer that gets there late is buried, with how far in", () => {
