@@ -1,5 +1,8 @@
 export const GRADE_REQUEST_URL =
   "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml";
+/** A "Reply to a grade" issue with the agent filled in (.github/ISSUE_TEMPLATE/builder-reply.yml). */
+export const builderReplyUrl = (agentId: string) =>
+  `https://github.com/robd-hub/agent-report-card/issues/new?template=builder-reply.yml&agent-id=${encodeURIComponent(agentId)}`;
 export const X_URL = "https://x.com/agentreportcard";
 export const STATUS_URL = "https://stats.uptimerobot.com/qX2nWP1BOo";
 /** Our MCP server's listing on mcprush (the link its badge uses). */

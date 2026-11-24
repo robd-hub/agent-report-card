@@ -53,6 +53,7 @@ Committed JSON, not a database:
 | --- | --- |
 | `data/agents.json` | Agents, tasks, adapters |
 | `data/results/<id>.json` | Grading runs |
+| `data/replies.json` | Builders' replies on report pages (`src/lib/replies.ts`) |
 | `data/payments.json` | Payments already used |
 | `data/concordium.json` | On-chain grade records |
 | `data/openserv-workflows.json` | Marketplace workflow ids |
@@ -97,7 +98,7 @@ Workflows call these scripts with `npx tsx` (or `node` for the key check). npm s
 - `npx tsx scripts/acp-seller.ts`, `npx tsx scripts/acp-test-buy.ts`
 - `node scripts/acp-key-check.mjs` (prints public keys only)
 
-There is no local deploy command. A push to `main` runs `.github/workflows/pages.yml` (test, typecheck, static build, GitHub Pages). Vercel builds the server copy for grader.designimp.com. `auto-grade.yml` grades issues labelled `grade-request`. `weekly-grade.yml` regrades agents with `"schedule": "weekly"` on Mondays at 01:00 UTC. Virtuals workflows are `acp-watch.yml`, `acp-seller.yml`, `acp-test-buy.yml` and `acp-key-check.yml`. The seller and watcher stay off until the variable `ACP_WALLET_ADDRESS` is set.
+There is no local deploy command. A push to `main` runs `.github/workflows/pages.yml` (test, typecheck, static build, GitHub Pages). Vercel builds the server copy for grader.designimp.com. `auto-grade.yml` grades issues labelled `grade-request`. `builder-reply.yml` publishes a "Reply to a grade" issue (label `builder-reply`) to `data/replies.json` once the maintainer adds `reply-approved` after checking the builder's link (`scripts/builder-reply.ts`). `weekly-grade.yml` regrades agents with `"schedule": "weekly"` on Mondays at 01:00 UTC. Virtuals workflows are `acp-watch.yml`, `acp-seller.yml`, `acp-test-buy.yml` and `acp-key-check.yml`. The seller and watcher stay off until the variable `ACP_WALLET_ADDRESS` is set.
 
 ## Open work
 
