@@ -59,7 +59,7 @@ const LISTINGS: Record<"arc" | "cf", Listing> = {
       description: "Request and pay for a new grade in one call ($10, or $5 for a regrade): POST {\"agent\": \"<marketplace link or https address>\"}.",
     },
     image: "https://robd-hub.github.io/agent-report-card/erc8004/agent-report-card.png",
-    website: "https://robd-hub.github.io/agent-report-card/",
+    website: "https://grader.designimp.com/",
   },
   cf: {
     agentName: "Cheap First",
@@ -80,7 +80,7 @@ const LISTINGS: Record<"arc" | "cf", Listing> = {
       description: "One answer for $0.005 in USDC on Base: POST {\"question\": \"...\"}. An OpenAI-compatible endpoint is at /api/v1/chat/completions.",
     },
     image: "https://robd-hub.github.io/agent-report-card/erc8004/cheap-first.png",
-    website: "https://robd-hub.github.io/cheap-first/",
+    website: "https://cheapfirst.designimp.com/",
   },
 };
 

@@ -32,7 +32,9 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}
-          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          # Links that leave the site (badges, lookups, share pictures) point at the
+          # public address, not at this Pages copy. Old Pages links keep working.
+          SITE_URL: https://grader.designimp.com
           CARD_PAYMENT_LINK: ${{ vars.CARD_PAYMENT_LINK }}
           CARD_PAYMENT_LINK_REGRADE: ${{ vars.CARD_PAYMENT_LINK_REGRADE }}
           # Shows the "pay in CCD" option once Concordium is switched on.

@@ -18,9 +18,10 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import { loadAgents, loadReport, saveReport } from "../src/lib/data";
+import { SITE_URL } from "../src/lib/links";
 import type { AgentConfig, GradingRun } from "../src/lib/types";
 
-const SITE = "https://robd-hub.github.io/agent-report-card";
+const SITE = SITE_URL;
 
 /** A drop of this many points or more, or a lower letter, counts as a regression. */
 export const DROP_POINTS = 5;

@@ -10,11 +10,11 @@
  */
 import fs from "node:fs";
 import { latestRun, loadAgents, loadReport } from "../src/lib/data";
-import { REGRADE_PRICE_USD } from "../src/lib/links";
+import { REGRADE_PRICE_USD, SITE_URL } from "../src/lib/links";
 import { loadReplies, parseReplyForm, saveReplies } from "../src/lib/replies";
 import { parseIssueForm } from "./auto-grade";
 
-const SITE = "https://robd-hub.github.io/agent-report-card";
+const SITE = SITE_URL;
 
 function main() {
   const issue = Number(process.env.ISSUE_NUMBER);

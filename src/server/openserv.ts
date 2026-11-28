@@ -11,14 +11,14 @@
 import { after } from "next/server";
 import { loadAgents, latestRun, loadReport } from "@/lib/data";
 import { honestyCheck } from "@/lib/grade";
-import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "@/lib/links";
+import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD, SITE_URL } from "@/lib/links";
 import { adviceFor } from "@/lib/trust";
 import { handleOpenServ, type AgentSpec } from "@/lib/openservAgent";
 import type { AgentConfig, GradingRun } from "@/lib/types";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
 /** The pay-by-API endpoint only runs on Vercel, so it's linked there rather than on the static site. */
-const API = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://agent-report-card.vercel.app";
+const API = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : SITE_URL;
 
 interface Graded {
   agent: AgentConfig;

@@ -57,7 +57,7 @@
     },
     {
       "name": "web",
-      "endpoint": "https://robd-hub.github.io/agent-report-card/",
+      "endpoint": "https://grader.designimp.com/",
       "description": "Website"
     },
     {

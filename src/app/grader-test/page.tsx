@@ -5,6 +5,7 @@ import { excerpt, REPPO_WEIGHT } from "@/lib/grade";
 export const metadata = {
   title: "Grader test · Agent Report Card",
   description: "We planted known errors in good answers and graded them like any other agent's, to check the grader catches them without marking down answers that are fine.",
+  alternates: { canonical: "/grader-test/" },
 };
 
 const show = (n: number | null) => (n === null ? "…" : String(n));

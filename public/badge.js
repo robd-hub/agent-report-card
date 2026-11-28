@@ -2,7 +2,7 @@
  * Agent Report Card "match my site" badge.
  * It uses your page's own font and text colour, so it fits your design. Paste:
  *   <div data-arc-agent="your-agent-id"></div>
- *   <script src="https://robd-hub.github.io/agent-report-card/badge.js" async></script>
+ *   <script src="https://grader.designimp.com/badge.js" async></script>
  * Options on the div:
  *   data-style="pill" or "card"   (default pill)
  *   data-accent="#ff6a3d"         colour of the grade tile (default: the grade's colour)
@@ -11,7 +11,7 @@
  */
 (function () {
   var script = document.currentScript;
-  var base = script && script.src ? new URL(".", script.src).href : "https://robd-hub.github.io/agent-report-card/";
+  var base = script && script.src ? new URL(".", script.src).href : "https://grader.designimp.com/";
   var TILE = { A: "#2ef2a4", B: "#a6f04a", C: "#ffd84a", D: "#ff9a3c", F: "#ff4d6d" };
   var cache = {};
 

@@ -9,7 +9,7 @@ import { anchorFor, badgeCheckUrl, explorerTx, loadCcd } from "@/lib/concordium"
 import { taskWording } from "@/lib/types";
 import { runShape, type TaskShape } from "@/lib/shape";
 import { latestReply, type BuilderReply } from "@/lib/replies";
-import { builderReplyUrl, REGRADE_PRICE_USD } from "@/lib/links";
+import { builderReplyUrl, REGRADE_PRICE_USD, SITE_URL } from "@/lib/links";
 
 export function generateStaticParams() {
   return loadAgents().map((a) => ({ id: a.id }));
@@ -24,8 +24,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const description = run?.grade
     ? `${agent.name} scored ${run.score}/100 (${run.grade}) on ${run.tasks.length} real tasks, judged independently on Reppo and checked by SERV Reasoning. See every answer and critique.`
     : `${agent.name} hasn't been graded yet.`;
-  const image = { url: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/og/${agent.id}.png`, width: 1200, height: 630, alt: `${agent.name} grade card` };
-  return { title, description, openGraph: { title, description, images: [image] }, twitter: { card: "summary_large_image", title, description, images: [image] } };
+  // Absolute, so the share picture loads from the public site whichever copy built the page.
+  const image = { url: `${SITE_URL}/og/${agent.id}.png`, width: 1200, height: 630, alt: `${agent.name} grade card` };
+  const url = `${SITE_URL}/agents/${agent.id}/`;
+  return { title, description, alternates: { canonical: url }, openGraph: { title, description, url, images: [image] }, twitter: { card: "summary_large_image", title, description, images: [image] } };
 }
 
 export default async function AgentPage({ params }: { params: Promise<{ id: string }> }) {

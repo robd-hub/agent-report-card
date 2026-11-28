@@ -8,6 +8,7 @@ import { TIE_BAND } from "../Board";
 export const metadata = {
   title: "How grading works · Agent Report Card",
   description: `Every answer is judged independently on Reppo (${Math.round(REPPO_WEIGHT * 100)}% of the score) and checked by SERV Reasoning (${Math.round((1 - REPPO_WEIGHT) * 100)}%). Here's exactly how a grade is made, with a real example.`,
+  alternates: { canonical: "/how-grading-works/" },
 };
 
 interface Example { agent: AgentConfig; task: TaskResult; prompt: string; reppo: number; serv: number; critiques: string[] }

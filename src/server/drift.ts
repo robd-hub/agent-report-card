@@ -7,6 +7,7 @@
  * by scripts/prepare-server.ts); the same check runs in the browser at /drift-watch.
  */
 import { analyzeDrift, driftOptions, fromObjects, parseLogs, type DriftOptions } from "@/lib/drift";
+import { SITE_URL } from "@/lib/links";
 
 const MAX_ROWS = 20_000;
 const MAX_BYTES = 10_000_000;
@@ -43,7 +44,7 @@ export function GET(): Response {
   return json({
     about: "Drift Watch: refusal rate and answer length per kind of task, recent against before. Free, no model, nothing stored.",
     usage: 'POST {"rows": [{"time": "2026-11-18T09:00:00Z", "task": "price-lookup", "answer": "..."}], "options": {"minPerWindow": 30, "refusalPoints": 0.1, "lengthChange": 0.3}}',
-    page: "https://robd-hub.github.io/agent-report-card/drift-watch/",
+    page: `${SITE_URL}/drift-watch/`,
   });
 }
 

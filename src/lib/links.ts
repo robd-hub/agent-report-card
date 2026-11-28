@@ -1,3 +1,13 @@
+/**
+ * The public address of the site, for every link that leaves it: report pages,
+ * badges, bot replies, listings and share pictures. Vercel serves the whole site
+ * and the API here. GitHub Pages keeps a static copy at PAGES_URL, and old links
+ * to it keep working, but new links point here.
+ */
+export const SITE_URL = "https://grader.designimp.com";
+/** The static GitHub Pages copy. Older badges and cards link here; it stays up. */
+export const PAGES_URL = "https://robd-hub.github.io/agent-report-card";
+
 export const GRADE_REQUEST_URL =
   "https://github.com/robd-hub/agent-report-card/issues/new?template=grade-request.yml";
 /** A "Reply to a grade" issue with the agent filled in (.github/ISSUE_TEMPLATE/builder-reply.yml). */

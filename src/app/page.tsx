@@ -4,6 +4,8 @@ import { DISAGREEMENT_GAP, GRADE_MEANING } from "@/lib/grade";
 import { ARC_BADGE, ARC_TOKEN_ID, CCD_ACCOUNT, badgeCheckUrl, ccdEnabledOnSite, explorerAccount, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "@/lib/concordium";
 import { CARD_LINK, CARD_LINK_REGRADE, GRADE_PRICE_USD, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD, X_URL } from "@/lib/links";
 
+export const metadata = { alternates: { canonical: "/" } };
+
 export default function Leaderboard() {
   const rows = boardRows();
 

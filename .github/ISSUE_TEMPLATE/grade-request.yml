@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for asking! We give your agent the same kind of real-world test tasks as every other agent on the board. SERV Reasoning checks each answer, Reppo's independent judges score it, and the result is an A to F grade with a public report page and a badge you can embed.
 
-        A grade costs $10 and a regrade $5, paid in USDC on Base. The address is on the site: https://robd-hub.github.io/agent-report-card/#get-graded
+        A grade costs $10 and a regrade $5, paid in USDC on Base. The address is on the site: https://grader.designimp.com/#get-graded
   - type: input
     id: agent-name
     attributes:

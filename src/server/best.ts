@@ -13,8 +13,9 @@ import { categoryById, type CategoryId } from "@/lib/categories";
 import { loadAgents, loadReport } from "@/lib/data";
 import { bestAnswer, CATEGORIES, categoryForTask, trustRecord } from "@/lib/trust";
 import { ccdFacts, loadCcd } from "@/lib/concordium";
+import { SITE_URL } from "@/lib/links";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
 const CORS: Record<string, string> = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };
 
 function json(body: unknown, status = 200): Response {

@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
     description: c
       ? `Independent A to F grades for ${c.plural}, judged on Reppo and checked by SERV Reasoning.${top ? ` Top right now: ${top.agent.name} (${top.run!.grade}, ${top.run!.score}).` : ""}`
       : undefined,
+    alternates: { canonical: `/top/${category}/` },
   };
 }
 

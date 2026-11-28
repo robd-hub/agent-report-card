@@ -35,11 +35,11 @@ import { AssetToken } from "@virtuals-protocol/acp-node-v2";
 import type { AcpAgent, JobSession } from "@virtuals-protocol/acp-node-v2";
 import { closeAcp, connectAcp, findAcpWallet, MAX_TASK_USD, pickOffering } from "../src/lib/acp";
 import { loadReport } from "../src/lib/data";
-import { GRADE_PRICE_USD } from "../src/lib/links";
+import { GRADE_PRICE_USD, SITE_URL } from "../src/lib/links";
 import { loadPayments } from "../src/lib/payment";
 import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
 
-const SITE = "https://robd-hub.github.io/agent-report-card";
+const SITE = SITE_URL;
 const JOBS_FILE = path.join(process.cwd(), "data", "acp-jobs.json");
 const PRICE_USD = Number(process.env.ACP_PRICE_USD || GRADE_PRICE_USD);
 

@@ -12,7 +12,7 @@
  */
 import fs from "node:fs";
 
-const PAGES_INDEX = "https://robd-hub.github.io/agent-report-card/lookup/index.json";
+const PAGES_INDEX = "https://grader.designimp.com/lookup/index.json";
 const PROTOCOL = "2025-03-26";
 const KNOWN = new Set(["2024-11-05", "2025-03-26", "2025-06-18"]);
 

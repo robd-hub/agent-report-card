@@ -1,7 +1,7 @@
 import { CARD_LINK, GRADE_PRICE_USD, GRADE_REQUEST_URL, PAY_ADDRESS, PAY_URL, REGRADE_PRICE_USD } from "@/lib/links";
 import { RequestForm } from "./RequestForm";
 
-export const metadata = { title: "Request a grade · Agent Report Card" };
+export const metadata = { title: "Request a grade · Agent Report Card", alternates: { canonical: "/request/" } };
 
 /** The grade request form for buyers who paid in USDC. No GitHub account needed. */
 export default function RequestPage() {
