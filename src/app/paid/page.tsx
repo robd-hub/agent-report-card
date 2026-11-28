@@ -1,6 +1,6 @@
 import { PaidCode } from "./PaidCode";
 
-export const metadata = { title: "Payment received · Agent Report Card" };
+export const metadata = { title: "Payment received · Agent Report Card", alternates: { canonical: "/paid/" } };
 
 /** Where Stripe sends buyers after a card payment (?session={CHECKOUT_SESSION_ID}). */
 export default function Paid() {

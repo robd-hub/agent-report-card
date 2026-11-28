@@ -6,7 +6,7 @@ Guidance for Cursor and other coding agents. When this file and the code differ,
 
 Agent Report Card grades AI agents A to F, publishes a report, and offers an embeddable badge. The aim is a best-in-class grader that keeps improving and, in time, runs as a commercial product.
 
-Rob Doughty (GitHub [robd-hub](https://github.com/robd-hub)) built it for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2), Reppo track. The API and paid site is [grader.designimp.com](https://grader.designimp.com) (Vercel). The static leaderboard is [robd-hub.github.io/agent-report-card](https://robd-hub.github.io/agent-report-card/). Some cards still name `agent-report-card.vercel.app`. The X account published in the site is [@agentreportcard](https://x.com/agentreportcard) (`X_URL` in `src/lib/links.ts`, `twitter.site` in `src/app/layout.tsx`). The account is being rebranded to @robdev. Leave the handle in code as it is unless asked to change it.
+Rob Doughty (GitHub [robd-hub](https://github.com/robd-hub)) built it for [SERV Hackathon 02](https://www.openserv.ai/hackathon-2), Reppo track. The public site and API is [grader.designimp.com](https://grader.designimp.com) (Vercel), `SITE_URL` in `src/lib/links.ts`. New links use it. A static copy stays at [robd-hub.github.io/agent-report-card](https://robd-hub.github.io/agent-report-card/) (`PAGES_URL`) and `agent-report-card.vercel.app` still answers, so old links keep working. Leave on-chain and registered addresses alone: the Concordium cards in `public/concordium/` are pinned by hash, the ERC-8004 registration files are read at their github.io address, and the x402, OpenServ and Stripe callback endpoints are registered elsewhere. The X account published in the site is [@agentreportcard](https://x.com/agentreportcard) (`X_URL` in `src/lib/links.ts`, `twitter.site` in `src/app/layout.tsx`). The account is being rebranded to @robdev. Leave the handle in code as it is unless asked to change it.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ Committed JSON, not a database:
 
 Remote MCP is `POST /api/mcp` (`src/server/mcp.ts`, protocol logic in `src/lib/mcp.ts`). Stateless JSON-RPC, no API key, read-only. Tools: `lookup_agent_grade`, `search_graded_agents`, `how_to_get_graded`. `.mcp.json` and `server.json` point at `https://grader.designimp.com/api/mcp`. The rate limit is `LIMITS.mcp` in `src/server/http.ts` (120 a minute). The body cap is `MAX_BODY` in `src/server/mcp.ts` (100,000 bytes). A GET that asks for `text/event-stream` returns 405. The server does not hold a stream open.
 
-Stdio, no dependencies: `node mcp/server.mjs` (package bin `agent-report-card-mcp`). It reads `https://robd-hub.github.io/agent-report-card/lookup/index.json`, or `ARC_LOOKUP_FILE` / `ARC_LOOKUP_URL`.
+Stdio, no dependencies: `node mcp/server.mjs` (package bin `agent-report-card-mcp`). It reads `https://grader.designimp.com/lookup/index.json`, or `ARC_LOOKUP_FILE` / `ARC_LOOKUP_URL`.
 
 The same grades are also `GET /api/lookup`, `GET /api/agents`, static `/lookup/<id>.json`, Trust Check (`src/lib/trust.ts`, `GET /api/trust`, `/trust-check`), who's best (`GET /api/best`, `/top/[category]`), Drift Watch (`src/lib/drift.ts`, `POST /api/drift` on Vercel), and badges (`/badge/<id>.svg`, and on Vercel `GET /api/badge`).
 

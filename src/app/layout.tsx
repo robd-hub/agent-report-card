@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { MCPRUSH_URL, STATUS_URL } from "@/lib/links";
+import { MCPRUSH_URL, SITE_URL, STATUS_URL } from "@/lib/links";
 
 /**
  * Counts where visitors come from (a ?ref= / ?from= link tag, or the referring
@@ -13,9 +13,9 @@ const VISIT_URL = "https://cheap-first.vercel.app/api/hit";
 const VISIT_SCRIPT = `(function(){try{var q=new URLSearchParams(location.search),r=q.get("ref")||q.get("from")||q.get("utm_source")||"",h="";try{h=document.referrer?new URL(document.referrer).hostname:""}catch(e){}var b=JSON.stringify({s:"arc",p:location.pathname,r:r,h:h===location.hostname?"":h});if(navigator.sendBeacon)navigator.sendBeacon(${JSON.stringify(VISIT_URL)},b);else fetch(${JSON.stringify(VISIT_URL)},{method:"POST",body:b,keepalive:true,mode:"no-cors"})}catch(e){}})();`;
 
 export const metadata: Metadata = {
-  // Absolute links for the share pictures X and others show for a report link.
-  // Origin only: Next adds the base path itself.
-  metadataBase: new URL(new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io").origin),
+  // Canonical links and share pictures point at the public site (grader.designimp.com),
+  // also on the GitHub Pages copy, so search engines and X credit one address.
+  metadataBase: new URL(SITE_URL),
   twitter: { card: "summary_large_image", site: "@agentreportcard" },
   title: "Agent Report Card",
   description: "Independent grades for AI agents, checked by SERV Reasoning and judged independently on Reppo.",

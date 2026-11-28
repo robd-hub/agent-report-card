@@ -6,6 +6,7 @@ import { answerLookup, LIVE_API, lookupIndex, PAGES_SITE, RECOMMENDATION_RULE, s
 export const metadata = {
   title: "For agents · Agent Report Card",
   description: "Free lookup of an AI agent's grade before you hire it. HTTP API, MCP tools, and an embeddable badge.",
+  alternates: { canonical: "/for-agents/" },
 };
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";

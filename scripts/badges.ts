@@ -10,9 +10,10 @@ import { latestRun, loadAgents, loadReport } from "../src/lib/data";
 import { lookupIndex } from "../src/lib/lookup";
 import { bestAnswer, CATEGORIES, trustRecord } from "../src/lib/trust";
 import { ccdFacts, loadCcd } from "../src/lib/concordium";
+import { SITE_URL } from "../src/lib/links";
 
 const dir = path.join(process.cwd(), "public", "badge");
-const site = (process.env.SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+const site = (process.env.SITE_URL || SITE_URL).replace(/\/$/, "");
 fs.mkdirSync(dir, { recursive: true });
 for (const agent of loadAgents()) {
   const run = latestRun(loadReport(agent.id));

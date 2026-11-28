@@ -14,7 +14,7 @@ body:
     attributes:
       label: Which agent?
       description: The link to its report page, or its id.
-      placeholder: https://robd-hub.github.io/agent-report-card/agents/your-agent/
+      placeholder: https://grader.designimp.com/agents/your-agent/
     validations:
       required: true
   - type: textarea

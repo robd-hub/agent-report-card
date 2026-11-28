@@ -11,7 +11,7 @@ over time, so builders can watch their grade improve as they fix weak spots.
 Cheap First (self-graded every week). Any builder can order a grade for their own agent ($10, regrade $5,
 USDC on Base), and a bot grades it automatically.
 
-**Live site:** https://robd-hub.github.io/agent-report-card/
+**Live site:** https://grader.designimp.com/ (a static copy stays at https://robd-hub.github.io/agent-report-card/, and old links there keep working)
 
 [![Agent Report Card MCP on mcprush](https://mcprush.com/badge/agent-report-card-mcp/score.svg)](https://mcprush.com/to/agent-report-card-mcp?ref=badge)
 
@@ -64,7 +64,7 @@ All but the baseline and Cheap First are agents from the OpenServ marketplace. 1
 Each agent has a report page with every task, answer and score, and a badge builders can embed:
 
 ```markdown
-[![Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/serv-baseline.svg)](https://robd-hub.github.io/agent-report-card/agents/serv-baseline/)
+[![Agent Report Card](https://grader.designimp.com/badge/serv-baseline.svg)](https://grader.designimp.com/agents/serv-baseline/)
 ```
 
 ## Why it matters (Reppo track)
@@ -236,7 +236,7 @@ In Claude Desktop you can also add that URL as a custom connector. A client that
 **Badge.** Each report page has a README snippet. The SVG shows the latest published grade and links to the report:
 
 ```markdown
-[![Coder on Agent Report Card](https://robd-hub.github.io/agent-report-card/badge/coder.svg)](https://robd-hub.github.io/agent-report-card/agents/coder/)
+[![Coder on Agent Report Card](https://grader.designimp.com/badge/coder.svg)](https://grader.designimp.com/agents/coder/)
 ```
 
 On grader.designimp.com, `/api/badge?agent=<id>` draws the same badge from the published grade and caches it for five minutes (`style=pill` or `card`, `theme=light`). The `/badge/<id>.svg` file is what GitHub Pages serves, and it is rebuilt whenever a grade is published.
@@ -261,7 +261,7 @@ The server is also listed, free, on mcprush as [robd-hub/agent-report-card-mcp](
 Before an agent hands work to another agent, it can ask Agent Report Card first:
 
 ```
-curl "https://agent-report-card.vercel.app/api/trust/?agent=Cheap%20First"
+curl "https://grader.designimp.com/api/trust/?agent=Cheap%20First"
 ```
 
 The answer gives the grade, an `advice` field (`rely`, `check`, `avoid` or `unknown`), the honesty check result, when it was tested, whether the grade is out of date (older than 60 days) and links to the report and badge. The agent can be named by its name, OpenServ marketplace number or link, or its own https address. The same records are static files at `/trust/<id>.json` and `/trust/index.json` on both copies of the site, and there is a search page at `/trust-check/`. Code: `src/lib/trust.ts`, `src/server/trust.ts`.
@@ -313,9 +313,11 @@ npx tsx scripts/concordium.ts verify <agentId>      # compare a grade with the c
 
 ## Public site
 
-The site is published for free on GitHub Pages at
-https://robd-hub.github.io/agent-report-card/ by `.github/workflows/pages.yml`.
-It rebuilds by itself every time `main` changes, so merging new files in `data/results/`
+The public address is https://grader.designimp.com/ (Vercel, the whole site plus the API).
+A static copy is published for free on GitHub Pages at
+https://robd-hub.github.io/agent-report-card/ by `.github/workflows/pages.yml`, so old
+links keep working. Links that leave the site (badges, lookups, share pictures, bot
+replies) use `SITE_URL` in `src/lib/links.ts`. Both copies rebuild by themselves every time `main` changes, so merging new files in `data/results/`
 is all it takes to update the leaderboard. The site is plain static files built from
 `data/`; no API keys are used or published.
 

@@ -23,7 +23,7 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /agent-report-card
-          SITE_URL: https://robd-hub.github.io/agent-report-card
+          SITE_URL: https://grader.designimp.com
 
   vercel:
     name: API build

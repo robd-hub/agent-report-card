@@ -24,11 +24,11 @@ import { issueBody } from "@/lib/issueBody";
 
 export { issueBody };
 import { loadAgents } from "@/lib/data";
-import { GRADE_PRICE_USD, REGRADE_PRICE_USD } from "@/lib/links";
+import { GRADE_PRICE_USD, REGRADE_PRICE_USD, SITE_URL } from "@/lib/links";
 import { decodePayment, encodeHeader, paymentFrom, paymentRequired, paymentRequiredV2, requirements, settlePayment, settlePaymentV2, verifyPayment, verifyPaymentV2, type Offer, type PaymentRequirements } from "@/lib/x402";
 
 const REPO = process.env.GITHUB_REPOSITORY || "robd-hub/agent-report-card";
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://grader.designimp.com").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",

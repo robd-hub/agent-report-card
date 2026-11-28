@@ -30,7 +30,7 @@ import { loadAgents, loadReport } from "../src/lib/data";
 import { findEndpoint, findMarketplaceId } from "../src/lib/requests";
 import { ACP_WRITTEN_TASKS, closeAcp, fetchAcpAgent, findAcpWallet, MAX_TASK_USD, pickOffering } from "../src/lib/acp";
 export { findEndpoint, findMarketplaceId };
-import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD } from "../src/lib/links";
+import { GRADE_PRICE_USD, PAY_ADDRESS, REGRADE_PRICE_USD, SITE_URL } from "../src/lib/links";
 import { disagreement, disagreementNote, taskScore } from "../src/lib/grade";
 import { checkPayment, findTxHash, loadPayments, MAX_PAYMENT_AGE_DAYS, savePayment } from "../src/lib/payment";
 import { badgeCheckUrl, CCD_ACCOUNT, CCD_FREE_GRADES, ccdEnabledForBot, findBadge, findCcdTxHash, GRADE_PRICE_CCD, REGRADE_PRICE_CCD } from "../src/lib/concordium";
@@ -41,7 +41,7 @@ import { FULL_GRADE_TASKS, TASK_KINDS, writtenKinds } from "../src/lib/taskKinds
 import type { AgentConfig, TaskKind, TestTask } from "../src/lib/types";
 import { taskWording } from "../src/lib/types";
 
-const SITE = "https://robd-hub.github.io/agent-report-card";
+const SITE = SITE_URL;
 const AGENTS_FILE = path.join(process.cwd(), "data", "agents.json");
 const COMMENT_FILE = process.env.COMMENT_FILE || "comment.md";
 

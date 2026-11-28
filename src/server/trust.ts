@@ -12,11 +12,11 @@
  * files at /trust/<id>.json on both copies of the site.
  */
 import { loadAgents, loadReport } from "@/lib/data";
-import { GRADE_PRICE_USD } from "@/lib/links";
+import { GRADE_PRICE_USD, SITE_URL } from "@/lib/links";
 import { findTrust, isStale, trustRecord, type TrustRecord } from "@/lib/trust";
 import { ccdFacts, loadCcd } from "@/lib/concordium";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",

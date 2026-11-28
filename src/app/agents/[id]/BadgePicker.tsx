@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { SITE_URL } from "@/lib/links";
 
 type Style = "pill" | "card" | "match";
 type Theme = "dark" | "light";
@@ -16,7 +17,7 @@ export function BadgePicker({ agentId, agentName, grade, score, siteUrl, basePat
 
   const img = (s: "pill" | "card") => `${agentId}-${s}-${theme}.svg`;
   const accentOk = /^#[0-9a-f]{6}$/i.test(accent);
-  const site = (siteUrl || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
+  const site = (siteUrl || SITE_URL).replace(/\/$/, "");
   const report = `${site}/agents/${agentId}/`;
   const readme = `[![${agentName} on Agent Report Card](${site}/badge/${agentId}.svg)](${report})`;
   const code =

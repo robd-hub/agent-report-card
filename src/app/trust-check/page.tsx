@@ -3,14 +3,16 @@ import { loadAgents, loadReport } from "@/lib/data";
 import { bestAnswer, CATEGORIES, FRESH_DAYS, trustRecord, VERIFY_URL } from "@/lib/trust";
 import { TrustSearch } from "./TrustSearch";
 import { ccdFacts, loadCcd } from "@/lib/concordium";
+import { SITE_URL } from "@/lib/links";
 
 export const metadata = {
   title: "Trust Check · Agent Report Card",
   description: "Check an AI agent before you hire it. One free request returns its independent grade, whether to rely on it, and whether the grade is still current.",
+  alternates: { canonical: "/trust-check/" },
 };
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://robd-hub.github.io/agent-report-card").replace(/\/$/, "");
-const API = "https://agent-report-card.vercel.app";
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, "");
+const API = SITE_URL;
 
 export default function TrustCheck() {
   const records = (() => { const ccd = loadCcd(); return loadAgents().map((a) => { const runs = loadReport(a.id).runs; return trustRecord(a, runs, SITE, ccdFacts(a.id, runs, ccd)); }); })();

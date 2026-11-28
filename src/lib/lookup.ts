@@ -31,19 +31,19 @@ import {
 } from "./concordium";
 import { categoryOf, categoryById, CATEGORIES, type CategoryId } from "./categories";
 import { disagreement, GRADE_MEANING, honestyCheck, taskScore } from "./grade";
-import { GRADE_PRICE_USD, GRADE_REQUEST_URL, REGRADE_PRICE_USD } from "./links";
+import { GRADE_PRICE_USD, GRADE_REQUEST_URL, PAGES_URL, REGRADE_PRICE_USD, SITE_URL } from "./links";
 import { kindOf, kindScores, TASK_KINDS } from "./taskKinds";
 import { FRESH_DAYS } from "./trust";
 import type { AgentConfig, Grade, GradingRun, TaskResult } from "./types";
 
 /** The Vercel deployment. GitHub Pages is static and does not serve POST /api/grade. */
-export const LIVE_API = "https://grader.designimp.com";
+export const LIVE_API = SITE_URL;
 
-/** The static site. Badges and reports published with the repo live here. */
-export const PAGES_SITE = "https://robd-hub.github.io/agent-report-card";
+/** The static GitHub Pages copy. Old links to it keep working. */
+export const PAGES_SITE = PAGES_URL;
 
 export function siteBase(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || PAGES_SITE).replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || SITE_URL).replace(/\/$/, "");
 }
 
 /**

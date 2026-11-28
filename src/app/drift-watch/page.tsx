@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { LENGTH_CHANGE, MIN_PER_WINDOW, RECENT_DAYS } from "@/lib/drift";
 import { DriftCheck } from "./DriftCheck";
+import { SITE_URL } from "@/lib/links";
 
 export const metadata = {
   title: "Drift Watch · Agent Report Card",
   description: "Two free checks on your agent's live answers that need no judge: refusal rate and answer length per kind of task. A jump in either is nearly always something real.",
+  alternates: { canonical: "/drift-watch/" },
 };
 
-const API = "https://agent-report-card.vercel.app";
+const API = SITE_URL;
 
 export default function DriftWatch() {
   return (
